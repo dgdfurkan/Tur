@@ -1,0 +1,74 @@
+---
+import Button from '@/components/ui/Button.astro';
+import { pageUrl } from '@/config/paths';
+import { tr } from '@/i18n/tr';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Sayfa Bulunamadı">
+  <div class="container lost">
+    <svg class="lost__sign" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+      <rect class="plate" width="120" height="120" rx="14"></rect>
+      <rect class="rim" x="7" y="7" width="106" height="106" rx="9"></rect>
+      <rect class="road" x="50" y="46" width="20" height="56" rx="2"></rect>
+      <rect class="bar" x="26" y="26" width="68" height="20" rx="3"></rect>
+    </svg>
+    <h1>Aradığınız Sayfa Bulunamadı</h1>
+    <p class="lead">Adres değişmiş veya sayfa kaldırılmış olabilir.</p>
+    <div class="lost__actions">
+      <Button href={pageUrl()} size="lg">
+        {tr.nav.home}
+      </Button>
+      <Button href={pageUrl('turlar')} variant="secondary" size="lg">
+        {tr.actions.browseTours}
+      </Button>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .lost {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-5);
+    padding-block: var(--space-8) var(--space-section);
+  }
+
+  /* The "no through road" sign. */
+  .lost__sign {
+    width: 7.5rem;
+    height: 7.5rem;
+    border-radius: 0.875rem;
+    box-shadow: var(--shadow-sign);
+  }
+
+  .plate {
+    fill: var(--c-blue);
+  }
+
+  .rim {
+    fill: none;
+    stroke: var(--c-white);
+    stroke-width: 3;
+  }
+
+  .road {
+    fill: var(--c-white);
+  }
+
+  .bar {
+    fill: var(--c-red);
+  }
+
+  .lost h1 {
+    font-stretch: var(--wdth-display);
+    font-weight: 780;
+  }
+
+  .lost__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+  }
+</style>

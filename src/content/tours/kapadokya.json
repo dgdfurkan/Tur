@@ -1,0 +1,225 @@
+{
+  "title": "Kapadokya Kültür Turu",
+  "category": "kultur",
+  "summary": "Peribacaları, kaya kiliseleri ve yeraltı şehirleri üç günlük bir programda, profesyonel rehber eşliğinde gezilir.",
+  "emblem": "peribacasi",
+  "destination": "Kapadokya",
+  "nights": 2,
+  "distanceFromAnkaraKm": 290,
+  "pricePerPersonTry": 9850,
+  "singleSupplementTry": 3200,
+  "seatLayout": "2+1",
+  "included": [
+    "2+1 koltuk düzenli otobüsle ulaşım",
+    "2 gece yarım pansiyon konaklama",
+    "Profesyonel rehberlik hizmeti",
+    "Zorunlu paket tur sigortası",
+    "Yol, köprü ve otopark ücretleri",
+    "Araç içi ikram"
+  ],
+  "excluded": [
+    "Müze ve ören yeri giriş ücretleri",
+    "Öğle yemekleri ve içecekler",
+    "Sıcak hava balonu uçuşu",
+    "Türk Gecesi gösterisi",
+    "Kişisel harcamalar"
+  ],
+  "hotels": [
+    {
+      "name": "Mağara Konseptli Otel",
+      "location": "Ürgüp",
+      "stars": 4,
+      "nights": 2,
+      "board": "Yarım Pansiyon"
+    }
+  ],
+  "days": [
+    {
+      "title": "Ankara'dan Kapadokya'ya",
+      "summary": "Tuz Gölü ve Sultanhanı üzerinden Ihlara Vadisi'ne ulaşılır; gün Derinkuyu Yeraltı Şehri ile tamamlanır.",
+      "stops": [
+        {
+          "id": "ankara-kalkis",
+          "name": "Ankara, Kızılay",
+          "kind": "departure",
+          "lat": 39.9208,
+          "lon": 32.8541,
+          "summary": "Saat 07.00'de Kızılay'daki buluşma noktasından hareket edilir."
+        },
+        {
+          "id": "tuz-golu",
+          "name": "Tuz Gölü",
+          "kind": "rest",
+          "lat": 38.87,
+          "lon": 33.45,
+          "summary": "Türkiye'nin ikinci büyük gölünün kıyısında fotoğraf molası verilir.",
+          "durationMinutes": 30
+        },
+        {
+          "id": "sultanhani",
+          "name": "Sultanhanı Kervansarayı",
+          "kind": "sight",
+          "lat": 38.248,
+          "lon": 33.5465,
+          "summary": "1229 yılında yaptırılan, Anadolu'nun en büyük Selçuklu kervansarayı gezilir.",
+          "durationMinutes": 45
+        },
+        {
+          "id": "ihlara",
+          "name": "Ihlara Vadisi",
+          "kind": "sight",
+          "lat": 38.253,
+          "lon": 34.299,
+          "summary": "Melendiz Çayı boyunca yürünür, kayaya oyulmuş kiliseler görülür. Öğle yemeği molası Belisırma'da verilir.",
+          "durationMinutes": 150
+        },
+        {
+          "id": "derinkuyu",
+          "name": "Derinkuyu Yeraltı Şehri",
+          "kind": "sight",
+          "lat": 38.3735,
+          "lon": 34.735,
+          "summary": "Sekiz katı ziyarete açık olan yeraltı şehrinin yaşam alanları gezilir.",
+          "durationMinutes": 60
+        },
+        {
+          "id": "urgup-konaklama-1",
+          "name": "Ürgüp",
+          "kind": "lodging",
+          "lat": 38.631,
+          "lon": 34.913,
+          "summary": "Otele yerleşilir; akşam yemeği otelde alınır."
+        }
+      ]
+    },
+    {
+      "title": "Göreme ve Vadiler",
+      "summary": "Gün, Göreme Açık Hava Müzesi ile başlar; Uçhisar, Paşabağları ve Avanos ile devam eder.",
+      "stops": [
+        {
+          "id": "goreme",
+          "name": "Göreme Açık Hava Müzesi",
+          "kind": "sight",
+          "lat": 38.64,
+          "lon": 34.845,
+          "summary": "UNESCO Dünya Mirası Listesi'ndeki kaya kiliseleri ve freskler rehber anlatımıyla gezilir.",
+          "durationMinutes": 120
+        },
+        {
+          "id": "uchisar",
+          "name": "Uçhisar Kalesi",
+          "kind": "sight",
+          "lat": 38.63,
+          "lon": 34.805,
+          "summary": "Bölgenin en yüksek noktasından Güvercinlik Vadisi izlenir.",
+          "durationMinutes": 45
+        },
+        {
+          "id": "pasabaglari",
+          "name": "Paşabağları",
+          "kind": "sight",
+          "lat": 38.672,
+          "lon": 34.85,
+          "summary": "Üç başlıklı peribacalarının arasında yürünür.",
+          "durationMinutes": 45
+        },
+        {
+          "id": "avanos",
+          "name": "Avanos",
+          "kind": "sight",
+          "lat": 38.715,
+          "lon": 34.847,
+          "summary": "Kızılırmak kıyısındaki çömlek atölyesinde çark başında uygulama izlenir.",
+          "durationMinutes": 60
+        },
+        {
+          "id": "devrent",
+          "name": "Devrent Vadisi",
+          "kind": "sight",
+          "lat": 38.669,
+          "lon": 34.89,
+          "summary": "Hayvan siluetlerini andıran kaya oluşumları görülür.",
+          "durationMinutes": 30
+        },
+        {
+          "id": "urgup-konaklama-2",
+          "name": "Ürgüp",
+          "kind": "lodging",
+          "lat": 38.631,
+          "lon": 34.913,
+          "summary": "Otele dönülür; akşam yemeği otelde alınır."
+        }
+      ]
+    },
+    {
+      "title": "Ürgüp'ten Ankara'ya",
+      "summary": "Üç Güzeller ve Mustafapaşa gezildikten sonra dönüş yolculuğu başlar.",
+      "stops": [
+        {
+          "id": "uc-guzeller",
+          "name": "Üç Güzeller",
+          "kind": "sight",
+          "lat": 38.651,
+          "lon": 34.887,
+          "summary": "Kapadokya'nın simgesi sayılan üç peribacasının önünde fotoğraf molası verilir.",
+          "durationMinutes": 30
+        },
+        {
+          "id": "mustafapasa",
+          "name": "Mustafapaşa",
+          "kind": "sight",
+          "lat": 38.577,
+          "lon": 34.897,
+          "summary": "Eski adı Sinasos olan köyün taş konakları ve sokakları gezilir.",
+          "durationMinutes": 75
+        },
+        {
+          "id": "aksaray-mola",
+          "name": "Aksaray",
+          "kind": "rest",
+          "lat": 38.3687,
+          "lon": 34.037,
+          "summary": "Dönüş yolunda yemek molası verilir.",
+          "durationMinutes": 45
+        },
+        {
+          "id": "ankara-varis",
+          "name": "Ankara, Kızılay",
+          "kind": "arrival",
+          "lat": 39.9208,
+          "lon": 32.8541,
+          "summary": "Saat 20.30 civarında Kızılay'a varılır."
+        }
+      ]
+    }
+  ],
+  "departures": [
+    {
+      "id": "kapadokya-2026-11-06",
+      "startDate": "2026-11-06",
+      "endDate": "2026-11-08",
+      "time": "07:00",
+      "meetingPoint": "Kızılay, Güvenpark önü",
+      "bookedSeats": [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 17, 18, 19, 20, 21, 23, 28, 30, 31, 32, 33,
+        34, 38, 40, 41
+      ]
+    },
+    {
+      "id": "kapadokya-2026-11-20",
+      "startDate": "2026-11-20",
+      "endDate": "2026-11-22",
+      "time": "07:00",
+      "meetingPoint": "Kızılay, Güvenpark önü",
+      "bookedSeats": [3, 5, 7, 8, 9, 10, 11, 12, 15, 18, 22, 27, 29, 30, 32, 39, 41]
+    },
+    {
+      "id": "kapadokya-2026-12-04",
+      "startDate": "2026-12-04",
+      "endDate": "2026-12-06",
+      "time": "07:00",
+      "meetingPoint": "Kızılay, Güvenpark önü",
+      "bookedSeats": [2, 11, 22, 31, 32, 39]
+    }
+  ]
+}

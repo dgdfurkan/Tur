@@ -1,0 +1,95 @@
+---
+interface Props {
+  href?: string;
+  variant?: 'primary' | 'secondary';
+  size?: 'md' | 'lg';
+  type?: 'button' | 'submit';
+  class?: string;
+  [attribute: `data-${string}`]: string | undefined;
+  [attribute: `aria-${string}`]: string | undefined;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  type = 'button',
+  class: className,
+  ...rest
+} = Astro.props;
+const Tag = href ? 'a' : 'button';
+---
+
+<Tag
+  class:list={['button', `button--${variant}`, `button--${size}`, className]}
+  href={href}
+  type={href ? undefined : type}
+  {...rest}
+>
+  <slot name="icon" />
+  <span>
+    <slot />
+  </span>
+</Tag>
+
+<style>
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: 3rem;
+    padding: 0 var(--space-5);
+    border: 0.09375rem solid transparent;
+    border-radius: var(--radius-md);
+    font-stretch: var(--wdth-sign);
+    font-weight: 650;
+    font-size: 1rem;
+    line-height: 1.2;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      transform var(--dur-press) var(--ease-out),
+      background-color var(--dur-ui) ease,
+      border-color var(--dur-ui) ease;
+  }
+
+  .button--lg {
+    min-height: 3.5rem;
+    padding: 0 var(--space-6);
+    font-size: 1.0625rem;
+  }
+
+  .button--primary {
+    background: var(--c-blue);
+    color: var(--c-white);
+  }
+
+  .button--secondary {
+    background: var(--c-white);
+    border-color: var(--c-asphalt);
+    color: var(--c-asphalt);
+  }
+
+  .button:active {
+    transform: scale(0.97);
+  }
+
+  .button--primary:active {
+    background: var(--c-blue-deep);
+  }
+
+  .button--secondary:active {
+    background: var(--c-mist);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .button--primary:hover {
+      background: var(--c-blue-deep);
+    }
+
+    .button--secondary:hover {
+      background: var(--c-mist);
+    }
+  }
+</style>

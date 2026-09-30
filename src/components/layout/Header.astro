@@ -1,0 +1,275 @@
+---
+import BrandMark from '@/components/ui/BrandMark.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { pageUrl } from '@/config/paths';
+import { siteConfig } from '@/config/site';
+import { tr } from '@/i18n/tr';
+
+const links = [
+  { href: pageUrl('turlar'), label: tr.nav.tours },
+  { href: pageUrl('kurumsal'), label: tr.nav.corporate },
+  { href: pageUrl('iletisim'), label: tr.nav.contact },
+];
+
+const currentPath = Astro.url.pathname;
+const isCurrent = (href: string): boolean => currentPath.startsWith(href);
+---
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="brand" href={pageUrl()} aria-label={`${siteConfig.brand.name}, ${tr.nav.home}`}>
+      <BrandMark />
+      <span class="brand__name">{siteConfig.brand.name}</span>
+    </a>
+
+    <nav class="nav" aria-label={tr.nav.label}>
+      <ul class="nav__list">
+        {links.map((link) => (
+          <li>
+            <a
+              class="nav__link"
+              href={link.href}
+              aria-current={isCurrent(link.href) ? 'page' : undefined}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <button class="menu-button" type="button" popovertarget="site-menu">
+      <Icon name="menu" size={24} />
+      <span class="visually-hidden">{tr.nav.openMenu}</span>
+    </button>
+  </div>
+
+  <div class="menu" id="site-menu" popover>
+    <div class="menu__top">
+      <span class="brand">
+        <BrandMark />
+        <span class="brand__name">{siteConfig.brand.name}</span>
+      </span>
+      <button
+        class="menu-button"
+        type="button"
+        popovertarget="site-menu"
+        popovertargetaction="hide"
+      >
+        <Icon name="close" size={24} />
+        <span class="visually-hidden">{tr.nav.closeMenu}</span>
+      </button>
+    </div>
+    <nav aria-label={tr.nav.label}>
+      <ul class="menu__list">
+        {links.map((link) => (
+          <li class="menu__item">
+            <a
+              class="menu__link"
+              href={link.href}
+              aria-current={isCurrent(link.href) ? 'page' : undefined}
+            >
+              <span class="menu__face">
+                {link.label}
+                <Icon name="arrow" size={24} />
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: relative;
+    z-index: var(--z-header);
+    background: var(--c-white);
+  }
+
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    min-height: 4.5rem;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--c-asphalt);
+    text-decoration: none;
+  }
+
+  .brand__name {
+    font-stretch: var(--wdth-heading);
+    font-weight: 750;
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .nav__list {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .nav__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-md);
+    font-weight: 550;
+    text-decoration: none;
+    transition: background-color var(--dur-ui) ease;
+  }
+
+  .nav__link[aria-current='page'] {
+    background: var(--c-blue-tint);
+    color: var(--c-blue-deep);
+  }
+
+  .menu-button {
+    display: inline-grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    margin-right: -0.75rem;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: transparent;
+    cursor: pointer;
+    transition: transform var(--dur-press) var(--ease-out);
+  }
+
+  .menu-button:active {
+    transform: scale(0.94);
+  }
+
+  .menu {
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0 var(--gutter) calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+    border: 0;
+    background: var(--c-white);
+    color: var(--c-asphalt);
+    opacity: 0;
+    transition:
+      opacity var(--dur-ui) ease,
+      overlay var(--dur-ui) allow-discrete,
+      display var(--dur-ui) allow-discrete;
+  }
+
+  .menu:popover-open {
+    opacity: 1;
+  }
+
+  @starting-style {
+    .menu:popover-open {
+      opacity: 0;
+    }
+  }
+
+  .menu__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 4.5rem;
+  }
+
+  .menu__list {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+
+  .menu__link {
+    display: block;
+    padding: 0.3125rem;
+    border-radius: var(--radius-sign);
+    background: var(--c-blue);
+    box-shadow: var(--shadow-sign);
+    color: var(--c-white);
+    text-decoration: none;
+    transition: transform var(--dur-press) var(--ease-out);
+  }
+
+  .menu__link:active {
+    transform: scale(0.985);
+  }
+
+  .menu__face {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4) var(--space-5);
+    border: 0.15625rem solid var(--c-white);
+    border-radius: calc(var(--radius-sign) - 0.3125rem);
+    font-stretch: var(--wdth-sign);
+    font-weight: 650;
+    font-size: 1.625rem;
+  }
+
+  /* Direction signs slide in one after another, like passing a junction. */
+  .menu__item {
+    opacity: 0;
+    transform: translateX(-1.5rem);
+    transition:
+      opacity var(--dur-panel) var(--ease-out),
+      transform var(--dur-panel) var(--ease-drawer);
+  }
+
+  .menu:popover-open .menu__item {
+    opacity: 1;
+    transform: none;
+  }
+
+  .menu:popover-open .menu__item:nth-child(2) {
+    transition-delay: 60ms;
+  }
+
+  .menu:popover-open .menu__item:nth-child(3) {
+    transition-delay: 120ms;
+  }
+
+  @starting-style {
+    .menu:popover-open .menu__item {
+      opacity: 0;
+      transform: translateX(-1.5rem);
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .nav__link:hover {
+      background: var(--c-mist);
+    }
+
+    .menu-button:hover {
+      background: var(--c-mist);
+    }
+  }
+
+  @media (min-width: 40rem) {
+    .nav {
+      display: block;
+    }
+
+    .menu-button,
+    .menu {
+      display: none;
+    }
+  }
+</style>

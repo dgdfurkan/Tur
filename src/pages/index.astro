@@ -1,19 +1,247 @@
 ---
-const title = 'Ajans Adı';
+import DistanceSign from '@/components/home/DistanceSign.astro';
+import ServiceSign from '@/components/home/ServiceSign.astro';
+import TourTicket from '@/components/tour/TourTicket.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import { tourCatalog } from '@/composition/catalog';
+import { pageUrl } from '@/config/paths';
+import { tr } from '@/i18n/tr';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { todayIso } from '@/shared/format';
+
+const today = todayIso();
+const tours = await tourCatalog.listTours();
+
+const upcoming = tours
+  .map((tour) => ({ tour, departure: tour.nextDeparture(today) }))
+  .filter((item) => item.departure !== undefined)
+  .sort((a, b) => (a.departure?.startDate ?? '').localeCompare(b.departure?.startDate ?? ''))
+  .slice(0, 4);
+
+const services = [
+  {
+    icon: 'shield',
+    title: 'Zorunlu Paket Tur Sigortası',
+    text: 'Her misafir, tur başlamadan önce sigorta kapsamına alınır.',
+  },
+  {
+    icon: 'guide',
+    title: 'Profesyonel Rehber',
+    text: 'Turlara Kültür ve Turizm Bakanlığı ruhsatlı rehberler eşlik eder.',
+  },
+  {
+    icon: 'bus',
+    title: 'Konforlu Araç',
+    text: 'Konaklamalı turlarda 2+1 koltuk düzenli, klimalı otobüsler kullanılır.',
+  },
+  {
+    icon: 'receipt',
+    title: 'Açık Fiyat',
+    text: 'Fiyata dâhil olan ve olmayan hizmetler her tur sayfasında ayrı ayrı yazılır.',
+  },
+] as const;
 ---
 
-<!doctype html>
-<html lang="tr">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="robots" content="noindex, nofollow" />
-    <title>{title}</title>
-  </head>
-  <body>
-    <main>
-      <h1>{title}</h1>
-      <p>Site hazırlanıyor.</p>
-    </main>
-  </body>
-</html>
+<BaseLayout>
+  <section class="hero">
+    <div class="container hero__inner">
+      <div class="hero__copy">
+        <h1>Ankara Çıkışlı Kültür Turları</h1>
+        <p class="lead">
+          Kapadokya'dan Karadeniz yaylalarına uzanan programlarda ulaşım, konaklama ve rehberlik tek
+          elden planlanır. Her turun rotası, yola çıkmadan önce harita üzerinde izlenebilir.
+        </p>
+      </div>
+      <div class="hero__actions">
+        <Button href={pageUrl('turlar')} size="lg">
+          {tr.actions.browseTours}
+        </Button>
+        <Button href={pageUrl('turlar/kapadokya/rota')} variant="secondary" size="lg">
+          <Icon slot="icon" name="route" />
+          Kapadokya Rotasını Ön İzle
+        </Button>
+      </div>
+      <div class="hero__sign">
+        <DistanceSign tours={tours} />
+        <p class="hero__caption">Mesafeler Ankara'dan itibaren kilometre cinsindendir.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--mist" aria-labelledby="yaklasan-turlar">
+    <div class="container">
+      <SectionHeading
+        id="yaklasan-turlar"
+        title="Yaklaşan Turlar"
+        lead="Kalkış tarihi en yakın olan turlar, güncel doluluk durumuyla listelenir."
+      />
+      <ul class="ticket-list">
+        {upcoming.map(({ tour, departure }) => (
+          <li>
+            <TourTicket tour={tour} departure={departure} />
+          </li>
+        ))}
+      </ul>
+      <div class="section__more">
+        <Button href={pageUrl('turlar')} variant="secondary">
+          {tr.actions.allTours}
+        </Button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="hizmetler">
+    <div class="container">
+      <SectionHeading id="hizmetler" title="Her Turda Standart Olan Hizmetler" />
+      <ul class="services">
+        {services.map((service) => (
+          <ServiceSign {...service} />
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section corporate" aria-labelledby="kurumsal">
+    <div class="container corporate__inner">
+      <div>
+        <h2 id="kurumsal">Kurumsal ve Okul Turları</h2>
+        <p class="lead">
+          Okullar, kamu kurumları ve şirketler için tarih, program ve bütçeye göre özel turlar
+          düzenlenir.
+        </p>
+      </div>
+      <Button href={pageUrl('kurumsal')} size="lg">
+        Kurumsal Turları İncele
+      </Button>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-block: clamp(2.5rem, 1rem + 6vw, 6rem) clamp(1rem, 4vw, 3rem);
+  }
+
+  .hero__inner {
+    display: grid;
+    grid-template-areas: 'copy' 'sign' 'actions';
+    gap: var(--space-6);
+    align-items: center;
+  }
+
+  .hero__copy {
+    grid-area: copy;
+  }
+
+  .hero h1 {
+    font-size: var(--text-display);
+    font-stretch: var(--wdth-display);
+    font-weight: 780;
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+  }
+
+  .hero .lead {
+    margin-top: var(--space-5);
+  }
+
+  .hero__actions {
+    grid-area: actions;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .hero__sign {
+    grid-area: sign;
+    display: grid;
+    justify-items: center;
+  }
+
+  .hero__caption {
+    margin-top: var(--space-3);
+    color: var(--c-muted);
+    font-size: var(--text-small);
+    text-align: center;
+  }
+
+  .section--mist {
+    --section-bg: var(--c-mist);
+  }
+
+  .ticket-list {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .section__more {
+    margin-top: var(--space-6);
+  }
+
+  .services {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .corporate {
+    background: var(--c-blue);
+    color: var(--c-white);
+  }
+
+  .corporate__inner {
+    display: grid;
+    gap: var(--space-6);
+    align-items: center;
+  }
+
+  .corporate .lead {
+    margin-top: var(--space-4);
+    color: rgb(255 255 255 / 0.86);
+  }
+
+  .corporate :global(.button--primary) {
+    background: var(--c-white);
+    color: var(--c-blue-deep);
+  }
+
+  .corporate :global(:focus-visible) {
+    outline-color: var(--c-white);
+  }
+
+  @media (min-width: 40rem) {
+    .services {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 60rem) {
+    .hero__inner {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      grid-template-areas: 'copy sign' 'actions sign';
+      gap: var(--space-6) var(--space-8);
+    }
+
+    .hero__copy {
+      align-self: end;
+    }
+
+    .hero__actions {
+      align-self: start;
+    }
+
+    .hero__sign {
+      justify-items: end;
+    }
+
+    .hero__caption {
+      width: 100%;
+      max-width: 32rem;
+    }
+
+    .corporate__inner {
+      grid-template-columns: 1fr auto;
+    }
+  }
+</style>

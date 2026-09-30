@@ -1,0 +1,49 @@
+---
+interface Props {
+  size?: number;
+}
+
+const { size = 36 } = Astro.props;
+---
+
+<svg
+  class="brand-mark"
+  width={size}
+  height={size}
+  viewBox="0 0 40 40"
+  aria-hidden="true"
+  focusable="false"
+>
+  <rect class="plate" width="40" height="40" rx="9"></rect>
+  <rect class="rim" x="3" y="3" width="34" height="34" rx="6.5"></rect>
+  <path class="road" d="M11 29c0-7 6-6 9-9s2-8 9-9"></path>
+  <circle class="dot" cx="11" cy="29" r="3"></circle>
+  <circle class="dot" cx="29" cy="11" r="3"></circle>
+</svg>
+
+<style>
+  .brand-mark {
+    flex: none;
+  }
+
+  .plate {
+    fill: var(--c-blue);
+  }
+
+  .rim {
+    fill: none;
+    stroke: var(--c-white);
+    stroke-width: 1.5;
+  }
+
+  .road {
+    fill: none;
+    stroke: var(--c-white);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+  }
+
+  .dot {
+    fill: var(--c-white);
+  }
+</style>

@@ -1,0 +1,277 @@
+{
+  "title": "Karadeniz Yaylaları Turu",
+  "category": "doga",
+  "summary": "Samsun'dan Ayder'e uzanan beş günlük programda Sümela Manastırı, Uzungöl ve Kaçkar yaylaları gezilir.",
+  "emblem": "yayla",
+  "destination": "Ayder Yaylası",
+  "nights": 4,
+  "distanceFromAnkaraKm": 970,
+  "pricePerPersonTry": 18900,
+  "singleSupplementTry": 6400,
+  "seatLayout": "2+1",
+  "included": [
+    "2+1 koltuk düzenli otobüsle ulaşım",
+    "4 gece yarım pansiyon konaklama",
+    "Profesyonel rehberlik hizmeti",
+    "Zorunlu paket tur sigortası",
+    "Yol, köprü ve otopark ücretleri",
+    "Araç içi ikram"
+  ],
+  "excluded": [
+    "Müze ve ören yeri giriş ücretleri",
+    "Öğle yemekleri ve içecekler",
+    "Teleferik ve yayla minibüsü ücretleri",
+    "Kişisel harcamalar"
+  ],
+  "hotels": [
+    {
+      "name": "Şehir Oteli",
+      "location": "Ordu",
+      "stars": 4,
+      "nights": 1,
+      "board": "Yarım Pansiyon"
+    },
+    {
+      "name": "Şehir Oteli",
+      "location": "Trabzon",
+      "stars": 4,
+      "nights": 1,
+      "board": "Yarım Pansiyon"
+    },
+    {
+      "name": "Göl Manzaralı Dağ Oteli",
+      "location": "Uzungöl",
+      "stars": 3,
+      "nights": 1,
+      "board": "Yarım Pansiyon"
+    },
+    {
+      "name": "Ahşap Yayla Oteli",
+      "location": "Ayder",
+      "stars": 3,
+      "nights": 1,
+      "board": "Yarım Pansiyon"
+    }
+  ],
+  "days": [
+    {
+      "title": "Ankara'dan Karadeniz'e",
+      "summary": "Çorum üzerinden Samsun'a ulaşılır; gün Ordu Boztepe'de tamamlanır.",
+      "stops": [
+        {
+          "id": "ankara-kalkis",
+          "name": "Ankara, Kızılay",
+          "kind": "departure",
+          "lat": 39.9208,
+          "lon": 32.8541,
+          "summary": "Saat 06.00'da Kızılay'daki buluşma noktasından hareket edilir."
+        },
+        {
+          "id": "corum",
+          "name": "Çorum",
+          "kind": "rest",
+          "lat": 40.5506,
+          "lon": 34.9556,
+          "summary": "Kahvaltı molası verilir.",
+          "durationMinutes": 45
+        },
+        {
+          "id": "samsun-bandirma",
+          "name": "Bandırma Vapuru Müzesi",
+          "kind": "sight",
+          "lat": 41.283,
+          "lon": 36.356,
+          "summary": "Mustafa Kemal'in 19 Mayıs 1919'da Samsun'a çıktığı vapurun birebir örneği gezilir.",
+          "durationMinutes": 60
+        },
+        {
+          "id": "boztepe",
+          "name": "Ordu Boztepe",
+          "kind": "sight",
+          "lat": 40.993,
+          "lon": 37.864,
+          "summary": "Teleferikle çıkılan tepeden şehir ve Karadeniz izlenir.",
+          "durationMinutes": 75
+        },
+        {
+          "id": "ordu-konaklama",
+          "name": "Ordu",
+          "kind": "lodging",
+          "lat": 40.984,
+          "lon": 37.879,
+          "summary": "Otele yerleşilir; akşam yemeği otelde alınır."
+        }
+      ]
+    },
+    {
+      "title": "Giresun ve Trabzon",
+      "summary": "Sahil yolu boyunca Giresun Kalesi ve Trabzon'un tarihî yapıları gezilir.",
+      "stops": [
+        {
+          "id": "giresun-kalesi",
+          "name": "Giresun Kalesi",
+          "kind": "sight",
+          "lat": 40.919,
+          "lon": 38.392,
+          "summary": "Kaleden Giresun Adası ve şehir manzarası izlenir.",
+          "durationMinutes": 45
+        },
+        {
+          "id": "trabzon-ayasofya",
+          "name": "Trabzon Ayasofya Camii",
+          "kind": "sight",
+          "lat": 41.0033,
+          "lon": 39.6961,
+          "summary": "13. yüzyıldan kalan yapının freskleri görülür.",
+          "durationMinutes": 60
+        },
+        {
+          "id": "ataturk-kosku",
+          "name": "Atatürk Köşkü",
+          "kind": "sight",
+          "lat": 40.987,
+          "lon": 39.679,
+          "summary": "Soğuksu'daki köşk ve bahçesi gezilir.",
+          "durationMinutes": 45
+        },
+        {
+          "id": "trabzon-konaklama",
+          "name": "Trabzon",
+          "kind": "lodging",
+          "lat": 41.005,
+          "lon": 39.726,
+          "summary": "Otele yerleşilir; akşam yemeği otelde alınır."
+        }
+      ]
+    },
+    {
+      "title": "Sümela ve Uzungöl",
+      "summary": "Altındere Vadisi'ndeki manastırın ardından Uzungöl'e çıkılır.",
+      "stops": [
+        {
+          "id": "sumela",
+          "name": "Sümela Manastırı",
+          "kind": "sight",
+          "lat": 40.69,
+          "lon": 39.658,
+          "summary": "Altındere Vadisi'nde sarp kayalığa kurulu manastıra orman içinden yürünür.",
+          "durationMinutes": 150
+        },
+        {
+          "id": "uzungol",
+          "name": "Uzungöl",
+          "kind": "sight",
+          "lat": 40.619,
+          "lon": 40.296,
+          "summary": "Göl çevresinde yürüyüş yapılır; seyir terasından vadi izlenir.",
+          "durationMinutes": 120
+        },
+        {
+          "id": "uzungol-konaklama",
+          "name": "Uzungöl",
+          "kind": "lodging",
+          "lat": 40.617,
+          "lon": 40.29,
+          "summary": "Göl kıyısındaki otele yerleşilir."
+        }
+      ]
+    },
+    {
+      "title": "Rize ve Ayder",
+      "summary": "Çay bahçelerinden Fırtına Vadisi'ne geçilir; gün Ayder Yaylası'nda tamamlanır.",
+      "stops": [
+        {
+          "id": "rize-cay",
+          "name": "Rize Çay Bahçesi",
+          "kind": "sight",
+          "lat": 41.019,
+          "lon": 40.516,
+          "summary": "Şehre bakan çay bahçesinde demleme çay ikram edilir.",
+          "durationMinutes": 45
+        },
+        {
+          "id": "firtina-vadisi",
+          "name": "Fırtına Vadisi",
+          "kind": "sight",
+          "lat": 41.048,
+          "lon": 41.005,
+          "summary": "Fırtına Deresi üzerindeki taş kemer köprüler görülür.",
+          "durationMinutes": 45
+        },
+        {
+          "id": "zilkale",
+          "name": "Zilkale",
+          "kind": "sight",
+          "lat": 40.929,
+          "lon": 40.962,
+          "summary": "Vadiye hâkim Orta Çağ kalesi gezilir.",
+          "durationMinutes": 45
+        },
+        {
+          "id": "ayder-konaklama",
+          "name": "Ayder Yaylası",
+          "kind": "lodging",
+          "lat": 40.953,
+          "lon": 41.106,
+          "summary": "Yaylada serbest zaman verilir; ahşap otele yerleşilir."
+        }
+      ]
+    },
+    {
+      "title": "Ayder'den Ankara'ya",
+      "summary": "Sabah yayla yürüyüşünün ardından dönüş yolculuğu başlar.",
+      "stops": [
+        {
+          "id": "gelintulu",
+          "name": "Gelintülü Şelalesi",
+          "kind": "sight",
+          "lat": 40.951,
+          "lon": 41.113,
+          "summary": "Yayla merkezindeki şelaleye kısa bir yürüyüş yapılır.",
+          "durationMinutes": 30
+        },
+        {
+          "id": "samsun-mola",
+          "name": "Samsun",
+          "kind": "rest",
+          "lat": 41.2867,
+          "lon": 36.33,
+          "summary": "Öğle yemeği molası verilir.",
+          "durationMinutes": 60
+        },
+        {
+          "id": "ankara-varis",
+          "name": "Ankara, Kızılay",
+          "kind": "arrival",
+          "lat": 39.9208,
+          "lon": 32.8541,
+          "summary": "Saat 23.30 civarında Kızılay'a varılır."
+        }
+      ]
+    }
+  ],
+  "departures": [
+    {
+      "id": "karadeniz-yaylalari-2026-10-28",
+      "startDate": "2026-10-28",
+      "endDate": "2026-11-01",
+      "time": "06:00",
+      "meetingPoint": "Kızılay, Güvenpark önü",
+      "bookedSeats": [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+        26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41
+      ]
+    },
+    {
+      "id": "karadeniz-yaylalari-2026-11-11",
+      "startDate": "2026-11-11",
+      "endDate": "2026-11-15",
+      "time": "06:00",
+      "meetingPoint": "Kızılay, Güvenpark önü",
+      "bookedSeats": [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19, 20, 21, 22, 24, 27, 28, 29,
+        30, 31, 34, 35, 37, 38, 39, 41
+      ]
+    }
+  ]
+}

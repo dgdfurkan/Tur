@@ -1,0 +1,147 @@
+---
+import type { Departure } from '@/domain/tour/Departure';
+import { tr } from '@/i18n/tr';
+
+/** Top-down seating plan of the coach, front at the top. */
+interface Props {
+  departure: Departure;
+}
+
+const { departure } = Astro.props;
+const layout = departure.layout;
+const occupancy = departure.occupancy;
+
+const SEAT = 30;
+const STEP = 36;
+const PAD = 16;
+const CAB = 58;
+
+const width = PAD * 2 + (layout.columnCount - 1) * STEP + SEAT;
+const height = CAB + PAD + layout.rowCount * STEP;
+const seatX = (column: number): number => PAD + column * STEP;
+const seatY = (row: number): number => CAB + (row - 1) * STEP;
+const doorY = seatY(layout.doorRow);
+const label = `${tr.tour.seatStatus}: ${occupancy.capacity} koltuktan ${occupancy.booked} koltuk dolu, ${occupancy.remaining} koltuk boş.`;
+---
+
+<figure class="seat-map">
+  <svg
+    class="seat-map__svg"
+    viewBox={`0 0 ${width} ${height}`}
+    role="img"
+    aria-label={label}
+    data-seat-map
+    data-departure-id={departure.id}
+  >
+    <rect class="body" x="1" y="1" width={width - 2} height={height - 2} rx="22"></rect>
+    <path class="windscreen" d={`M${PAD} 22 Q${width / 2} 6 ${width - PAD} 22`}></path>
+    <circle class="wheel" cx={PAD + SEAT / 2} cy="38" r="9"></circle>
+    <rect class="door" x={width - 5} y="28" width="4" height="24" rx="2"></rect>
+    <rect class="door" x={width - 5} y={doorY + 3} width="4" height={SEAT - 6} rx="2"></rect>
+    {layout.seats.map((seat) => (
+      <g
+        class:list={['seat', departure.isBooked(seat.number) && 'seat--taken']}
+        data-seat={seat.number}
+      >
+        <rect x={seatX(seat.column)} y={seatY(seat.row)} width={SEAT} height={SEAT} rx="7" />
+        <text x={seatX(seat.column) + SEAT / 2} y={seatY(seat.row) + SEAT / 2 + 4}>
+          {seat.number}
+        </text>
+      </g>
+    ))}
+  </svg>
+  <figcaption class="seat-map__legend">
+    <span class="legend legend--free">{tr.tour.seatFree}</span>
+    <span class="legend legend--taken">{tr.tour.seatTaken}</span>
+  </figcaption>
+</figure>
+
+<style>
+  .seat-map {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: center;
+    margin: 0;
+  }
+
+  .seat-map__svg {
+    width: 100%;
+    max-width: 13.5rem;
+    height: auto;
+  }
+
+  .body {
+    fill: var(--c-white);
+    stroke: var(--c-asphalt);
+    stroke-width: 2;
+  }
+
+  .windscreen {
+    fill: none;
+    stroke: var(--c-line);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  .wheel {
+    fill: none;
+    stroke: var(--c-muted);
+    stroke-width: 2.5;
+  }
+
+  .door {
+    fill: var(--c-blue);
+  }
+
+  .seat rect {
+    fill: var(--c-green-tint);
+    stroke: var(--c-green);
+    stroke-width: 1.5;
+    transition:
+      fill var(--dur-ui) ease,
+      stroke var(--dur-ui) ease;
+  }
+
+  .seat text {
+    fill: var(--c-asphalt);
+    font-size: 11px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-anchor: middle;
+  }
+
+  .seat--taken rect {
+    fill: var(--c-asphalt);
+    stroke: var(--c-asphalt);
+  }
+
+  .seat--taken text {
+    fill: var(--c-white);
+  }
+
+  .seat-map__legend {
+    display: flex;
+    gap: var(--space-5);
+    font-size: var(--text-small);
+  }
+
+  .legend {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .legend::before {
+    content: '';
+    width: 1rem;
+    height: 1rem;
+    border: 0.09375rem solid var(--c-green);
+    border-radius: 0.25rem;
+    background: var(--c-green-tint);
+  }
+
+  .legend--taken::before {
+    border-color: var(--c-asphalt);
+    background: var(--c-asphalt);
+  }
+</style>

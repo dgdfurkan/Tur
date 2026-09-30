@@ -1,0 +1,169 @@
+---
+import Emblem from '@/components/ui/Emblem.astro';
+import { pageUrl } from '@/config/paths';
+import type { Tour } from '@/domain/tour/Tour';
+import { formatNumber } from '@/shared/format';
+
+/**
+ * The hero: a brown tourist distance sign, as seen when leaving Ankara, that
+ * lists each tour's destination and its distance. Every row links to the tour.
+ */
+interface Props {
+  tours: readonly Tour[];
+}
+
+const { tours } = Astro.props;
+---
+
+<div class="distance-sign">
+  <div class="board">
+    <ul class="board__face">
+      {tours.map((tour) => (
+        <li class="row">
+          <a class="row__link" href={pageUrl(`turlar/${tour.id}`)}>
+            <Emblem name={tour.emblem} size={40} />
+            <span class="row__name">{tour.destination}</span>
+            <span class="row__km tabular">
+              {formatNumber(tour.distanceFromOriginKm)}
+              <span class="visually-hidden"> kilometre, {tour.title}</span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+  <div class="posts" aria-hidden="true"></div>
+</div>
+
+<style>
+  .distance-sign {
+    position: relative;
+    width: 100%;
+    max-width: 32rem;
+  }
+
+  .board {
+    position: relative;
+    z-index: 1;
+    padding: 0.4375rem;
+    border-radius: 1.125rem;
+    background: var(--c-brown);
+    box-shadow: var(--shadow-sign);
+    overflow: hidden;
+  }
+
+  .board__face {
+    display: grid;
+    padding: var(--space-2);
+    border: 0.1875rem solid var(--c-white);
+    border-radius: 0.6875rem;
+  }
+
+  .row__link {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    color: var(--c-white);
+    font-size: clamp(1.375rem, 0.95rem + 2vw, 2.125rem);
+    font-stretch: var(--wdth-sign);
+    font-weight: 600;
+    line-height: 1.15;
+    text-decoration: none;
+    transition: background-color var(--dur-ui) ease;
+  }
+
+  .row__link:active {
+    background: rgb(255 255 255 / 0.16);
+  }
+
+  .row__link:focus-visible {
+    outline-color: var(--c-white);
+    outline-offset: -3px;
+  }
+
+  .row__km {
+    padding-left: var(--space-4);
+  }
+
+  /* Two steel posts carry the board. */
+  .posts {
+    display: flex;
+    justify-content: space-between;
+    height: clamp(2.5rem, 8vw, 5rem);
+    margin: -0.5rem 18% 0;
+  }
+
+  .posts::before,
+  .posts::after {
+    content: '';
+    width: 0.625rem;
+    border-radius: 0 0 0.125rem 0.125rem;
+    background: linear-gradient(90deg, #aab3bb, #d7dde2 45%, #8d979f);
+  }
+
+  /* One orchestrated entrance: rows arrive in order, then light sweeps the board. */
+  .row {
+    animation: row-in 600ms var(--ease-out) both;
+  }
+
+  .row:nth-child(1) {
+    animation-delay: 120ms;
+  }
+
+  .row:nth-child(2) {
+    animation-delay: 190ms;
+  }
+
+  .row:nth-child(3) {
+    animation-delay: 260ms;
+  }
+
+  .row:nth-child(4) {
+    animation-delay: 330ms;
+  }
+
+  .row:nth-child(5) {
+    animation-delay: 400ms;
+  }
+
+  .row:nth-child(n + 6) {
+    animation-delay: 470ms;
+  }
+
+  .board::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 38%,
+      rgb(255 255 255 / 0.2) 50%,
+      transparent 62%
+    );
+    transform: translateX(-100%);
+    animation: sheen 1100ms var(--ease-out) 700ms both;
+    pointer-events: none;
+  }
+
+  @keyframes row-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+  }
+
+  @keyframes sheen {
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .row__link:hover {
+      background: rgb(255 255 255 / 0.12);
+    }
+  }
+</style>

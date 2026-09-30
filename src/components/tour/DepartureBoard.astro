@@ -1,0 +1,144 @@
+---
+import OccupancyMeter from './OccupancyMeter.astro';
+import SeatMap from './SeatMap.astro';
+import type { Departure } from '@/domain/tour/Departure';
+import { tr } from '@/i18n/tr';
+import { formatDateRange, formatTime } from '@/shared/format';
+
+/**
+ * Upcoming departures with their seat plans. Choosing a date swaps the plan
+ * with CSS alone (`:has`), so the section works before any script loads.
+ */
+interface Props {
+  departures: readonly Departure[];
+}
+
+const { departures } = Astro.props;
+// The stylesheet below pairs options and plans by position, up to this many.
+const visible = departures.slice(0, 4);
+---
+
+{visible.length === 0 ? (
+  <p class="empty">{tr.tour.noDepartures}</p>
+) : (
+  <div class="board">
+    <fieldset class="board__options">
+      <legend class="visually-hidden">{tr.tour.departures}</legend>
+      {visible.map((departure, index) => (
+        <label class="option">
+          <input
+            class="visually-hidden"
+            type="radio"
+            name="departure"
+            value={departure.id}
+            checked={index === 0}
+          />
+          <span class="option__date">
+            {formatDateRange(departure.startDate, departure.endDate)}
+          </span>
+          <span class="option__meta">
+            {`${tr.tour.departureTime} ${formatTime(departure.time)}, ${departure.meetingPoint}`}
+          </span>
+          <OccupancyMeter occupancy={departure.occupancy} departureId={departure.id} />
+        </label>
+      ))}
+    </fieldset>
+    <div class="board__plans">
+      {visible.map((departure) => (
+        <div class="plan">
+          <SeatMap departure={departure} />
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+<style>
+  .board {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .board__options {
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .option {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-5);
+    border: 0.09375rem solid var(--c-line);
+    border-radius: var(--radius-lg);
+    background: var(--c-white);
+    cursor: pointer;
+    transition:
+      border-color var(--dur-ui) ease,
+      box-shadow var(--dur-ui) ease,
+      transform var(--dur-press) var(--ease-out);
+  }
+
+  .option:active {
+    transform: scale(0.99);
+  }
+
+  .option:has(input:checked) {
+    border-color: var(--c-blue);
+    box-shadow: inset 0 0 0 0.0625rem var(--c-blue);
+  }
+
+  .option:has(input:focus-visible) {
+    outline: 3px solid var(--c-blue);
+    outline-offset: 3px;
+  }
+
+  .option__date {
+    font-stretch: var(--wdth-sign);
+    font-size: 1.25rem;
+    font-weight: 650;
+  }
+
+  .option__meta {
+    color: var(--c-muted);
+    font-size: var(--text-small);
+  }
+
+  .plan {
+    display: none;
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+    background: var(--c-mist);
+  }
+
+  .board:has(.option:nth-of-type(1) input:checked) .plan:nth-child(1),
+  .board:has(.option:nth-of-type(2) input:checked) .plan:nth-child(2),
+  .board:has(.option:nth-of-type(3) input:checked) .plan:nth-child(3),
+  .board:has(.option:nth-of-type(4) input:checked) .plan:nth-child(4) {
+    display: block;
+  }
+
+  .empty {
+    color: var(--c-muted);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .option:hover {
+      border-color: var(--c-muted);
+    }
+
+    .option:has(input:checked):hover {
+      border-color: var(--c-blue);
+    }
+  }
+
+  @media (min-width: 52rem) {
+    .board {
+      grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+      align-items: start;
+    }
+  }
+</style>

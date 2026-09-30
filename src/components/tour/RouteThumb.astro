@@ -1,0 +1,162 @@
+---
+import { TURKEY_PROJECTION } from '@/domain/geo/MapProjection';
+import { smoothPath } from '@/domain/geo/spline';
+import type { Tour } from '@/domain/tour/Tour';
+import { mapData, ringsToSvgPath } from '@/features/map3d/MapData';
+import { CITIES } from '@/features/map3d/places';
+
+/** Static overview of a tour's route, framed on the stops with nearby cities for context. */
+interface Props {
+  tour: Tour;
+}
+
+const { tour } = Astro.props;
+
+const ASPECT = 16 / 10;
+const MIN_WIDTH_KM = 520;
+
+// SVG's y axis points down, so north is negated.
+const toSvg = (location: { lat: number; lon: number }) => {
+  const plane = TURKEY_PROJECTION.project(location);
+  return { x: plane.x, y: -plane.y };
+};
+
+const stops = tour.stops.map((stop) => ({ ...toSvg(stop.location), kind: stop.kind }));
+const xs = stops.map((p) => p.x);
+const ys = stops.map((p) => p.y);
+const minX = Math.min(...xs);
+const maxX = Math.max(...xs);
+const minY = Math.min(...ys);
+const maxY = Math.max(...ys);
+
+// Frame the route with breathing room, keep a minimum extent so short routes
+// still show recognisable geography, then widen to the fixed aspect ratio.
+let width = Math.max(MIN_WIDTH_KM, (maxX - minX) * 1.4);
+let height = Math.max(MIN_WIDTH_KM / ASPECT, (maxY - minY) * 1.4);
+if (width / height > ASPECT) height = width / ASPECT;
+else width = height * ASPECT;
+const left = (minX + maxX) / 2 - width / 2;
+const top = (minY + maxY) / 2 - height / 2;
+const viewBox = [left, top, width, height].map((value) => value.toFixed(1)).join(' ');
+
+const unit = width / 100;
+const margin = unit * 4;
+const origin = stops[0];
+// A city label is dropped when a stop marker would sit on top of it; the
+// departure city keeps its label because it names the starting point.
+const isCrowded = (city: { x: number; y: number }): boolean =>
+  stops.some(
+    (stop) =>
+      stop.kind !== 'departure' &&
+      stop.kind !== 'arrival' &&
+      Math.hypot(stop.x - city.x, stop.y - city.y) < unit * 5,
+  );
+const cities = CITIES.map((city) => ({ name: city.name, ...toSvg(city) })).filter(
+  (city) =>
+    city.x > left + margin &&
+    city.x < left + width - margin * 3 &&
+    city.y > top + margin &&
+    city.y < top + height - margin &&
+    !isCrowded(city),
+);
+const route = smoothPath(stops);
+---
+
+<svg class="thumb" viewBox={viewBox} aria-hidden="true" focusable="false">
+  <path class="thumb__neighbour" d={ringsToSvgPath(mapData.neighbours)}></path>
+  <path class="thumb__land" d={ringsToSvgPath(mapData.turkeyCoarse)}></path>
+  <path class="thumb__lake" d={ringsToSvgPath(Object.values(mapData.lakes))}></path>
+  {cities.map((city) => (
+    <g class="thumb__city">
+      <circle cx={city.x.toFixed(1)} cy={city.y.toFixed(1)} r={unit * 0.55} />
+      <text
+        x={(city.x + unit * 1.3).toFixed(1)}
+        y={(city.y + unit * 0.9).toFixed(1)}
+        font-size={unit * 2.6}
+      >
+        {city.name}
+      </text>
+    </g>
+  ))}
+  <path class="thumb__casing" d={route}></path>
+  <path class="thumb__route" d={route}></path>
+  {stops
+    .filter((stop) => stop.kind === 'sight' || stop.kind === 'lodging')
+    .map((stop) => (
+      <circle class="thumb__stop" cx={stop.x.toFixed(1)} cy={stop.y.toFixed(1)} r={unit * 0.9} />
+    ))}
+  {origin && (
+    <circle
+      class="thumb__origin"
+      cx={origin.x.toFixed(1)}
+      cy={origin.y.toFixed(1)}
+      r={unit * 1.3}
+    />
+  )}
+</svg>
+
+<style>
+  .thumb {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    background: #cfe4f2;
+  }
+
+  .thumb__neighbour {
+    fill: #e9ece4;
+  }
+
+  .thumb__land {
+    fill: #f6f1e1;
+    stroke: #c4b998;
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .thumb__lake {
+    fill: #b5d5ea;
+  }
+
+  .thumb__city circle {
+    fill: #8a8f85;
+  }
+
+  .thumb__city text {
+    fill: #6f746b;
+    font-stretch: var(--wdth-sign);
+    font-weight: 550;
+  }
+
+  .thumb__casing,
+  .thumb__route {
+    fill: none;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .thumb__casing {
+    stroke: var(--c-white);
+    stroke-width: 6;
+  }
+
+  .thumb__route {
+    stroke: var(--c-blue);
+    stroke-width: 3;
+  }
+
+  .thumb__stop {
+    fill: var(--c-brown);
+    stroke: var(--c-white);
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .thumb__origin {
+    fill: var(--c-blue);
+    stroke: var(--c-white);
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+  }
+</style>

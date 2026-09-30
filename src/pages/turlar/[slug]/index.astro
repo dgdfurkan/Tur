@@ -1,0 +1,436 @@
+---
+import DepartureBoard from '@/components/tour/DepartureBoard.astro';
+import Itinerary from '@/components/tour/Itinerary.astro';
+import OccupancyMeter from '@/components/tour/OccupancyMeter.astro';
+import RouteThumb from '@/components/tour/RouteThumb.astro';
+import Button from '@/components/ui/Button.astro';
+import Emblem from '@/components/ui/Emblem.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { tourCatalog } from '@/composition/catalog';
+import { pageUrl } from '@/config/paths';
+import type { Tour } from '@/domain/tour/Tour';
+import { categoryLabels, tr } from '@/i18n/tr';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { formatDateRange, formatDuration, formatKm, formatMoney, todayIso } from '@/shared/format';
+
+export async function getStaticPaths() {
+  const tours = await tourCatalog.listTours();
+  return tours.map((tour) => ({ params: { slug: tour.id }, props: { tour } }));
+}
+
+interface Props {
+  tour: Tour;
+}
+
+const { tour } = Astro.props;
+const today = todayIso();
+const departures = tour.upcomingDepartures(today);
+const next = departures[0];
+const routeUrl = pageUrl(`turlar/${tour.id}/rota`);
+const meetingPoint = (next ?? tour.departures[0])?.meetingPoint;
+
+const facts = [
+  { label: tr.tour.duration, value: formatDuration(tour.nights, tour.dayCount) },
+  { label: tr.tour.departurePoint, value: meetingPoint ?? 'Ankara' },
+  { label: 'Gezi Noktası', value: String(tour.sightCount) },
+  {
+    label: tr.tour.routeLength,
+    value: `${tr.tour.approximately} ${formatKm(tour.routeDistanceKm)}`,
+  },
+];
+---
+
+<BaseLayout title={tour.title} description={tour.summary}>
+  <article class="tour">
+    <header class="tour-head">
+      <div class="container tour-head__inner">
+        <div class="tour-head__main">
+          <nav class="crumbs" aria-label="Sayfa Yolu">
+            <a href={pageUrl('turlar')}>{tr.nav.tours}</a>
+            <span aria-hidden="true">/</span>
+            <span>{categoryLabels[tour.category]}</span>
+          </nav>
+          <div class="tour-head__title">
+            <div class="plate" aria-hidden="true">
+              <Emblem name={tour.emblem} size={64} />
+            </div>
+            <h1>{tour.title}</h1>
+          </div>
+          <p class="lead">{tour.summary}</p>
+          <dl class="facts">
+            {facts.map((fact) => (
+              <div>
+                <dt>{fact.label}</dt>
+                <dd>{fact.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        <aside class="fare" aria-label="Fiyat ve En Yakın Kalkış">
+          <p class="fare__label">{tr.tour.perPerson}</p>
+          <p class="fare__price tabular">{formatMoney(tour.price)}</p>
+          {tour.singleSupplement && (
+            <p class="fare__note">
+              {`${tr.tour.singleSupplement}: ${formatMoney(tour.singleSupplement)}`}
+            </p>
+          )}
+          <p class="fare__note">{tr.tour.samplePrice}</p>
+          {next && (
+            <div class="fare__next">
+              <p class="fare__label">{tr.tour.nextDeparture}</p>
+              <p class="fare__date">{formatDateRange(next.startDate, next.endDate)}</p>
+              <OccupancyMeter occupancy={next.occupancy} departureId={next.id} />
+            </div>
+          )}
+          <Button href="#kalkis-tarihleri" class="fare__action">
+            {tr.tour.departures}
+          </Button>
+        </aside>
+      </div>
+    </header>
+
+    <section class="container route-teaser" aria-labelledby="rota">
+      <div class="route-teaser__map">
+        <RouteThumb tour={tour} />
+      </div>
+      <div class="route-teaser__copy">
+        <h2 id="rota">Rota</h2>
+        <p class="lead">
+          Otobüsün izleyeceği yol ve duraklar, yola çıkmadan önce üç boyutlu harita üzerinde
+          izlenebilir.
+        </p>
+        <Button href={routeUrl} size="lg">
+          <Icon slot="icon" name="route" />
+          {tr.actions.previewRoute}
+        </Button>
+      </div>
+    </section>
+
+    <section class="section container" aria-labelledby="gunluk-program">
+      <h2 id="gunluk-program" class="section-title">
+        {tr.tour.itinerary}
+      </h2>
+      <Itinerary tour={tour} />
+    </section>
+
+    {tour.hotels.length > 0 && (
+      <section class="section section--mist" aria-labelledby="konaklama">
+        <div class="container">
+          <h2 id="konaklama" class="section-title">
+            {tr.tour.lodging}
+          </h2>
+          <ul class="hotels">
+            {tour.hotels.map((hotel) => (
+              <li class="hotel">
+                <Icon name="bed" size={28} />
+                <div>
+                  <h3>{hotel.name}</h3>
+                  <p>{`${hotel.location}, ${hotel.nights} ${tr.tour.nightsUnit}, ${hotel.board}`}</p>
+                  <p class="hotel__stars" aria-label={`${hotel.stars} yıldızlı`}>
+                    {Array.from({ length: hotel.stars }, () => (
+                      <Icon name="star" size={16} />
+                    ))}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )}
+
+    <section class="section container" aria-label="Fiyat Kapsamı">
+      <div class="scope">
+        <div>
+          <h2 class="section-title">{tr.tour.included}</h2>
+          <ul class="scope__list scope__list--in">
+            {tour.included.map((item) => (
+              <li>
+                <Icon name="check" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h2 class="section-title">{tr.tour.excluded}</h2>
+          <ul class="scope__list scope__list--out">
+            {tour.excluded.map((item) => (
+              <li>
+                <Icon name="minus" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--mist" aria-labelledby="kalkis-tarihleri">
+      <div class="container">
+        <h2 id="kalkis-tarihleri" class="section-title">
+          {`${tr.tour.departures} ve ${tr.tour.seatStatus}`}
+        </h2>
+        <DepartureBoard departures={departures} />
+      </div>
+    </section>
+
+    <section class="section container reserve" aria-labelledby="rezervasyon">
+      <div>
+        <h2 id="rezervasyon">Rezervasyon</h2>
+        <p class="lead">
+          Yer ayırtmak ve ayrıntılı bilgi almak için ofisimizle iletişime geçebilirsiniz.
+        </p>
+      </div>
+      <Button href={pageUrl('iletisim')} size="lg">
+        {tr.actions.contactUs}
+      </Button>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .tour-head {
+    padding-block: var(--space-5) var(--space-7);
+  }
+
+  .tour-head__inner {
+    display: grid;
+    gap: var(--space-7);
+  }
+
+  .crumbs {
+    display: flex;
+    gap: var(--space-2);
+    color: var(--c-muted);
+    font-size: var(--text-small);
+  }
+
+  .crumbs a {
+    color: var(--c-blue);
+    font-weight: 550;
+  }
+
+  .tour-head__title {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-5);
+  }
+
+  .plate {
+    display: grid;
+    place-items: center;
+    width: 5.5rem;
+    height: 5.5rem;
+    border-radius: var(--radius-sign);
+    background: var(--c-brown);
+    box-shadow:
+      inset 0 0 0 0.3125rem var(--c-brown),
+      inset 0 0 0 0.46875rem var(--c-white),
+      var(--shadow-sign);
+    color: var(--c-white);
+    view-transition-name: tour-plate;
+  }
+
+  .tour-head h1 {
+    font-stretch: var(--wdth-display);
+    font-weight: 780;
+    line-height: 1;
+  }
+
+  .tour-head .lead {
+    margin-top: var(--space-4);
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5);
+    margin: var(--space-6) 0 0;
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--c-line);
+  }
+
+  .facts dt {
+    color: var(--c-muted);
+    font-size: var(--text-caption);
+  }
+
+  .facts dd {
+    margin: var(--space-1) 0 0;
+    font-weight: 650;
+  }
+
+  .fare {
+    display: grid;
+    gap: var(--space-2);
+    align-content: start;
+    padding: var(--space-5);
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-1);
+  }
+
+  .fare__label {
+    color: var(--c-muted);
+    font-size: var(--text-small);
+  }
+
+  .fare__price {
+    font-stretch: var(--wdth-heading);
+    font-size: 2.5rem;
+    font-weight: 780;
+    line-height: 1;
+  }
+
+  .fare__note {
+    color: var(--c-muted);
+    font-size: var(--text-small);
+  }
+
+  .fare__next {
+    display: grid;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 0.125rem dashed var(--c-line);
+  }
+
+  .fare__date {
+    font-weight: 650;
+  }
+
+  .fare :global(.fare__action) {
+    margin-top: var(--space-3);
+  }
+
+  .route-teaser {
+    display: grid;
+    gap: var(--space-5);
+    align-items: center;
+  }
+
+  .route-teaser__map {
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    view-transition-name: route-map;
+  }
+
+  .route-teaser__copy {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+  }
+
+  .section-title {
+    margin-bottom: var(--space-6);
+  }
+
+  .hotels {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .hotel {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+    background: var(--c-white);
+  }
+
+  .hotel p {
+    margin-top: var(--space-1);
+    color: var(--c-muted);
+  }
+
+  .hotel .hotel__stars {
+    display: flex;
+    gap: 0.125rem;
+    color: var(--c-yellow);
+  }
+
+  .hotel__stars :global(svg) {
+    fill: currentColor;
+  }
+
+  .scope {
+    display: grid;
+    gap: var(--space-7);
+  }
+
+  .scope__list {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .scope__list li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-3);
+    align-items: start;
+  }
+
+  .scope__list :global(svg) {
+    margin-top: 0.2rem;
+  }
+
+  .scope__list--in :global(svg) {
+    color: var(--c-green);
+  }
+
+  .scope__list--out :global(svg) {
+    color: var(--c-muted);
+  }
+
+  .reserve {
+    display: grid;
+    gap: var(--space-5);
+    align-items: center;
+  }
+
+  .reserve .lead {
+    margin-top: var(--space-3);
+  }
+
+  @media (min-width: 40rem) {
+    .facts {
+      grid-template-columns: repeat(4, auto);
+      justify-content: start;
+      gap: var(--space-5) var(--space-7);
+    }
+
+    .tour-head__title {
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: var(--space-5);
+    }
+
+    .hotels {
+      grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    }
+
+    .scope {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 60rem) {
+    .tour-head__inner {
+      grid-template-columns: minmax(0, 1fr) 21rem;
+      align-items: end;
+    }
+
+    .route-teaser {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+      gap: var(--space-8);
+    }
+
+    .reserve {
+      grid-template-columns: 1fr auto;
+    }
+  }
+</style>

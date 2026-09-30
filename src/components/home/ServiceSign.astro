@@ -1,0 +1,59 @@
+---
+import Icon, { type IconName } from '@/components/ui/Icon.astro';
+
+/** Service assurance shown as a blue roadside service sign with a white panel. */
+interface Props {
+  icon: IconName;
+  title: string;
+  text: string;
+}
+
+const { icon, title, text } = Astro.props;
+---
+
+<li class="service">
+  <div class="service__sign" aria-hidden="true">
+    <div class="service__panel">
+      <Icon name={icon} size={34} />
+    </div>
+  </div>
+  <div>
+    <h3>{title}</h3>
+    <p>{text}</p>
+  </div>
+</li>
+
+<style>
+  .service {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-4);
+    align-items: start;
+  }
+
+  .service__sign {
+    padding: 0.5rem;
+    border-radius: var(--radius-md);
+    background: var(--c-blue);
+    box-shadow: var(--shadow-sign);
+  }
+
+  .service__panel {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 0.3125rem;
+    background: var(--c-white);
+    color: var(--c-asphalt);
+  }
+
+  .service h3 {
+    font-size: 1.25rem;
+  }
+
+  .service p {
+    margin-top: var(--space-2);
+    color: var(--c-muted);
+  }
+</style>

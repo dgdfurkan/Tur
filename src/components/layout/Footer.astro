@@ -1,0 +1,130 @@
+---
+import BrandMark from '@/components/ui/BrandMark.astro';
+import { pageUrl } from '@/config/paths';
+import { siteConfig } from '@/config/site';
+import { tr } from '@/i18n/tr';
+
+const year = new Date().getFullYear();
+const links = [
+  { href: pageUrl('turlar'), label: tr.nav.tours },
+  { href: pageUrl('kurumsal'), label: tr.nav.corporate },
+  { href: pageUrl('iletisim'), label: tr.nav.contact },
+];
+---
+
+<footer class="site-footer">
+  <div class="lane" aria-hidden="true"></div>
+  <div class="container site-footer__inner">
+    <div class="site-footer__brand">
+      <span class="brand">
+        <BrandMark />
+        <span class="brand__name">{siteConfig.brand.name}</span>
+      </span>
+      <p>{siteConfig.license.tursabNumber ?? tr.footer.licensePending}</p>
+    </div>
+
+    <nav aria-label={tr.nav.label}>
+      <ul class="site-footer__links">
+        {links.map((link) => (
+          <li>
+            <a href={link.href}>{link.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="site-footer__legal">
+      {siteConfig.isPrototype && <p>{tr.footer.prototypeNote}</p>}
+      <p>
+        © {year} {siteConfig.brand.name}. {tr.footer.rights}
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--c-asphalt);
+    color: var(--c-white);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Centre-line road marking. */
+  .lane {
+    height: 0.25rem;
+    margin-inline: var(--gutter);
+    transform: translateY(2.5rem);
+    background: repeating-linear-gradient(
+      90deg,
+      rgb(255 255 255 / 0.55) 0 2.5rem,
+      transparent 2.5rem 4.5rem
+    );
+  }
+
+  .site-footer__inner {
+    display: grid;
+    gap: var(--space-6);
+    padding-block: var(--space-9) var(--space-7);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .brand__name {
+    font-stretch: var(--wdth-heading);
+    font-weight: 750;
+    font-size: 1.25rem;
+  }
+
+  .site-footer__brand p {
+    margin-top: var(--space-3);
+    color: rgb(255 255 255 / 0.72);
+    font-size: var(--text-small);
+  }
+
+  .site-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+  }
+
+  .site-footer__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-weight: 550;
+    text-decoration: none;
+  }
+
+  .site-footer__legal {
+    display: grid;
+    gap: var(--space-2);
+    max-width: 62ch;
+    color: rgb(255 255 255 / 0.72);
+    font-size: var(--text-small);
+  }
+
+  .site-footer :focus-visible {
+    outline-color: var(--c-white);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .site-footer__links a:hover {
+      text-decoration: underline;
+    }
+  }
+
+  @media (min-width: 56rem) {
+    .site-footer__inner {
+      grid-template-columns: 1fr auto;
+      align-items: start;
+    }
+
+    .site-footer__legal {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

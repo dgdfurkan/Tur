@@ -1,0 +1,95 @@
+---
+import Icon, { type IconName } from '@/components/ui/Icon.astro';
+import { siteConfig } from '@/config/site';
+import { tr } from '@/i18n/tr';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const { contact } = siteConfig;
+
+const rows: { icon: IconName; label: string; value: string | null }[] = [
+  { icon: 'phone', label: tr.contact.phone, value: contact.phone },
+  { icon: 'phone', label: tr.contact.whatsapp, value: contact.whatsapp },
+  { icon: 'mail', label: tr.contact.email, value: contact.email },
+  { icon: 'pin', label: tr.contact.address, value: contact.address },
+  { icon: 'clock', label: tr.contact.hours, value: contact.hours },
+];
+---
+
+<BaseLayout
+  title={tr.nav.contact}
+  description="Rezervasyon, teklif ve sorular için ofis iletişim bilgileri."
+>
+  <div class="container page">
+    <h1>{tr.nav.contact}</h1>
+    <p class="lead">Rezervasyon, teklif ve sorularınız için ofisimize ulaşabilirsiniz.</p>
+
+    <dl class="contact">
+      {rows.map((row) => (
+        <div class="contact__row">
+          <dt>
+            <Icon name={row.icon} size={22} />
+            {row.label}
+          </dt>
+          <dd class:list={[row.value === null && 'contact__pending']}>
+            {row.value ?? tr.contact.pending}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block: var(--space-7) var(--space-section);
+  }
+
+  .page h1 {
+    font-stretch: var(--wdth-display);
+    font-weight: 780;
+  }
+
+  .page .lead {
+    margin-top: var(--space-4);
+  }
+
+  .contact {
+    display: grid;
+    max-width: 44rem;
+    margin: var(--space-7) 0 0;
+    border-top: 1px solid var(--c-line);
+  }
+
+  .contact__row {
+    display: grid;
+    gap: var(--space-2);
+    padding-block: var(--space-5);
+    border-bottom: 1px solid var(--c-line);
+  }
+
+  .contact dt {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-weight: 650;
+  }
+
+  .contact dt :global(svg) {
+    color: var(--c-blue);
+  }
+
+  .contact dd {
+    margin: 0;
+  }
+
+  .contact__pending {
+    color: var(--c-muted);
+  }
+
+  @media (min-width: 40rem) {
+    .contact__row {
+      grid-template-columns: 14rem 1fr;
+      align-items: center;
+    }
+  }
+</style>

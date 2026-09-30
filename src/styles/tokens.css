@@ -1,0 +1,74 @@
+/*
+ * Design tokens. The visual language borrows from Turkish road signage:
+ * blue informs and navigates, brown marks heritage destinations, green means
+ * available, yellow warns that seats are running out, red means sold out.
+ */
+:root {
+  --c-asphalt: #1b1f24;
+  --c-asphalt-soft: #2b3138;
+  --c-white: #fff;
+  --c-mist: #f2f5f7;
+  --c-line: #d8dee4;
+  --c-muted: #56606b;
+  --c-blue: #0b5a8f;
+  --c-blue-deep: #08436b;
+  --c-blue-tint: #e7f0f7;
+  --c-brown: #74462a;
+  --c-brown-deep: #5a3520;
+  --c-brown-tint: #f5ede7;
+  --c-green: #0b7a4b;
+  --c-green-tint: #e6f4ed;
+  --c-yellow: #f2b705;
+  --c-yellow-tint: #fdf4d3;
+  --c-red: #c0161c;
+  --c-red-tint: #fbe9e9;
+
+  /* Width axis: condensed for headlines and sign lettering, normal for reading. */
+  --wdth-display: 80%;
+  --wdth-heading: 86%;
+  --wdth-sign: 90%;
+  --wdth-text: 100%;
+
+  --text-display: clamp(2.5rem, 1.35rem + 5.6vw, 5.25rem);
+  --text-h1: clamp(2.125rem, 1.4rem + 3.4vw, 3.75rem);
+  --text-h2: clamp(1.75rem, 1.3rem + 2vw, 2.75rem);
+  --text-h3: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --text-lead: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+  --text-body: 1.0625rem;
+  --text-small: 0.9375rem;
+  --text-caption: 0.8125rem;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+  --space-section: clamp(4rem, 2.5rem + 7vw, 8rem);
+  --gutter: clamp(1.25rem, 0.75rem + 2.5vw, 3rem);
+  --container: 75rem;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 1rem;
+  --radius-sign: 0.875rem;
+
+  --shadow-1: 0 1px 2px rgb(27 31 36 / 0.06), 0 3px 10px rgb(27 31 36 / 0.05);
+  --shadow-2: 0 2px 4px rgb(27 31 36 / 0.06), 0 12px 32px rgb(27 31 36 / 0.1);
+  --shadow-sign: 0 2px 0 rgb(27 31 36 / 0.18), 0 10px 24px rgb(27 31 36 / 0.14);
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --dur-press: 120ms;
+  --dur-ui: 200ms;
+  --dur-panel: 420ms;
+
+  --z-header: 10;
+  --z-sticky: 20;
+  --z-overlay: 40;
+  --z-toast: 50;
+}

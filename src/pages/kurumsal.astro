@@ -1,0 +1,213 @@
+---
+import Button from '@/components/ui/Button.astro';
+import Icon, { type IconName } from '@/components/ui/Icon.astro';
+import { pageUrl } from '@/config/paths';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+interface Feature {
+  icon: IconName;
+  title: string;
+  text: string;
+}
+
+const school: Feature[] = [
+  {
+    icon: 'list',
+    title: 'Müfredatla Uyumlu Program',
+    text: 'Gezi programı, sınıf düzeyine ve dersin kazanımlarına göre öğretmenlerle birlikte hazırlanır.',
+  },
+  {
+    icon: 'bus',
+    title: 'Belgeli Araç ve Sürücü',
+    text: 'Araç ve sürücü belgeleri, gezi öncesinde okul idaresine yazılı olarak sunulur.',
+  },
+  {
+    icon: 'shield',
+    title: 'Sigorta',
+    text: 'Her öğrenci ve öğretmen, zorunlu paket tur sigortası kapsamına alınır.',
+  },
+  {
+    icon: 'mail',
+    title: 'Veli Bilgilendirmesi',
+    text: 'Program ile kalkış ve dönüş saatleri velilere yazılı olarak iletilir.',
+  },
+];
+
+const institutions: Feature[] = [
+  {
+    icon: 'users',
+    title: 'Kurum İçi Geziler',
+    text: 'Personel gezileri ve hizmet içi eğitim programları için günübirlik veya konaklamalı turlar düzenlenir.',
+  },
+  {
+    icon: 'seat',
+    title: 'Toplu Katılım',
+    text: 'Grubun büyüklüğüne göre araç, otel ve rehber kapasitesi önceden ayrılır.',
+  },
+  {
+    icon: 'receipt',
+    title: 'Resmî Belgelendirme',
+    text: 'Teklif, sözleşme ve fatura süreçleri kurumun mevzuatına uygun biçimde yürütülür.',
+  },
+];
+
+const steps = [
+  {
+    title: 'İhtiyacın Bildirilmesi',
+    text: 'Katılımcı sayısı, tarih aralığı ve gidilmek istenen bölge ofisimize iletilir.',
+  },
+  {
+    title: 'Program ve Teklif',
+    text: 'Üç iş günü içinde günlük program ve kişi başı fiyat yazılı olarak sunulur.',
+  },
+  {
+    title: 'Onay ve Hazırlık',
+    text: 'Onayın ardından araç, konaklama ve rehber ayrılır; katılımcı listesi sigorta için alınır.',
+  },
+];
+---
+
+<BaseLayout
+  title="Kurumsal ve Okul Turları"
+  description="Okullar, kamu kurumları ve şirketler için tarih, program ve bütçeye göre düzenlenen özel turlar."
+>
+  <div class="container page-head">
+    <h1>Kurumsal ve Okul Turları</h1>
+    <p class="lead">
+      Okullar, kamu kurumları ve şirketler için tarih, program ve bütçeye göre özel turlar
+      düzenlenir.
+    </p>
+  </div>
+
+  <section class="section container" aria-labelledby="okul-gezileri">
+    <h2 id="okul-gezileri">Okul Gezileri</h2>
+    <ul class="features">
+      {school.map((feature) => (
+        <li class="feature">
+          <Icon name={feature.icon} size={28} />
+          <div>
+            <h3>{feature.title}</h3>
+            <p>{feature.text}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="section section--mist" aria-labelledby="kurumlar">
+    <div class="container">
+      <h2 id="kurumlar">Kamu Kurumları ve Şirketler</h2>
+      <ul class="features">
+        {institutions.map((feature) => (
+          <li class="feature">
+            <Icon name={feature.icon} size={28} />
+            <div>
+              <h3>{feature.title}</h3>
+              <p>{feature.text}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section container" aria-labelledby="teklif-sureci">
+    <h2 id="teklif-sureci">Teklif Süreci</h2>
+    <ol class="steps">
+      {steps.map((step, index) => (
+        <li class="step">
+          <span class="step__number tabular" aria-hidden="true">
+            {index + 1}
+          </span>
+          <div>
+            <h3>{step.title}</h3>
+            <p>{step.text}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+    <div class="cta">
+      <Button href={pageUrl('iletisim')} size="lg">
+        Teklif İçin İletişime Geçin
+      </Button>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-head {
+    padding-block: var(--space-7) var(--space-5);
+  }
+
+  .page-head h1 {
+    font-stretch: var(--wdth-display);
+    font-weight: 780;
+  }
+
+  .page-head .lead {
+    margin-top: var(--space-4);
+  }
+
+  .features,
+  .steps {
+    display: grid;
+    gap: var(--space-6);
+    margin-top: var(--space-6);
+  }
+
+  .feature,
+  .step {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-4);
+    align-items: start;
+  }
+
+  .feature :global(svg) {
+    margin-top: 0.125rem;
+    color: var(--c-blue);
+  }
+
+  .feature h3,
+  .step h3 {
+    font-size: 1.25rem;
+  }
+
+  .feature p,
+  .step p {
+    margin-top: var(--space-2);
+    color: var(--c-muted);
+    max-width: 52ch;
+  }
+
+  /* Route markers: the steps are a real sequence, so they are numbered. */
+  .step__number {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-md);
+    background: var(--c-blue);
+    box-shadow:
+      inset 0 0 0 0.1875rem var(--c-blue),
+      inset 0 0 0 0.3125rem var(--c-white);
+    color: var(--c-white);
+    font-stretch: var(--wdth-sign);
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .cta {
+    margin-top: var(--space-7);
+  }
+
+  @media (min-width: 48rem) {
+    .features {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .steps {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

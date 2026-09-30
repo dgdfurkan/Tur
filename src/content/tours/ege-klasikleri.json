@@ -1,0 +1,215 @@
+{
+  "title": "Ege Klasikleri Turu",
+  "category": "kultur",
+  "summary": "Pamukkale travertenleri, Efes Antik Kenti ve Şirince dört günlük bir programda gezilir; dönüş yolunda Gordion ziyaret edilir.",
+  "emblem": "antik-kent",
+  "destination": "Efes",
+  "nights": 3,
+  "distanceFromAnkaraKm": 610,
+  "pricePerPersonTry": 15400,
+  "singleSupplementTry": 5100,
+  "seatLayout": "2+1",
+  "included": [
+    "2+1 koltuk düzenli otobüsle ulaşım",
+    "3 gece yarım pansiyon konaklama",
+    "Profesyonel rehberlik hizmeti",
+    "Zorunlu paket tur sigortası",
+    "Yol, köprü ve otopark ücretleri",
+    "Araç içi ikram"
+  ],
+  "excluded": [
+    "Müze ve ören yeri giriş ücretleri",
+    "Öğle yemekleri ve içecekler",
+    "Kişisel harcamalar"
+  ],
+  "hotels": [
+    {
+      "name": "Termal Otel",
+      "location": "Karahayıt",
+      "stars": 4,
+      "nights": 1,
+      "board": "Yarım Pansiyon"
+    },
+    {
+      "name": "Deniz Manzaralı Otel",
+      "location": "Kuşadası",
+      "stars": 4,
+      "nights": 1,
+      "board": "Yarım Pansiyon"
+    },
+    {
+      "name": "Termal Otel",
+      "location": "Afyonkarahisar",
+      "stars": 5,
+      "nights": 1,
+      "board": "Yarım Pansiyon"
+    }
+  ],
+  "days": [
+    {
+      "title": "Ankara'dan Pamukkale'ye",
+      "summary": "Afyonkarahisar üzerinden Pamukkale'ye ulaşılır; travertenler ve Hierapolis gezilir.",
+      "stops": [
+        {
+          "id": "ankara-kalkis",
+          "name": "Ankara, Kızılay",
+          "kind": "departure",
+          "lat": 39.9208,
+          "lon": 32.8541,
+          "summary": "Saat 07.00'de Kızılay'daki buluşma noktasından hareket edilir."
+        },
+        {
+          "id": "afyon-mola",
+          "name": "Afyonkarahisar",
+          "kind": "rest",
+          "lat": 38.757,
+          "lon": 30.539,
+          "summary": "Öğle yemeği molası verilir.",
+          "durationMinutes": 60
+        },
+        {
+          "id": "pamukkale",
+          "name": "Pamukkale Travertenleri",
+          "kind": "sight",
+          "lat": 37.924,
+          "lon": 29.123,
+          "summary": "Beyaz traverten teraslarında çıplak ayakla yürünür.",
+          "durationMinutes": 120
+        },
+        {
+          "id": "hierapolis",
+          "name": "Hierapolis Antik Kenti",
+          "kind": "sight",
+          "lat": 37.927,
+          "lon": 29.127,
+          "summary": "Antik tiyatro ve nekropol gezilir.",
+          "durationMinutes": 60
+        },
+        {
+          "id": "karahayit-konaklama",
+          "name": "Karahayıt",
+          "kind": "lodging",
+          "lat": 37.966,
+          "lon": 29.104,
+          "summary": "Termal otele yerleşilir; akşam yemeği otelde alınır."
+        }
+      ]
+    },
+    {
+      "title": "Efes ve Şirince",
+      "summary": "Efes Antik Kenti ve Meryem Ana Evi'nin ardından Şirince'ye çıkılır.",
+      "stops": [
+        {
+          "id": "efes",
+          "name": "Efes Antik Kenti",
+          "kind": "sight",
+          "lat": 37.941,
+          "lon": 27.342,
+          "summary": "Celsus Kütüphanesi, Büyük Tiyatro ve Kuretler Caddesi rehber anlatımıyla gezilir.",
+          "durationMinutes": 150
+        },
+        {
+          "id": "meryem-ana",
+          "name": "Meryem Ana Evi",
+          "kind": "sight",
+          "lat": 37.912,
+          "lon": 27.334,
+          "summary": "Bülbül Dağı'ndaki ziyaret yeri görülür.",
+          "durationMinutes": 45
+        },
+        {
+          "id": "sirince",
+          "name": "Şirince",
+          "kind": "sight",
+          "lat": 37.943,
+          "lon": 27.433,
+          "summary": "Taş döşeli sokaklarda serbest zaman verilir.",
+          "durationMinutes": 90
+        },
+        {
+          "id": "kusadasi-konaklama",
+          "name": "Kuşadası",
+          "kind": "lodging",
+          "lat": 37.86,
+          "lon": 27.26,
+          "summary": "Otele yerleşilir; akşam yemeği otelde alınır."
+        }
+      ]
+    },
+    {
+      "title": "İzmir ve Sardes",
+      "summary": "İzmir'in tarihî merkezi ve Lidya başkenti Sardes gezilir.",
+      "stops": [
+        {
+          "id": "izmir-konak",
+          "name": "İzmir, Konak",
+          "kind": "sight",
+          "lat": 38.4189,
+          "lon": 27.1287,
+          "summary": "Saat Kulesi görülür; Kemeraltı Çarşısı'nda serbest zaman verilir.",
+          "durationMinutes": 120
+        },
+        {
+          "id": "sardes",
+          "name": "Sardes Antik Kenti",
+          "kind": "sight",
+          "lat": 38.488,
+          "lon": 28.04,
+          "summary": "Lidya başkentindeki gymnasium ve sinagog kalıntıları gezilir.",
+          "durationMinutes": 75
+        },
+        {
+          "id": "afyon-konaklama",
+          "name": "Afyonkarahisar",
+          "kind": "lodging",
+          "lat": 38.757,
+          "lon": 30.539,
+          "summary": "Termal otele yerleşilir; akşam yemeği otelde alınır."
+        }
+      ]
+    },
+    {
+      "title": "Gordion ve Dönüş",
+      "summary": "Frig başkenti Gordion gezildikten sonra Ankara'ya dönülür.",
+      "stops": [
+        {
+          "id": "gordion",
+          "name": "Gordion Antik Kenti",
+          "kind": "sight",
+          "lat": 39.65,
+          "lon": 31.978,
+          "summary": "UNESCO Dünya Mirası Listesi'ndeki Frig başkentinde Midas Tümülüsü ve müze gezilir.",
+          "durationMinutes": 90
+        },
+        {
+          "id": "ankara-varis",
+          "name": "Ankara, Kızılay",
+          "kind": "arrival",
+          "lat": 39.9208,
+          "lon": 32.8541,
+          "summary": "Saat 17.30 civarında Kızılay'a varılır."
+        }
+      ]
+    }
+  ],
+  "departures": [
+    {
+      "id": "ege-klasikleri-2026-11-12",
+      "startDate": "2026-11-12",
+      "endDate": "2026-11-15",
+      "time": "07:00",
+      "meetingPoint": "Kızılay, Güvenpark önü",
+      "bookedSeats": [
+        1, 2, 3, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 21, 24, 27, 32, 33, 37, 38, 40, 41
+      ]
+    },
+    {
+      "id": "ege-klasikleri-2026-12-03",
+      "startDate": "2026-12-03",
+      "endDate": "2026-12-06",
+      "time": "07:00",
+      "meetingPoint": "Kızılay, Güvenpark önü",
+      "bookedSeats": [2, 3, 6, 12, 20, 21, 24, 25, 29, 31, 37]
+    }
+  ]
+}

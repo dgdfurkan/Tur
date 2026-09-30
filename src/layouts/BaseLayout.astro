@@ -1,0 +1,45 @@
+---
+import { Font } from 'astro:assets';
+import Footer from '@/components/layout/Footer.astro';
+import Header from '@/components/layout/Header.astro';
+import { assetUrl } from '@/config/paths';
+import { siteConfig } from '@/config/site';
+import { tr } from '@/i18n/tr';
+import '@/styles/base.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Full-screen experiences (route simulation) render without header and footer. */
+  chrome?: boolean;
+}
+
+const { title, description = siteConfig.brand.description, chrome = true } = Astro.props;
+const pageTitle = title ? `${title} | ${siteConfig.brand.name}` : siteConfig.brand.name;
+---
+
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    {siteConfig.isPrototype && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="icon" type="image/svg+xml" href={assetUrl('favicon.svg')} />
+    <Font cssVariable="--font-sans" preload />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#icerik">
+      {tr.nav.skipToContent}
+    </a>
+    {chrome && <Header />}
+    <main id="icerik">
+      <slot />
+    </main>
+    {chrome && <Footer />}
+  </body>
+</html>
