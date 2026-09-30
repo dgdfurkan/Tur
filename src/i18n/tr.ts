@@ -20,6 +20,7 @@ export const tr = {
     allTours: 'Tüm Turlar',
     previewRoute: 'Rotayı Ön İzle',
     viewTour: 'Turu İncele',
+    seeDepartures: 'Kalkış Tarihlerini Gör',
     startSimulation: 'Simülasyonu Başlat',
     contactUs: 'İletişime Geçin',
     backToTour: 'Tur Sayfasına Dön',

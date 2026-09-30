@@ -68,6 +68,25 @@ for (const map of MAPS) {
       await expect(page.locator('#scene-vadi')).toBeAttached();
     });
 
+    test('the end of the journey leads on to the departure dates', async ({ page }) => {
+      await page.goto(map.address);
+      const app = page.locator('[data-route-app]');
+      await expect(app).toHaveAttribute('data-ready', 'true');
+      const departures = page.getByRole('link', { name: 'Kalkış Tarihlerini Gör' });
+      await expect(departures).toBeHidden();
+
+      const sheetToggle = page.getByRole('button', { name: 'Durakları Göster' });
+      if (await sheetToggle.isVisible()) await sheetToggle.click();
+      await page.locator('[data-stop-index]').last().click();
+
+      await expect(app).toHaveAttribute('data-state', 'finished');
+      await expect(page.locator('[data-card-title]')).toHaveText('Tur Tamamlandı');
+      await expect(page.getByRole('button', { name: 'Yeniden İzle' })).toBeVisible();
+      await departures.click();
+      await expect(page).toHaveURL(/\/turlar\/kapadokya\/#kalkis-tarihleri$/);
+      await expect(page.getByRole('heading', { name: /Kalkış Tarihleri/ })).toBeInViewport();
+    });
+
     test.describe('with reduced motion', () => {
       test.use({ reducedMotion: 'reduce' });
 
@@ -98,6 +117,19 @@ test.describe('on a phone', () => {
     // Ihlara Vadisi fills the card: a kind, a duration and two lines of text.
     await toggle.click();
     await page.getByRole('button', { name: 'Ihlara Vadisi' }).click();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await expect(toggle).toBeInViewport({ ratio: 1 });
+  });
+
+  test('the list button stays on screen at the end of the journey', async ({ page }) => {
+    await page.goto(ROUTE);
+    await expect(page.locator('[data-route-app]')).toHaveAttribute('data-ready', 'true');
+    const toggle = page.locator('[data-action="sheet"]');
+
+    // The end has two buttons, each on a row of its own.
+    await toggle.click();
+    await page.locator('[data-stop-index]').last().click();
+    await expect(page.locator('[data-route-app]')).toHaveAttribute('data-state', 'finished');
     await expect(toggle).toHaveAttribute('aria-expanded', 'false');
     await expect(toggle).toBeInViewport({ ratio: 1 });
   });

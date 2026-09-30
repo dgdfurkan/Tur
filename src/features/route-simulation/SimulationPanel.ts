@@ -68,10 +68,12 @@ export class SimulationPanel {
     this.stopButtons = [...root.querySelectorAll<HTMLButtonElement>('[data-stop-index]')];
     this.place = new PlaceCard(this.find('[data-place]'));
 
-    // The card grows and shrinks with its text; the closed sheet always shows down to the list button.
+    // The card grows and shrinks with its text and the controls with the journey's state; the
+    // closed sheet always shows down to the list button.
     const observer = new ResizeObserver(() => this.syncPeek());
     observer.observe(this.panel);
     observer.observe(this.find('[data-card]'));
+    observer.observe(this.find('[data-controls]'));
     this.syncPeek();
   }
 

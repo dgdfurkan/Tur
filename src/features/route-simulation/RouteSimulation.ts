@@ -109,7 +109,10 @@ export class RouteSimulation {
     this.notifyChanged();
   }
 
-  /** Jumps straight to a stop and waits there as if the coach had just arrived. */
+  /**
+   * Jumps straight to a stop and waits there as if the coach had just arrived.
+   * Jumping to the last stop ends the journey, as arriving there does.
+   */
   seekToStop(stopIndex: number): void {
     const lastIndex = this.plan.stops.length - 1;
     if (!Number.isInteger(stopIndex) || stopIndex < 0 || stopIndex > lastIndex) {
@@ -117,7 +120,8 @@ export class RouteSimulation {
     }
     this.stopIndex = stopIndex;
     this.legProgress = 0;
-    if (stopIndex === lastIndex) {
+    const finished = stopIndex === lastIndex;
+    if (finished) {
       this.legIndex = lastIndex - 1;
       this.legProgress = 1;
       this.phase = 'finished';
@@ -128,6 +132,7 @@ export class RouteSimulation {
       this.dwellRemaining = this.dwellSeconds(stopIndex);
     }
     this.emit((listener) => listener.stopReached?.(stopIndex));
+    if (finished) this.emit((listener) => listener.finished?.());
     this.notifyChanged();
   }
 

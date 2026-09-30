@@ -144,11 +144,16 @@ describe('RouteSimulation', () => {
 
   it('seeks to a stop and restarts', () => {
     const simulation = new RouteSimulation(plan());
+    const finished = vi.fn();
+    simulation.subscribe({ finished });
     simulation.seekToStop(2);
     expect(simulation.snapshot).toMatchObject({ phase: 'dwelling', legIndex: 2, stopIndex: 2 });
+    expect(finished).not.toHaveBeenCalled();
 
+    // Jumping to the last stop ends the journey, just as driving there does.
     simulation.seekToStop(3);
     expect(simulation.snapshot).toMatchObject({ phase: 'finished', stopIndex: 3, legProgress: 1 });
+    expect(finished).toHaveBeenCalledOnce();
 
     simulation.restart();
     expect(simulation.snapshot).toMatchObject({ phase: 'idle', legIndex: 0, playing: false });

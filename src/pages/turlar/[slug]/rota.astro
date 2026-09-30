@@ -93,7 +93,7 @@ const days = tour.days.map((day) => ({
         <p class="visually-hidden" aria-live="polite" data-announce></p>
       </div>
 
-      <div class="controls">
+      <div class="controls" data-controls>
         <button class="control control--primary control--start" type="button" data-action="start">
           <Icon name="play" />
           <span>{tr.actions.startSimulation}</span>
@@ -113,6 +113,13 @@ const days = tour.days.map((day) => ({
         <button class="control control--speed" type="button" data-action="speed">
           <span data-speed-label>{tr.route.speed} 1x</span>
         </button>
+        <a
+          class="control control--primary control--departures"
+          href={`${tourUrl}#kalkis-tarihleri`}
+        >
+          <Icon name="calendar" />
+          <span>{tr.actions.seeDepartures}</span>
+        </a>
         <button class="control control--restart" type="button" data-action="restart">
           <Icon name="restart" />
           <span class="control__restart-label">{tr.route.restart}</span>
@@ -511,6 +518,10 @@ const days = tour.days.map((day) => ({
       background-color var(--dur-ui) ease;
   }
 
+  a.control {
+    text-decoration: none;
+  }
+
   .control:active {
     transform: scale(0.97);
   }
@@ -530,15 +541,19 @@ const days = tour.days.map((day) => ({
   .route[data-state='finished'] .control--start,
   .route[data-state='finished'] .control--toggle,
   .route[data-state='finished'] .control--speed,
-  .route[data-step='true'] .control--speed {
+  .route[data-step='true'] .control--speed,
+  /* Once the journey has been watched, the way on is to the dates it can be taken. */
+  .route:not([data-state='finished']) .control--departures {
     display: none;
   }
 
-  .route[data-state='finished'] .control--restart {
-    flex: 1;
-    border-color: var(--c-blue);
-    background: var(--c-blue);
-    color: var(--c-white);
+  /* At the end each of the two ways on gets a row of its own, so neither label has to wrap. */
+  .route[data-state='finished'] .controls {
+    flex-wrap: wrap;
+  }
+
+  .route[data-state='finished'] .control {
+    flex: 1 1 100%;
   }
 
   .control__again-label,
@@ -673,8 +688,7 @@ const days = tour.days.map((day) => ({
       background: var(--c-mist);
     }
 
-    .control--primary:hover,
-    .route[data-state='finished'] .control--restart:hover {
+    .control--primary:hover {
       background: var(--c-blue-deep);
     }
 
