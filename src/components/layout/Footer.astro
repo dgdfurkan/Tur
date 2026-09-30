@@ -1,4 +1,5 @@
 ---
+import Coach from '@/components/scenes/parts/Coach.astro';
 import BrandMark from '@/components/ui/BrandMark.astro';
 import { pageUrl } from '@/config/paths';
 import { siteConfig } from '@/config/site';
@@ -14,7 +15,12 @@ const links = [
 ---
 
 <footer class="site-footer">
-  <div class="lane" aria-hidden="true"></div>
+  <div class="road" aria-hidden="true">
+    <div class="lane"></div>
+    <div class="road__coach">
+      <Coach />
+    </div>
+  </div>
   <div class="container site-footer__inner">
     <div class="site-footer__brand">
       <span class="brand">
@@ -50,16 +56,66 @@ const links = [
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
-  /* Centre-line road marking. */
+  /* The footer is the road itself, seen from the side, with its centre line. */
+  .road {
+    position: relative;
+    margin-inline: var(--gutter);
+  }
+
   .lane {
     height: 0.25rem;
-    margin-inline: var(--gutter);
     transform: translateY(2.5rem);
     background: repeating-linear-gradient(
       90deg,
       rgb(255 255 255 / 0.55) 0 2.5rem,
       transparent 2.5rem 4.5rem
     );
+  }
+
+  /* The coach has reached the end of the road and is parked there. */
+  .road__coach {
+    position: absolute;
+    top: 0.625rem;
+    right: 0;
+    width: 6.25rem;
+  }
+
+  /* Where the browser can tie motion to scrolling, the coach drives in as the footer comes into view. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .site-footer {
+        view-timeline-name: --footer;
+      }
+
+      .road__coach {
+        /* Longhands on purpose: the minifier folds a timeline into the shorthand, which browsers reject. */
+        animation-name: coach-arrives;
+        animation-timing-function: ease-out;
+        animation-fill-mode: both;
+        animation-timeline: --footer;
+        animation-range: entry 0% entry 100%;
+      }
+
+      .road__coach :global(.coach__wheel) {
+        animation-name: coach-rolls;
+        animation-timing-function: ease-out;
+        animation-fill-mode: both;
+        animation-timeline: --footer;
+        animation-range: entry 0% entry 100%;
+      }
+
+      @keyframes coach-arrives {
+        from {
+          transform: translateX(calc(-100vw + var(--gutter)));
+        }
+      }
+
+      @keyframes coach-rolls {
+        from {
+          transform: rotate(-1800deg);
+        }
+      }
+    }
   }
 
   .site-footer__inner {

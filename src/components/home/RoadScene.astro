@@ -1,0 +1,412 @@
+---
+import { ink } from '@/components/scenes/palette';
+import Balloon from '@/components/scenes/parts/Balloon.astro';
+import Cloud from '@/components/scenes/parts/Cloud.astro';
+import Coach from '@/components/scenes/parts/Coach.astro';
+import Pine from '@/components/scenes/parts/Pine.astro';
+import Poplar from '@/components/scenes/parts/Poplar.astro';
+
+/**
+ * The landscape along the road out of Ankara: the places the tours reach, a
+ * road, and a coach driving along it. It is decoration, drawn on a stage of
+ * 1440 by 420 units that is scaled to cover the hero's width. What stands
+ * still is drawn once; whatever moves is a small element of its own, so the
+ * browser can animate it without repainting the landscape.
+ */
+interface Props {
+  /** Clouds and balloons; left out where only a strip of the landscape is shown. */
+  sky?: boolean;
+}
+
+const { sky = true } = Astro.props;
+const DASHES = Array.from({ length: 15 }, (_, index) => 24 + index * 96);
+const POSTS = [180, 660, 1140];
+---
+
+<div class="scene" data-road-scene aria-hidden="true">
+  <div class="scene__stage">
+    <svg class="scene__layer scene__layer--far" viewBox="0 0 1440 420" focusable="false">
+      <!-- The ranges are low where the headline stands and rise towards the middle and the east. -->
+      <path
+        fill="#c6dbea"
+        d="M0 300 96 262l74 30 116-52 100 44 104-34 116 50 136-104 108 80 98-50 128 74 122-100 108 66 134-74V420H0Z"
+      ></path>
+      <path
+        fill={ink.farBlue}
+        d="M0 322 128 268l86 36 122-66 110 56 86-32 106 52 126-150 110 110 94-50 116 70 130-98 96 62 134-66V420H0Z"
+      ></path>
+      <g fill={ink.foam}>
+        <path d="M764 162l-27 33 16-7 12 13 13-11 16 6Z"></path>
+        <path d="M1214 166l-31 24 16-4 13 12 13-10 17 6Z"></path>
+      </g>
+    </svg>
+
+    <svg class="scene__layer scene__layer--mid" viewBox="0 0 1440 420" focusable="false">
+      <path fill={ink.farGreen} d="M0 322q170-66 380-22t400-14 360-22 300 26V420H0Z"></path>
+      <path fill={ink.farSand} d="M330 346q200-84 470-22V420H330Z"></path>
+      <path fill={ink.grass} d="M880 340q240-72 560-34V420H880Z"></path>
+      <path fill={ink.steppe} d="M0 346q170-44 360-6V420H0Z"></path>
+
+      <!-- Timber-framed houses, as in Safranbolu and Beypazarı -->
+      <g>
+        <rect x="84" y="312" width="46" height="34" fill={ink.stoneShade}></rect>
+        <rect x="78" y="284" width="58" height="30" fill={ink.wall}></rect>
+        <path d="M70 286l37-20 37 20Z" fill={ink.roof}></path>
+        <g fill={ink.glass}>
+          <rect x="86" y="292" width="8" height="14"></rect>
+          <rect x="102" y="292" width="8" height="14"></rect>
+          <rect x="118" y="292" width="8" height="14"></rect>
+        </g>
+        <rect x="150" y="320" width="40" height="26" fill={ink.stone}></rect>
+        <rect x="144" y="296" width="52" height="26" fill={ink.wall}></rect>
+        <path d="M136 298l34-17 34 17Z" fill={ink.roofShade}></path>
+        <g fill={ink.glass}>
+          <rect x="152" y="303" width="8" height="12"></rect>
+          <rect x="166" y="303" width="8" height="12"></rect>
+          <rect x="180" y="303" width="8" height="12"></rect>
+        </g>
+        <rect x="212" y="316" width="36" height="30" fill={ink.wall}></rect>
+        <path d="M206 318l24-14 24 14Z" fill={ink.roof}></path>
+        <rect x="224" y="326" width="10" height="20" fill={ink.woodDeep}></rect>
+      </g>
+      <Poplar x={40} y={348} height={62} />
+      <Poplar x={272} y={346} height={54} fill={ink.grassDeep} />
+      <Poplar x={290} y={348} height={42} />
+
+      <!-- Fairy chimneys -->
+      <g>
+        <path d="M452 348l9-52q7-7 14 0l9 52Z" fill={ink.tuffShade}></path>
+        <path d="M454 298q14-24 28 0l-5 7h-18Z" fill={ink.tuffCap}></path>
+        <path d="M506 350l13-84q10-8 20 0l13 84Z" fill={ink.tuff}></path>
+        <path d="M533 264q3 1 6 2l13 84h-17Z" fill={ink.tuffShade}></path>
+        <path d="M509 270q20-36 40 0l-6 9h-28Z" fill={ink.tuffCap}></path>
+        <path d="M574 350l10-60q8-7 16 0l10 60Z" fill={ink.tuff}></path>
+        <path d="M596 288q2 1 4 2l10 60h-13Z" fill={ink.tuffShade}></path>
+        <path d="M576 292q16-28 32 0l-5 7h-22Z" fill={ink.tuffCap}></path>
+        <path d="M640 350l14-98q11-8 22 0l14 98Z" fill={ink.tuff}></path>
+        <path d="M670 250q3 1 6 2l14 98h-18Z" fill={ink.tuffShade}></path>
+        <path d="M643 256q22-40 44 0l-7 10h-30Z" fill={ink.tuffCap}></path>
+        <rect x="660" y="304" width="9" height="13" rx="4.5" fill={ink.rockDeep}></rect>
+        <path d="M716 350l8-46q7-6 14 0l8 46Z" fill={ink.tuffShade}></path>
+        <path d="M718 306q13-22 26 0l-5 6h-16Z" fill={ink.tuffCap}></path>
+      </g>
+
+      <!-- Standing columns of an ancient city -->
+      <g>
+        <g fill={ink.marble}>
+          <rect x="812" y="296" width="9" height="50"></rect>
+          <rect x="834" y="296" width="9" height="50"></rect>
+          <rect x="856" y="306" width="9" height="40"></rect>
+          <rect x="806" y="288" width="42" height="9"></rect>
+        </g>
+        <g fill={ink.marbleShade}>
+          <rect x="818" y="296" width="3" height="50"></rect>
+          <rect x="840" y="296" width="3" height="50"></rect>
+          <rect x="862" y="306" width="3" height="40"></rect>
+          <rect x="804" y="344" width="68" height="5"></rect>
+        </g>
+      </g>
+
+      <!-- A castle above the pines, and a chalet on the high pasture -->
+      <g>
+        <path d="M1010 336l34-46h56l30 46Z" fill={ink.cliff}></path>
+        <rect x="1046" y="262" width="52" height="30" fill={ink.stone}></rect>
+        <rect x="1082" y="262" width="16" height="30" fill={ink.stoneShade}></rect>
+        <g fill={ink.stone}>
+          <rect x="1046" y="255" width="8" height="8"></rect>
+          <rect x="1060" y="255" width="8" height="8"></rect>
+          <rect x="1074" y="255" width="8" height="8"></rect>
+          <rect x="1088" y="255" width="8" height="8"></rect>
+        </g>
+        <rect x="1062" y="236" width="20" height="56" fill={ink.marble}></rect>
+        <rect x="1070" y="246" width="5" height="9" rx="2.5" fill={ink.dark}></rect>
+      </g>
+      <Pine x={952} y={344} height={60} fill={ink.forestDeep} />
+      <Pine x={984} y={346} height={46} />
+      <Pine x={1146} y={342} height={66} fill={ink.forestDeep} />
+      <Pine x={1180} y={344} height={50} />
+      <Pine x={1216} y={342} height={72} fill={ink.forestDeep} />
+      <g>
+        <rect x="1288" y="308" width="60" height="28" fill={ink.wood}></rect>
+        <rect x="1288" y="330" width="60" height="8" fill={ink.cliff}></rect>
+        <path d="M1278 310l40-26 40 26Z" fill={ink.woodDeep}></path>
+        <rect x="1298" y="314" width="9" height="9" fill={ink.lit}></rect>
+        <rect x="1316" y="318" width="10" height="20" fill={ink.dark}></rect>
+      </g>
+      <Pine x={1384} y={344} height={64} />
+      <Pine x={1416} y={346} height={48} fill={ink.forestDeep} />
+    </svg>
+
+    {sky && (
+      <>
+        <div class="scene__cloud scene__cloud--1">
+          <svg viewBox="-32 -14 64 28" focusable="false">
+            <Cloud x={0} y={0} scale={1.6} />
+          </svg>
+        </div>
+        <div class="scene__cloud scene__cloud--2">
+          <svg viewBox="-32 -14 64 28" focusable="false">
+            <Cloud x={0} y={0} scale={1.6} />
+          </svg>
+        </div>
+        <div class="scene__cloud scene__cloud--3">
+          <svg viewBox="-32 -14 64 28" focusable="false">
+            <Cloud x={0} y={0} scale={1.6} />
+          </svg>
+        </div>
+
+        <div class="scene__balloon scene__balloon--1">
+          <svg viewBox="-16 -17 32 42" focusable="false">
+            <Balloon x={0} y={0} fill={ink.clay} />
+          </svg>
+        </div>
+        <div class="scene__balloon scene__balloon--2">
+          <svg viewBox="-16 -17 32 42" focusable="false">
+            <Balloon x={0} y={0} fill={ink.yellow} stripe={ink.red} />
+          </svg>
+        </div>
+        <div class="scene__balloon scene__balloon--3">
+          <svg viewBox="-16 -17 32 42" focusable="false">
+            <Balloon x={0} y={0} fill={ink.blue} />
+          </svg>
+        </div>
+      </>
+    )}
+
+    <svg class="scene__layer scene__layer--near" viewBox="0 0 1440 420" focusable="false">
+      <rect y="348" width="1440" height="72" fill={ink.steppe}></rect>
+      <rect y="356" width="1440" height="50" fill={ink.asphalt}></rect>
+      <g fill={ink.line}>
+        <rect y="359" width="1440" height="1.6" opacity="0.7"></rect>
+        <rect y="401.5" width="1440" height="1.6" opacity="0.7"></rect>
+        {DASHES.map((x) => (
+          <rect x={x} y="379" width="46" height="4"></rect>
+        ))}
+      </g>
+      <rect y="406" width="1440" height="14" fill={ink.grassDeep}></rect>
+      <!-- Kilometre posts along the verge -->
+      {POSTS.map((x) => (
+        <g>
+          <rect x={x} y="334" width="5" height="20" fill={ink.line} />
+          <rect x={x} y="334" width="5" height="6" fill={ink.red} />
+        </g>
+      ))}
+    </svg>
+
+    <div class="scene__lane">
+      <div class="scene__coach">
+        <Coach />
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /*
+   * Whoever places the scene sets --scene-height. The stage keeps its
+   * proportions and always covers the width: a scene shorter than the stage
+   * shows its lower part, and a narrow screen shows its middle.
+   */
+  .scene {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--scene-height, 18rem);
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .scene__stage {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: max(100%, calc(var(--scene-height, 18rem) * 1440 / 420));
+    aspect-ratio: 1440 / 420;
+    transform: translateX(-50%);
+  }
+
+  .scene__layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .scene__cloud,
+  .scene__balloon {
+    position: absolute;
+  }
+
+  .scene__cloud svg,
+  .scene__balloon svg {
+    width: 100%;
+    height: auto;
+  }
+
+  /* Clouds and balloons keep to the sky between the headline and the sign, clear of the text. */
+  .scene__cloud {
+    width: 7%;
+    opacity: 0.9;
+    animation: scene-drift 46s ease-in-out infinite alternate;
+  }
+
+  .scene__cloud--1 {
+    left: 1%;
+    top: 38%;
+  }
+
+  .scene__cloud--2 {
+    left: 50%;
+    top: 3%;
+    width: 6%;
+    animation-duration: 58s;
+    animation-delay: -20s;
+  }
+
+  .scene__cloud--3 {
+    left: 92%;
+    top: 30%;
+    width: 6.5%;
+    animation-duration: 64s;
+    animation-delay: -36s;
+  }
+
+  .scene__balloon {
+    width: 2.6%;
+    animation: scene-bob 6s ease-in-out infinite alternate;
+  }
+
+  .scene__balloon--1 {
+    left: 46.5%;
+    top: 40%;
+  }
+
+  .scene__balloon--2 {
+    left: 50.5%;
+    top: 16%;
+    width: 3.2%;
+    animation-duration: 7.5s;
+    animation-delay: -3s;
+  }
+
+  .scene__balloon--3 {
+    left: 53.5%;
+    top: 46%;
+    width: 2.2%;
+    animation-duration: 5.2s;
+    animation-delay: -1.5s;
+  }
+
+  /*
+   * The coach rides at the right end of a lane as wide as the stage; sliding
+   * the lane carries it from beyond one edge to beyond the other.
+   */
+  .scene__lane {
+    position: absolute;
+    left: 0;
+    bottom: 5.4%;
+    width: 100%;
+    animation: scene-drive 26s linear infinite;
+  }
+
+  .scene__coach {
+    width: 8.6%;
+    margin-left: auto;
+    animation: scene-ride 0.46s ease-in-out infinite alternate;
+  }
+
+  .scene__coach :global(.coach__wheel) {
+    animation: scene-roll 0.62s linear infinite;
+  }
+
+  .scene[data-paused] :global(*) {
+    animation-play-state: paused;
+  }
+
+  @keyframes scene-drift {
+    to {
+      transform: translateX(22%);
+    }
+  }
+
+  @keyframes scene-bob {
+    to {
+      transform: translateY(-16%);
+    }
+  }
+
+  @keyframes scene-drive {
+    from {
+      transform: translateX(-104%);
+    }
+
+    to {
+      transform: translateX(10%);
+    }
+  }
+
+  @keyframes scene-ride {
+    to {
+      transform: translateY(-1.6%);
+    }
+  }
+
+  @keyframes scene-roll {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Far things pass more slowly than near ones as the page scrolls away. */
+  @supports (animation-timeline: scroll()) {
+    .scene__layer--far {
+      /* Longhands on purpose: the minifier folds a timeline into the shorthand, which browsers reject. */
+      animation-name: scene-recede-far;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: scroll(root);
+      animation-range: 0 90vh;
+    }
+
+    .scene__layer--mid {
+      animation-name: scene-recede-mid;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: scroll(root);
+      animation-range: 0 90vh;
+    }
+
+    @keyframes scene-recede-far {
+      to {
+        transform: translateY(12%);
+      }
+    }
+
+    @keyframes scene-recede-mid {
+      to {
+        transform: translateY(5%);
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scene :global(*) {
+      animation: none;
+    }
+
+    /* The coach is parked in view instead of driving by. */
+    .scene__lane {
+      transform: translateX(-42%);
+    }
+  }
+</style>
+
+<script>
+  // Nothing moves while the landscape is out of sight.
+  for (const scene of document.querySelectorAll<HTMLElement>('[data-road-scene]')) {
+    new IntersectionObserver(([entry]) => {
+      scene.toggleAttribute('data-paused', entry?.isIntersecting === false);
+    }).observe(scene);
+  }
+</script>

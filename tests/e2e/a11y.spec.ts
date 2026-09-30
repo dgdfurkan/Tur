@@ -12,13 +12,22 @@ const PAGES: Record<string, string> = {
   'not-found page': './boyle-bir-sayfa-yok/',
 };
 
-for (const [name, path] of Object.entries(PAGES)) {
-  test(`${name} has no accessibility violations`, async ({ page }) => {
-    await page.goto(path);
-    const results = await new AxeBuilder({ page }).analyze();
-    expect(results.violations).toEqual([]);
-  });
-}
+/**
+ * Axe judges what is painted at the instant it runs. With motion, content that
+ * arrives on scroll is still hidden or half-transparent then, so it would be
+ * skipped or misjudged. Reduced motion shows each page whole and at rest.
+ */
+test.describe('pages at rest', () => {
+  test.use({ contextOptions: { reducedMotion: 'reduce' } });
+
+  for (const [name, path] of Object.entries(PAGES)) {
+    test(`${name} has no accessibility violations`, async ({ page }) => {
+      await page.goto(path);
+      const results = await new AxeBuilder({ page }).analyze();
+      expect(results.violations).toEqual([]);
+    });
+  }
+});
 
 // The route preview draws either map depending on the device; both have to pass.
 for (const map of ['3b', 'duz']) {

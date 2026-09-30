@@ -2,6 +2,8 @@
 import DepartureBoard from '@/components/tour/DepartureBoard.astro';
 import Itinerary from '@/components/tour/Itinerary.astro';
 import OccupancyMeter from '@/components/tour/OccupancyMeter.astro';
+import Scene from '@/components/scenes/Scene.astro';
+import SceneSprite from '@/components/scenes/SceneSprite.astro';
 import RouteThumb from '@/components/tour/RouteThumb.astro';
 import Button from '@/components/ui/Button.astro';
 import Emblem from '@/components/ui/Emblem.astro';
@@ -28,6 +30,7 @@ const departures = tour.upcomingDepartures(today);
 const next = departures[0];
 const routeUrl = pageUrl(`turlar/${tour.id}/rota`);
 const meetingPoint = (next ?? tour.departures[0])?.meetingPoint;
+const postcards = tour.highlights(2);
 
 const facts = [
   { label: tr.tour.duration, value: formatDuration(tour.nights, tour.dayCount) },
@@ -43,19 +46,31 @@ const facts = [
 <BaseLayout title={tour.title} description={tour.summary}>
   <article class="tour">
     <header class="tour-head">
+      <div class="container">
+        <nav class="crumbs" aria-label="Sayfa Yolu">
+          <a href={pageUrl('turlar')}>{tr.nav.tours}</a>
+          <span aria-hidden="true">/</span>
+          <span>{categoryLabels[tour.category]}</span>
+        </nav>
+        <ul class="postcards" aria-label="Turun Öne Çıkan Yerleri">
+          <li class="postcard" data-reveal>
+            <Scene scene={tour.scene} />
+            <p class="postcard__sign">
+              <Emblem name={tour.emblem} size={24} />
+              {tour.destination}
+            </p>
+          </li>
+          {postcards.map((sight) => (
+            <li class="postcard" data-reveal>
+              <Scene scene={sight.scene} />
+              <p class="postcard__sign">{sight.name}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
       <div class="container tour-head__inner">
         <div class="tour-head__main">
-          <nav class="crumbs" aria-label="Sayfa Yolu">
-            <a href={pageUrl('turlar')}>{tr.nav.tours}</a>
-            <span aria-hidden="true">/</span>
-            <span>{categoryLabels[tour.category]}</span>
-          </nav>
-          <div class="tour-head__title">
-            <div class="plate" aria-hidden="true">
-              <Emblem name={tour.emblem} size={64} />
-            </div>
-            <h1>{tour.title}</h1>
-          </div>
+          <h1>{tour.title}</h1>
           <p class="lead">{tour.summary}</p>
           <dl class="facts">
             {facts.map((fact) => (
@@ -188,6 +203,7 @@ const facts = [
       </Button>
     </section>
   </article>
+  <SceneSprite scenes={[tour.scene, ...tour.stops.map((stop) => stop.scene)]} />
 </BaseLayout>
 
 <style>
@@ -198,6 +214,7 @@ const facts = [
   .tour-head__inner {
     display: grid;
     gap: var(--space-7);
+    margin-top: var(--space-6);
   }
 
   .crumbs {
@@ -212,24 +229,68 @@ const facts = [
     font-weight: 550;
   }
 
-  .tour-head__title {
+  /* Pictures of the places the tour is known for, each signed like a tourist destination. */
+  .postcards {
     display: grid;
     gap: var(--space-4);
-    margin-top: var(--space-5);
+    margin-top: var(--space-4);
   }
 
-  .plate {
-    display: grid;
-    place-items: center;
-    width: 5.5rem;
-    height: 5.5rem;
-    border-radius: var(--radius-sign);
+  .postcard {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  /* A phone has room for the tour's own picture only. */
+  .postcard:not(:first-child) {
+    display: none;
+  }
+
+  .postcard__sign {
+    position: absolute;
+    left: var(--space-3);
+    bottom: var(--space-3);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    max-width: calc(100% - 2 * var(--space-3));
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-sm);
     background: var(--c-brown);
     box-shadow:
-      inset 0 0 0 0.3125rem var(--c-brown),
-      inset 0 0 0 0.46875rem var(--c-white),
+      inset 0 0 0 0.09375rem var(--c-white),
+      0 0 0 0.125rem var(--c-brown),
       var(--shadow-sign);
     color: var(--c-white);
+    font-stretch: var(--wdth-sign);
+    font-weight: 650;
+    line-height: 1.25;
+  }
+
+  .postcard:first-child .postcard__sign {
+    font-size: 1.125rem;
+  }
+
+  /* The pictures draw a little closer as the page is scrolled. */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .postcard :global(svg) {
+        /* Longhands on purpose: the minifier folds a timeline into the shorthand, which browsers reject. */
+        animation-name: postcard-approach;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: scroll(root);
+        animation-range: 0 70vh;
+      }
+
+      @keyframes postcard-approach {
+        to {
+          transform: scale(1.1);
+        }
+      }
+    }
   }
 
   .tour-head h1 {
@@ -402,10 +463,12 @@ const facts = [
       gap: var(--space-5) var(--space-7);
     }
 
-    .tour-head__title {
-      grid-template-columns: auto 1fr;
-      align-items: center;
-      gap: var(--space-5);
+    .postcards {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .postcard:not(:first-child) {
+      display: block;
     }
 
     .hotels {
@@ -420,7 +483,7 @@ const facts = [
   @media (min-width: 60rem) {
     .tour-head__inner {
       grid-template-columns: minmax(0, 1fr) 21rem;
-      align-items: end;
+      align-items: start;
     }
 
     .route-teaser {

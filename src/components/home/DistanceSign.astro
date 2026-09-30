@@ -88,11 +88,11 @@ const { tours } = Astro.props;
     padding-left: var(--space-4);
   }
 
-  /* Two steel posts carry the board. */
+  /* Two steel posts carry the board; whoever places the sign says how tall they are. */
   .posts {
     display: flex;
     justify-content: space-between;
-    height: clamp(2.5rem, 8vw, 5rem);
+    height: var(--post-height, clamp(2.5rem, 8vw, 5rem));
     margin: -0.5rem 18% 0;
   }
 
@@ -164,21 +164,6 @@ const { tours } = Astro.props;
   @media (hover: hover) and (pointer: fine) {
     .row__link:hover {
       background: rgb(255 255 255 / 0.12);
-    }
-  }
-
-  /*
-   * Beside the headline the sign has room to stand: the posts run down to the
-   * skyline at the foot of the hero, which clips whatever extends past it.
-   */
-  @media (min-width: 60rem) {
-    .posts {
-      position: absolute;
-      top: calc(100% - 0.5rem);
-      left: 18%;
-      right: 18%;
-      height: 100vh;
-      margin: 0;
     }
   }
 </style>

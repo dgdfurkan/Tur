@@ -1,3 +1,4 @@
+import { rankSights } from '@/domain/tour/highlights';
 import type { RoutePlan, RouteStop } from '@/domain/tour/RoutePlan';
 import type { StopKind } from '@/domain/tour/Tour';
 import { driveSeconds } from '@/features/route-simulation/RouteSimulation';
@@ -57,21 +58,8 @@ const DWELL_SECONDS: Record<StopKind, number> = {
  * four, in the order the coach reaches them.
  */
 export function pickHighlights(plan: RoutePlan, limit = MAX_HIGHLIGHTS): RouteStop[] {
-  const seen = new Set<string>();
-  return plan.stops
-    .filter((stop) => {
-      if (stop.stop.kind !== 'sight' || seen.has(stop.stop.id)) return false;
-      seen.add(stop.stop.id);
-      return true;
-    })
-    .sort(
-      (a, b) =>
-        b.stop.facts.length - a.stop.facts.length ||
-        (b.stop.durationMinutes ?? 0) - (a.stop.durationMinutes ?? 0) ||
-        a.index - b.index,
-    )
-    .slice(0, limit)
-    .sort((a, b) => a.index - b.index);
+  const chosen = new Set(rankSights(plan.stops.map(({ stop }) => stop)).slice(0, limit));
+  return plan.stops.filter(({ stop }) => chosen.has(stop));
 }
 
 function shotsFor(plan: RoutePlan, template: FilmTemplate): (Shot & { seconds: number })[] {

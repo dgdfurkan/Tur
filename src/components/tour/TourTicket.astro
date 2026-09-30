@@ -1,5 +1,6 @@
 ---
 import OccupancyMeter from './OccupancyMeter.astro';
+import Scene from '@/components/scenes/Scene.astro';
 import Emblem from '@/components/ui/Emblem.astro';
 import { pageUrl } from '@/config/paths';
 import type { Departure } from '@/domain/tour/Departure';
@@ -7,7 +8,11 @@ import type { Tour } from '@/domain/tour/Tour';
 import { categoryLabels, tr } from '@/i18n/tr';
 import { formatDateRange, formatDuration, formatMoney, formatTime } from '@/shared/format';
 
-/** A tour presented as a boarding pass: journey on the left, fare stub on the right. */
+/**
+ * A tour as a ticket: a picture of where it goes, the journey, and a fare stub
+ * that tears off along a perforation. The page that shows tickets must include
+ * the pictures themselves with <SceneSprite>.
+ */
 interface Props {
   tour: Tour;
   departure?: Departure | undefined;
@@ -18,37 +23,43 @@ const { tour, departure, headingLevel: Heading = 'h3' } = Astro.props;
 const tourUrl = pageUrl(`turlar/${tour.id}`);
 ---
 
-<article class="ticket" data-category={tour.category}>
+<article class="ticket" data-category={tour.category} data-tilt>
+  <div class="ticket__art">
+    <div class="ticket__picture">
+      <Scene scene={tour.scene} />
+    </div>
+    <p class="ticket__category">
+      <Emblem name={tour.emblem} size={20} />
+      {categoryLabels[tour.category]}
+    </p>
+    {
+      // A day trip already says so in its category sign.
+      !tour.isDayTrip && (
+        <p class="ticket__duration">{formatDuration(tour.nights, tour.dayCount)}</p>
+      )
+    }
+  </div>
+
   <div class="ticket__main">
-    <div class="ticket__emblem">
-      <Emblem name={tour.emblem} size={56} />
-    </div>
-    <div class="ticket__body">
-      <p class="ticket__category">{categoryLabels[tour.category]}</p>
-      <Heading class="ticket__title">
-        <a href={tourUrl}>{tour.title}</a>
-      </Heading>
-      <dl class="ticket__facts">
-        <div class="ticket__fact--wide">
-          <dt>{tr.tour.nextDeparture}</dt>
-          <dd>
-            {departure
-              ? formatDateRange(departure.startDate, departure.endDate)
-              : tr.tour.noDepartures}
-          </dd>
-        </div>
+    <Heading class="ticket__title">
+      <a href={tourUrl}>{tour.title}</a>
+    </Heading>
+    <dl class="ticket__facts">
+      <div>
+        <dt>{tr.tour.nextDeparture}</dt>
+        <dd>
+          {departure
+            ? formatDateRange(departure.startDate, departure.endDate)
+            : tr.tour.noDepartures}
+        </dd>
+      </div>
+      {departure && (
         <div>
-          <dt>{tr.tour.duration}</dt>
-          <dd>{formatDuration(tour.nights, tour.dayCount)}</dd>
+          <dt>{tr.tour.departureTime}</dt>
+          <dd class="tabular">{formatTime(departure.time)}</dd>
         </div>
-        {departure && (
-          <div>
-            <dt>{tr.tour.departureTime}</dt>
-            <dd class="tabular">{formatTime(departure.time)}</dd>
-          </div>
-        )}
-      </dl>
-    </div>
+      )}
+    </dl>
   </div>
 
   <div class="ticket__stub">
@@ -64,45 +75,81 @@ const tourUrl = pageUrl(`turlar/${tour.id}`);
   .ticket {
     --cut: var(--section-bg, var(--c-white));
     --notch: 0.75rem;
+    /* Set by the pointer on devices that have one; the ticket leans towards it. */
+    --tilt-x: 0;
+    --tilt-y: 0;
     position: relative;
     display: grid;
+    grid-template-rows: auto 1fr auto;
+    height: 100%;
     border: 1px solid var(--c-line);
     border-radius: var(--radius-lg);
     background: var(--c-white);
     box-shadow: var(--shadow-1);
+    transform: perspective(60rem) rotateX(calc(var(--tilt-y) * -5deg))
+      rotateY(calc(var(--tilt-x) * 7deg));
     transition:
-      transform var(--dur-ui) var(--ease-out),
+      transform 500ms var(--ease-out),
       box-shadow var(--dur-ui) ease;
   }
 
-  .ticket__main {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: var(--space-4);
-    padding: var(--space-5);
+  .ticket__art {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: calc(var(--radius-lg) - 1px) calc(var(--radius-lg) - 1px) 0 0;
+    overflow: hidden;
   }
 
-  .ticket__emblem {
-    display: grid;
-    place-items: center;
-    width: 4.5rem;
-    height: 4.5rem;
-    border-radius: var(--radius-md);
+  /* A little larger than its frame, so it can shift against the pointer without showing an edge. */
+  .ticket__picture {
+    position: absolute;
+    inset: -4%;
+    transform: translate(calc(var(--tilt-x) * -3%), calc(var(--tilt-y) * -3%));
+    transition: transform 500ms var(--ease-out);
+  }
+
+  /* A brown tourist sign names the kind of tour. */
+  .ticket__category {
+    position: absolute;
+    top: var(--space-3);
+    left: var(--space-3);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0.1875rem var(--space-3) 0.1875rem var(--space-2);
+    border-radius: var(--radius-sm);
     background: var(--c-brown);
     box-shadow:
-      inset 0 0 0 0.1875rem var(--c-brown),
-      inset 0 0 0 0.3125rem var(--c-white);
+      inset 0 0 0 0.0625rem var(--c-white),
+      0 0 0 0.125rem var(--c-brown),
+      0 2px 6px rgb(27 31 36 / 0.3);
     color: var(--c-white);
-  }
-
-  .ticket__category {
-    color: var(--c-brown);
+    font-stretch: var(--wdth-sign);
     font-size: var(--text-small);
     font-weight: 650;
   }
 
+  .ticket__duration {
+    position: absolute;
+    right: var(--space-3);
+    bottom: var(--space-3);
+    padding: 0.0625rem var(--space-2);
+    border-radius: var(--radius-sm);
+    background: var(--c-asphalt);
+    color: var(--c-white);
+    font-stretch: var(--wdth-sign);
+    font-size: var(--text-caption);
+    font-weight: 650;
+  }
+
+  .ticket__main {
+    display: grid;
+    align-content: start;
+    gap: var(--space-4);
+    padding: var(--space-5);
+  }
+
   .ticket__title {
-    margin-top: var(--space-1);
     font-size: var(--text-h3);
   }
 
@@ -120,14 +167,9 @@ const tourUrl = pageUrl(`turlar/${tour.id}`);
 
   .ticket__facts {
     display: grid;
-    grid-template-columns: repeat(2, auto);
-    justify-content: start;
-    gap: var(--space-3) var(--space-6);
-    margin: var(--space-4) 0 0;
-  }
-
-  .ticket__fact--wide {
-    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-4);
+    margin: 0;
   }
 
   .ticket__facts dt,
@@ -145,9 +187,8 @@ const tourUrl = pageUrl(`turlar/${tour.id}`);
   .ticket__stub {
     position: relative;
     display: grid;
-    gap: var(--space-4);
-    align-content: center;
-    padding: var(--space-5);
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5) var(--space-5);
     border-top: 0.125rem dashed var(--c-line);
   }
 
@@ -197,49 +238,20 @@ const tourUrl = pageUrl(`turlar/${tour.id}`);
 
   @media (hover: hover) and (pointer: fine) {
     .ticket:hover {
-      transform: translateY(-0.1875rem);
       box-shadow: var(--shadow-2);
+    }
+
+    /* While the pointer is over the ticket it follows closely; on leaving it settles back slowly. */
+    .ticket:hover,
+    .ticket:hover .ticket__picture {
+      transition-duration: 140ms, var(--dur-ui);
     }
   }
 
-  @media (min-width: 48rem) {
-    .ticket {
-      grid-template-columns: 1fr minmax(15rem, 18rem);
-    }
-
-    .ticket__main {
-      padding: var(--space-6);
-    }
-
-    .ticket__facts {
-      grid-template-columns: repeat(3, auto);
-    }
-
-    .ticket__fact--wide {
-      grid-column: auto;
-    }
-
-    .ticket__stub {
-      padding: var(--space-6);
-      border-top: 0;
-      border-left: 0.125rem dashed var(--c-line);
-    }
-
-    .ticket__stub::before,
-    .ticket__stub::after {
-      left: calc(var(--notch) * -1 - 1px);
-      right: auto;
-    }
-
-    .ticket__stub::before {
-      top: calc(var(--notch) * -1 - 1px);
-      clip-path: inset(50% 0 0 0);
-    }
-
-    .ticket__stub::after {
-      top: auto;
-      bottom: calc(var(--notch) * -1 - 1px);
-      clip-path: inset(0 0 50% 0);
+  @media (prefers-reduced-motion: reduce) {
+    .ticket,
+    .ticket__picture {
+      transform: none;
     }
   }
 </style>

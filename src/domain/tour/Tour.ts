@@ -1,6 +1,7 @@
 import type { GeoPoint } from '../geo/GeoPoint';
 import type { Money } from '../shared/Money';
 import type { Departure } from './Departure';
+import { rankSights } from './highlights';
 
 export type TourCategory = 'kultur' | 'doga' | 'gunubirlik';
 export type StopKind = 'departure' | 'sight' | 'rest' | 'lodging' | 'arrival';
@@ -168,6 +169,23 @@ export class Tour {
 
   get sightCount(): number {
     return this.stops.filter((stop) => stop.kind === 'sight').length;
+  }
+
+  /**
+   * The sights to show beside the tour's own picture: those there is most to
+   * say about, each with a picture not shown already, in travel order.
+   */
+  highlights(limit: number): readonly Stop[] {
+    const shown = new Set<SceneKey>([this.scene]);
+    const picked: Stop[] = [];
+    for (const stop of rankSights(this.stops)) {
+      if (picked.length === limit) break;
+      if (shown.has(stop.scene)) continue;
+      shown.add(stop.scene);
+      picked.push(stop);
+    }
+    const order = this.stops;
+    return picked.sort((a, b) => order.indexOf(a) - order.indexOf(b));
   }
 
   /** Approximate road distance of the whole route. */

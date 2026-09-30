@@ -55,11 +55,13 @@ const text = occupancyText(occupancy);
     --level: var(--c-red);
   }
 
+  /* The row keeps one height whether the status is plain text or a yellow tag, so meters line up. */
   .meter__labels {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
     gap: var(--space-3);
+    min-height: 1.75rem;
     font-size: var(--text-small);
   }
 
@@ -93,7 +95,23 @@ const text = occupancyText(occupancy);
 
   .meter__fill {
     fill: var(--level);
-    transition: width var(--dur-panel) var(--ease-out);
+    transition:
+      width var(--dur-panel) var(--ease-out),
+      transform 900ms var(--ease-out) 300ms;
+  }
+
+  /* Inside something that arrives on scroll, the bar fills once it has arrived. */
+  @media screen and (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+    :global([data-reveal]:not([data-revealed])) .meter__fill {
+      transform: scaleX(0);
+      animation: fill-anyway 1ms 5s forwards;
+    }
+
+    @keyframes fill-anyway {
+      to {
+        transform: none;
+      }
+    }
   }
 </style>
 
