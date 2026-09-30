@@ -1,4 +1,4 @@
-import { Vector3 } from 'three';
+import { MathUtils, Vector3 } from 'three';
 import { toRoutePlan, type RouteOutline } from '@/application/dto/RouteOutline';
 import type { RoutePlan } from '@/domain/tour/RoutePlan';
 import { BusModel } from '@/features/map3d/BusModel';
@@ -14,12 +14,14 @@ interface ShowcaseRoute {
   readonly plan: RoutePlan;
   readonly track: RouteTrack;
   readonly bus: BusModel;
-  /** Where along the road the coach starts, so the coaches are spread out. */
-  readonly offset: number;
+  /** How far along its road the coach is; the coaches start spread out. */
+  distance: number;
 }
 
-/** World units per second; about 60 km of map per second. */
-const CRUISE_SPEED = 6;
+/** Coach speed per unit of camera distance, so it looks the same at any zoom. */
+const SPEED_PER_DISTANCE = 0.075;
+const MIN_SPEED = 3;
+const MAX_SPEED = 24;
 const SELECTED_PITCH = 52;
 const FRAME_MARGIN = 5;
 /** Where a parked coach sits on its road when motion is reduced. */
@@ -53,7 +55,7 @@ export class TourMapShowcase implements Disposable {
     private readonly reducedMotion: boolean,
   ) {
     this.world.rig.moveTo(this.world.overviewPose(), true);
-    this.world.onFrame((_delta, elapsed) => this.animate(elapsed));
+    this.world.onFrame((delta, elapsed) => this.animate(delta, elapsed));
   }
 
   setRoutes(outlines: readonly RouteOutline[]): void {
@@ -67,7 +69,9 @@ export class TourMapShowcase implements Disposable {
         plan,
         track,
         bus,
-        offset: (index / outlines.length) * track.length,
+        distance: this.reducedMotion
+          ? track.length * PARKED_FRACTION
+          : (index / outlines.length) * track.length,
       });
     });
   }
@@ -139,23 +143,25 @@ export class TourMapShowcase implements Disposable {
     this.world.dispose();
   }
 
-  private animate(elapsedSeconds: number): void {
+  private animate(deltaSeconds: number, elapsedSeconds: number): void {
     const { view } = this.world.rig;
     const scale = coachScale(view);
     const width = roadScale(view);
+    const step = this.reducedMotion
+      ? 0
+      : MathUtils.clamp(view.distance * SPEED_PER_DISTANCE, MIN_SPEED, MAX_SPEED) * deltaSeconds;
     this.markers?.setScale(markerScale(view));
     for (const route of this.routes.values()) {
       const { track, bus } = route;
       track.setScale(width);
-      const distance = this.reducedMotion
-        ? track.length * PARKED_FRACTION
-        : (elapsedSeconds * CRUISE_SPEED + route.offset) % track.length;
-      track.positionAt(distance, this.position);
-      track.directionAt(distance, this.direction);
+      route.distance = (route.distance + step) % track.length;
+      track.positionAt(route.distance, this.position);
+      track.directionAt(route.distance, this.direction);
       bus.group.position.copy(this.position);
       bus.group.rotation.y = Math.atan2(-this.direction.z, this.direction.x);
       bus.group.scale.setScalar(scale);
       bus.bounce(elapsedSeconds, this.reducedMotion ? 0 : 1);
+      bus.roll(step / scale);
     }
   }
 }

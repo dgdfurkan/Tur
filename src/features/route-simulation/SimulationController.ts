@@ -8,7 +8,7 @@ import type { RouteView } from './RouteView';
 import type { SimulationPanel } from './SimulationPanel';
 import type { SoundManager } from './SoundManager';
 
-const SPEEDS = [1, 2] as const;
+const SPEEDS = [1, 2, 3] as const;
 const ENGINE_IDLE = 0.4;
 const ENGINE_DRIVING = 1;
 

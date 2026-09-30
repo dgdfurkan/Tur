@@ -17,6 +17,10 @@ const GLASS = '#22303c';
 const TYRE = '#1f2328';
 const LAMP = '#ffd66b';
 const ROOF_UNIT = '#c9cdd1';
+const HUB = '#aeb4ba';
+const WHEEL_RADIUS = 0.068;
+/** Fastest the wheels are shown turning, in radians per frame; faster would strobe. */
+const MAX_TURN = 0.55;
 
 /**
  * A low-poly tour coach, one unit long with its nose along +X. It is built from
@@ -25,6 +29,7 @@ const ROOF_UNIT = '#c9cdd1';
 export class BusModel implements Disposable {
   readonly group = new Group();
   private readonly chassis = new Group();
+  private readonly axles: Group[] = [];
   private readonly geometries: BufferGeometry[] = [];
   private readonly shadowMaterial = new MeshBasicMaterial({
     color: '#1b1f24',
@@ -53,10 +58,21 @@ export class BusModel implements Disposable {
     add(new BoxGeometry(0.32, 0.035, 0.18), ROOF_UNIT, -0.12, 0.365, 0);
     add(new BoxGeometry(0.012, 0.035, 0.05), LAMP, 0.503, 0.13, 0.1);
     add(new BoxGeometry(0.012, 0.035, 0.05), LAMP, 0.503, 0.13, -0.1);
+    // Tyres, hubs and a bar across each hub: without the bar a turning wheel looks still.
+    const tyre = this.track(new CylinderGeometry(WHEEL_RADIUS, WHEEL_RADIUS, 0.33, 14));
+    const hub = this.track(new CylinderGeometry(0.036, 0.036, 0.338, 10));
+    const bar = this.track(new BoxGeometry(WHEEL_RADIUS * 1.5, 0.018, 0.342));
+    for (const part of [tyre, hub]) part.rotateX(Math.PI / 2);
     for (const x of [0.3, -0.32]) {
-      const axle = new CylinderGeometry(0.068, 0.068, 0.33, 12);
-      axle.rotateX(Math.PI / 2);
-      add(axle, TYRE, x, 0.068, 0);
+      const axle = new Group();
+      axle.position.set(x, WHEEL_RADIUS, 0);
+      axle.add(
+        new Mesh(tyre, kit.solid(TYRE)),
+        new Mesh(hub, kit.solid(HUB)),
+        new Mesh(bar, kit.solid(TYRE)),
+      );
+      this.axles.push(axle);
+      this.chassis.add(axle);
     }
     this.group.add(this.chassis);
 
@@ -70,6 +86,12 @@ export class BusModel implements Disposable {
   /** Suspension bounce while the coach is moving; `motion` is 0 at rest and 1 at speed. */
   bounce(elapsedSeconds: number, motion: number): void {
     this.chassis.position.y = Math.sin(elapsedSeconds * 18) * 0.006 * motion;
+  }
+
+  /** Turns the wheels for a distance travelled, given in the coach's own length. */
+  roll(lengths: number): void {
+    const turn = Math.min(MAX_TURN, Math.max(-MAX_TURN, lengths / WHEEL_RADIUS));
+    for (const axle of this.axles) axle.rotation.z -= turn;
   }
 
   dispose(): void {

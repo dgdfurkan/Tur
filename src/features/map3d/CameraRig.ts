@@ -10,7 +10,7 @@ export interface CameraPose {
 }
 
 const AZIMUTH = MathUtils.degToRad(9);
-const RESPONSE = 3.2;
+const RESPONSE = 3.8;
 const FRAME_MARGIN = 1.22;
 const NO_PADDING: ViewPadding = { left: 0, right: 0, top: 0, bottom: 0 };
 

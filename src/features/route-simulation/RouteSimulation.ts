@@ -22,18 +22,19 @@ export interface SimulationListener {
   changed?(snapshot: SimulationSnapshot): void;
 }
 
-const SECONDS_PER_KM = 0.016;
-const MIN_LEG_SECONDS = 1.1;
-const MAX_LEG_SECONDS = 5.5;
+const SECONDS_PER_KM = 0.0105;
+const MIN_LEG_SECONDS = 0.9;
+const MAX_LEG_SECONDS = 3.4;
 /** Hops inside one town should not look like a journey. */
 const SHORT_HOP_KM = 2;
-const SHORT_HOP_SECONDS = 0.5;
+const SHORT_HOP_SECONDS = 0.45;
 
+/** Long enough to read the card about the place, short enough to keep the journey moving. */
 const DWELL_SECONDS: Record<StopKind, number> = {
   departure: 0,
-  rest: 1.5,
-  sight: 2.3,
-  lodging: 2.6,
+  rest: 1.2,
+  sight: 2.4,
+  lodging: 2.4,
   arrival: 0,
 };
 
