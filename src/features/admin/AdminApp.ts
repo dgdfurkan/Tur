@@ -61,9 +61,10 @@ export class AdminApp {
     });
   }
 
-  start(): void {
+  /** @param section The section to open first, as named in the address by the tab bar of other pages. */
+  start(section?: string | null): void {
     this.refresh();
-    this.show('ozet', false);
+    this.show(isViewName(section ?? undefined) ? (section as ViewName) : 'ozet', false);
     this.root.dataset['ready'] = 'true';
   }
 

@@ -1,12 +1,13 @@
 import { readFile } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
-import { expectNoErrors, trackErrors } from './support';
+import { TEST_PANEL_CODE } from '../panelCode';
+import { expectNoErrors, openPanelPage, trackErrors } from './support';
 
 const PANEL = './yonetim/';
 const KAPADOKYA = 'Kapadokya Kültür Turu, 6-8 Kasım 2026';
 
 async function openPanel(page: Page): Promise<void> {
-  await page.goto(PANEL);
+  await openPanelPage(page, PANEL);
   await expect(page.locator('[data-admin]')).toHaveAttribute('data-ready', 'true');
 }
 
@@ -123,4 +124,56 @@ test('the panel refuses to run inside another page', async ({ page, baseURL }) =
   await expect(panel).not.toHaveAttribute('data-ready', 'true');
   await expect(panel.getByText('başka bir sayfanın içinde')).toBeVisible();
   await expect(panel.getByRole('button', { name: 'Demo Verilerini Sıfırla' })).toBeHidden();
+});
+
+test.describe('the lock', () => {
+  test('keeps the panel out of sight until the right code is given', async ({ page }) => {
+    await page.goto(PANEL);
+    const panel = page.locator('[data-admin]');
+    await expect(panel).toHaveAttribute('data-access', 'locked');
+    await expect(page.getByRole('heading', { name: 'Panel Kilitli' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Örnek Verileri Yükle' })).toBeHidden();
+    await expect(page.getByRole('navigation', { name: 'Panel Bölümleri' })).toBeHidden();
+
+    await page.getByLabel('Erişim Kodu').fill('yanlis-kod');
+    await page.getByRole('button', { name: 'Paneli Aç' }).click();
+    await expect(page.getByRole('alert')).toHaveText('Erişim kodu hatalı.');
+    await expect(panel).toHaveAttribute('data-access', 'locked');
+    await expect(panel).not.toHaveAttribute('data-ready', 'true');
+
+    await page.getByLabel('Erişim Kodu').fill(TEST_PANEL_CODE);
+    await page.getByRole('button', { name: 'Paneli Aç' }).click();
+    await expect(panel).toHaveAttribute('data-ready', 'true');
+    await expect(page.getByRole('button', { name: 'Örnek Verileri Yükle' })).toBeVisible();
+  });
+
+  test('stays open for the tab and can be locked again', async ({ page }) => {
+    await openPanel(page);
+    await page.reload();
+    await expect(page.locator('[data-admin]')).toHaveAttribute('data-ready', 'true');
+
+    await page.getByRole('button', { name: 'Kilitle' }).click();
+    await expect(page.locator('[data-admin]')).toHaveAttribute('data-access', 'locked');
+    await expect(page.getByRole('button', { name: 'Örnek Verileri Yükle' })).toBeHidden();
+  });
+
+  test('is forgotten by a new visit unless the device is remembered', async ({ page, context }) => {
+    await page.goto(PANEL);
+    await page.getByLabel('Erişim Kodu').fill(TEST_PANEL_CODE);
+    await page.getByLabel('Bu Cihazda Hatırla').check();
+    await page.getByRole('button', { name: 'Paneli Aç' }).click();
+    await expect(page.locator('[data-admin]')).toHaveAttribute('data-ready', 'true');
+
+    // A new tab shares the device's storage but not the first tab's session.
+    const second = await context.newPage();
+    await second.goto(PANEL);
+    await expect(second.locator('[data-admin]')).toHaveAttribute('data-ready', 'true');
+  });
+});
+
+test('no public page links to the panel', async ({ page }) => {
+  for (const path of ['./', './turlar/', './turlar/kapadokya/', './kurumsal/', './iletisim/']) {
+    await page.goto(path);
+    await expect(page.locator('a[href*="yonetim"]')).toHaveCount(0);
+  }
 });

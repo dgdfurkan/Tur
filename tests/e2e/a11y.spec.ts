@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { openPanelPage } from './support';
 
 const PAGES: Record<string, string> = {
   'home page': './',
@@ -40,8 +41,15 @@ test('the home page map has no accessibility violations once it is interactive',
   expect(results.violations).toEqual([]);
 });
 
-test('operations panel has no accessibility violations on any tab', async ({ page }) => {
+test('the locked panel has no accessibility violations', async ({ page }) => {
   await page.goto('./yonetim/');
+  await expect(page.locator('[data-admin]')).toHaveAttribute('data-access', 'locked');
+  const results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations).toEqual([]);
+});
+
+test('operations panel has no accessibility violations on any tab', async ({ page }) => {
+  await openPanelPage(page, './yonetim/');
   await expect(page.locator('[data-admin]')).toHaveAttribute('data-ready', 'true');
   await page.getByRole('button', { name: 'Örnek Verileri Yükle' }).click();
   for (const tab of ['Özet', 'Yolcu Ekle', 'Yolcu Listesi']) {

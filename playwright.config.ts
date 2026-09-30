@@ -19,9 +19,11 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
   ],
   webServer: {
-    // --ignore-lock keeps the server in the foreground; Astro 7 otherwise detaches
+    // The site under test is the build made by `npm run build:e2e`, whose panel opens with the
+    // test code. --ignore-lock keeps the server in the foreground; Astro 7 otherwise detaches
     // it into a background process when it detects an AI coding agent.
     command: `npx astro preview --ignore-lock --port ${port}`,
+    env: { OUT_DIR: './dist-e2e' },
     url: `http://localhost:${port}${basePath}/`,
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,

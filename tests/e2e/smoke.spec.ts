@@ -48,8 +48,11 @@ for (const path of EVERY_PAGE) {
     await page.goto(path);
     await page.waitForLoadState('networkidle');
     // Lazy parts announce themselves; where there is one, wait for it to finish starting.
-    const lazy = page.locator('[data-route-app], [data-admin]');
-    if ((await lazy.count()) > 0) await expect(lazy).toHaveAttribute('data-ready', 'true');
+    const route = page.locator('[data-route-app]');
+    if ((await route.count()) > 0) await expect(route).toHaveAttribute('data-ready', 'true');
+    // A visitor who finds the panel gets no further than its lock.
+    const panel = page.locator('[data-admin]');
+    if ((await panel.count()) > 0) await expect(panel).toHaveAttribute('data-access', 'locked');
     expectNoErrors(errors);
   });
 }

@@ -40,6 +40,15 @@ export class SafeStorage {
     }
   }
 
+  /** Storage that lasts only as long as the tab; it never throws either. */
+  static session(): SafeStorage {
+    try {
+      return new SafeStorage(globalThis.sessionStorage);
+    } catch {
+      return new SafeStorage(undefined);
+    }
+  }
+
   private static browserStore(): KeyValueStore | undefined {
     try {
       return globalThis.localStorage;

@@ -19,5 +19,7 @@ export function mountAdmin(root: HTMLElement): void {
     () => new Date(),
     () => crypto.randomUUID(),
   );
-  new AdminApp(root, bookings, new CsvListExporter(), todayIso()).start();
+  new AdminApp(root, bookings, new CsvListExporter(), todayIso()).start(
+    new URLSearchParams(location.search).get('bolum'),
+  );
 }

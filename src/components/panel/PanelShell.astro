@@ -1,0 +1,106 @@
+---
+import BrandMark from '@/components/ui/BrandMark.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { assetUrl, pageUrl } from '@/config/paths';
+import { tr } from '@/i18n/tr';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import '@/styles/panel.css';
+import '@/styles/admin.css';
+
+/**
+ * The frame every page of the operations panel shares: the header, the lock
+ * that asks for the access code, and the tab bar. A page puts its own content
+ * in the slot; it stays out of sight until the panel has been opened.
+ */
+interface Props {
+  title: string;
+  description: string;
+  /** Which page this is, so the tab bar can mark it. */
+  current: 'kayit' | 'video';
+}
+
+const { title, description, current } = Astro.props;
+const { admin } = tr;
+const sections = [
+  { id: 'ozet', label: admin.tabs.summary, icon: 'chart' },
+  { id: 'ekle', label: admin.tabs.add, icon: 'plus' },
+  { id: 'liste', label: admin.tabs.list, icon: 'list' },
+] as const;
+---
+
+<BaseLayout title={title} description={description} chrome={false}>
+  <link slot="head" rel="manifest" href={assetUrl('manifest.webmanifest')} />
+
+  <div class="admin" data-admin data-access="checking" data-view="ozet">
+    <header class="admin__bar">
+      <a class="admin__brand" href={pageUrl()} aria-label={admin.backToSite}>
+        <BrandMark size={32} />
+      </a>
+      <span class="admin__title">{admin.title}</span>
+      <button class="admin__lock" type="button" data-action="lock" hidden>
+        <Icon name="lock" size={18} />
+        <span>{admin.gate.lock}</span>
+      </button>
+      <span class="admin__badge">{admin.demoBadge}</span>
+    </header>
+
+    <p class="admin__framed">{admin.framed}</p>
+
+    <form class="gate" data-gate novalidate>
+      <h1 tabindex="-1">{admin.gate.heading}</h1>
+      <p>{admin.gate.intro}</p>
+      <div class="field">
+        <label for="gate-code">{admin.gate.code}</label>
+        <input
+          id="gate-code"
+          name="code"
+          type="password"
+          autocomplete="current-password"
+          aria-describedby="gate-error"
+          required
+        />
+        <p class="field__error" id="gate-error" role="alert" data-gate-error></p>
+      </div>
+      <label class="check">
+        <input type="checkbox" name="remember" />
+        <span>{admin.gate.remember}</span>
+      </label>
+      <button class="button button--primary button--block" type="submit">
+        {admin.gate.submit}
+      </button>
+    </form>
+
+    <div class="admin__content">
+      <slot />
+    </div>
+
+    <nav class="tabs" aria-label={admin.tabs.label}>
+      {sections.map((section, index) =>
+        current === 'kayit' ? (
+          <button
+            class="tab"
+            type="button"
+            data-tab={section.id}
+            aria-current={index === 0 ? 'page' : undefined}
+          >
+            <Icon name={section.icon} size={22} />
+            <span>{section.label}</span>
+          </button>
+        ) : (
+          <a class="tab" href={`${pageUrl('yonetim')}?bolum=${section.id}`}>
+            <Icon name={section.icon} size={22} />
+            <span>{section.label}</span>
+          </a>
+        ),
+      )}
+      <a
+        class="tab"
+        href={pageUrl('yonetim/video')}
+        aria-current={current === 'video' ? 'page' : undefined}
+      >
+        <Icon name="film" size={22} />
+        <span>{admin.tabs.video}</span>
+      </a>
+    </nav>
+  </div>
+</BaseLayout>

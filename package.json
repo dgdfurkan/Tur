@@ -16,8 +16,10 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test",
+    "build:e2e": "OUT_DIR=./dist-e2e astro build --mode e2e",
+    "test:e2e": "npm run build:e2e && playwright test",
     "map:build": "node scripts/build-map-data.ts",
+    "panel:code": "node scripts/set-panel-code.ts",
     "verify": "npm run check && npm run lint && npm test && npm run build"
   },
   "dependencies": {

@@ -90,7 +90,24 @@ export const tr = {
     framed:
       'Panel, başka bir sayfanın içinde açıldığında çalışmaz. Lütfen paneli kendi adresinden açınız.',
     backToSite: 'Siteye Dön',
-    tabs: { summary: 'Özet', add: 'Yolcu Ekle', list: 'Yolcu Listesi' },
+    gate: {
+      heading: 'Panel Kilitli',
+      intro: 'Panel yalnızca yetkili kişilere açıktır. Devam etmek için erişim kodunu yazınız.',
+      code: 'Erişim Kodu',
+      remember: 'Bu Cihazda Hatırla',
+      submit: 'Paneli Aç',
+      lock: 'Kilitle',
+      wrong: 'Erişim kodu hatalı.',
+      paused: 'Çok sayıda hatalı deneme yapıldı. Otuz saniye sonra yeniden deneyiniz.',
+      insecure: 'Panel yalnızca güvenli bağlantı (HTTPS) üzerinden açılır.',
+    },
+    tabs: {
+      label: 'Panel Bölümleri',
+      summary: 'Özet',
+      add: 'Yolcu Ekle',
+      list: 'Yolcu Listesi',
+      video: 'Video',
+    },
     stats: {
       departures: 'Yaklaşan Kalkış',
       passengers: 'Kayıtlı Yolcu',
