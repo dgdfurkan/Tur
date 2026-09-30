@@ -1,0 +1,11 @@
+dist/
+.astro/
+node_modules/
+.claude/
+coverage/
+playwright-report/
+test-results/
+.lighthouseci/
+package-lock.json
+skills-lock.json
+src/features/map3d/data/
