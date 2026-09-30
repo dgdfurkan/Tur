@@ -3,7 +3,12 @@ import { GeoPoint } from '@/domain/geo/GeoPoint';
 import { Money } from '@/domain/shared/Money';
 import { RoutePlan } from '@/domain/tour/RoutePlan';
 import { Tour, type Stop, type StopKind } from '@/domain/tour/Tour';
-import { easeLeg, RouteSimulation } from '@/features/route-simulation/RouteSimulation';
+import {
+  driveSeconds,
+  easeLeg,
+  RouteSimulation,
+  uneaseLeg,
+} from '@/features/route-simulation/RouteSimulation';
 
 function stop(id: string, kind: StopKind, lat: number, lon: number): Stop {
   return {
@@ -18,7 +23,11 @@ function stop(id: string, kind: StopKind, lat: number, lon: number): Stop {
 }
 
 function plan(): RoutePlan {
-  const tour = new Tour({
+  return RoutePlan.fromTour(sampleTour());
+}
+
+function sampleTour(): Tour {
+  return new Tour({
     id: 't',
     title: 'T',
     category: 'kultur',
@@ -49,7 +58,6 @@ function plan(): RoutePlan {
     ],
     departures: [],
   });
-  return RoutePlan.fromTour(tour);
 }
 
 describe('RoutePlan', () => {
@@ -67,6 +75,17 @@ describe('RoutePlan', () => {
     const { minX, maxX, minY, maxY } = plan().bounds;
     expect(minX).toBeLessThan(maxX);
     expect(minY).toBeLessThan(maxY);
+  });
+
+  it('cuts out a single day, starting where the day before ended', () => {
+    const tour = sampleTour();
+    const first = RoutePlan.forDay(tour, 1);
+    expect(first.stops.map((s) => s.stop.id)).toEqual(['a', 'b']);
+    const second = RoutePlan.forDay(tour, 2);
+    expect(second.stops.map((s) => s.stop.id)).toEqual(['b', 'c', 'd']);
+    expect(second.stops.map((s) => s.day)).toEqual([2, 2, 2]);
+    expect(second.stops[0]?.distanceKm).toBe(0);
+    expect(() => RoutePlan.forDay(tour, 3)).toThrow(RangeError);
   });
 
   it('measures the room around a stop, ignoring stops at the same place', () => {
@@ -154,5 +173,20 @@ describe('easeLeg', () => {
     expect(easeLeg(0.5)).toBeCloseTo(0.5);
     expect(easeLeg(0.25)).toBeLessThan(0.25);
     expect(easeLeg(2)).toBe(1);
+  });
+
+  it('can be undone, to place the coach at an exact share of a leg', () => {
+    for (const share of [0, 0.1, 0.37, 0.5, 0.82, 1]) {
+      expect(easeLeg(uneaseLeg(share))).toBeCloseTo(share);
+    }
+  });
+});
+
+describe('driveSeconds', () => {
+  it('keeps hops inside a town short and long legs within a limit', () => {
+    expect(driveSeconds(1)).toBeLessThan(driveSeconds(20));
+    expect(driveSeconds(20)).toBe(driveSeconds(40));
+    expect(driveSeconds(200)).toBeGreaterThan(driveSeconds(100));
+    expect(driveSeconds(2000)).toBe(driveSeconds(1000));
   });
 });

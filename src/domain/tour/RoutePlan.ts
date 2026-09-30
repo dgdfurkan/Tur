@@ -40,6 +40,25 @@ export class RoutePlan<P extends RoutePlace = Stop> {
     );
   }
 
+  /**
+   * One day of a tour on its own. It starts where the day before ended, so the
+   * first leg of the morning has somewhere to set off from.
+   */
+  static forDay(
+    tour: Tour,
+    dayNumber: number,
+    projection: MapProjection = TURKEY_PROJECTION,
+  ): RoutePlan {
+    const day = tour.days.find((candidate) => candidate.number === dayNumber);
+    if (!day) throw new RangeError(`Tour ${tour.id} has no day ${dayNumber}`);
+    const eve = tour.days.find((candidate) => candidate.number === dayNumber - 1)?.stops.at(-1);
+    const visits = day.stops.map((stop) => ({ stop, day: day.number }));
+    return RoutePlan.fromStops(
+      eve ? [{ stop: eve, day: day.number }, ...visits] : visits,
+      projection,
+    );
+  }
+
   /** Builds a plan from stops in travel order, each tagged with its day. */
   static fromStops<P extends RoutePlace>(
     visits: readonly { stop: P; day: number }[],

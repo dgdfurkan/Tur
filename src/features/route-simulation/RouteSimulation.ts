@@ -143,9 +143,7 @@ export class RouteSimulation {
   }
 
   legSeconds(legIndex: number): number {
-    const km = this.plan.legKm(legIndex);
-    if (km < SHORT_HOP_KM) return SHORT_HOP_SECONDS;
-    return Math.min(MAX_LEG_SECONDS, Math.max(MIN_LEG_SECONDS, km * SECONDS_PER_KM));
+    return driveSeconds(this.plan.legKm(legIndex));
   }
 
   private dwellSeconds(stopIndex: number): number {
@@ -202,8 +200,23 @@ export class RouteSimulation {
   }
 }
 
+/** How long the coach takes over a leg of the given length; the scale is the map's, not the road's. */
+export function driveSeconds(km: number): number {
+  if (km < SHORT_HOP_KM) return SHORT_HOP_SECONDS;
+  return Math.min(MAX_LEG_SECONDS, Math.max(MIN_LEG_SECONDS, km * SECONDS_PER_KM));
+}
+
 /** Coaches pull away and brake gently; applied by views to the linear leg progress. */
 export function easeLeg(progress: number): number {
   const clamped = Math.min(1, Math.max(0, progress));
   return clamped < 0.5 ? 2 * clamped * clamped : 1 - (-2 * clamped + 2) ** 2 / 2;
+}
+
+/**
+ * The progress that `easeLeg` turns into the given share of a leg. It lets a
+ * caller place the coach at an exact point, for motion that must not slow at stops.
+ */
+export function uneaseLeg(share: number): number {
+  const clamped = Math.min(1, Math.max(0, share));
+  return clamped < 0.5 ? Math.sqrt(clamped / 2) : 1 - Math.sqrt((1 - clamped) / 2);
 }

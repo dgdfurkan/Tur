@@ -1,4 +1,4 @@
-import { MathUtils, Vector3, type PerspectiveCamera } from 'three';
+import { MathUtils, Vector2, Vector3, type PerspectiveCamera } from 'three';
 import type { MapView } from './world';
 import type { Updatable, ViewPadding } from '@/shared/lifecycle';
 
@@ -30,6 +30,10 @@ export class CameraRig implements Updatable {
   private width = 1;
   private height = 1;
   private readonly viewNow = { distance: 150, unitsPerPixel: 1 };
+  /** How far the picture is shifted so its centre sits in the middle of the free area. */
+  private readonly offset = new Vector2();
+  private readonly wantedOffset = new Vector2();
+  private framed = false;
 
   /**
    * @param instant Jump straight to each pose instead of gliding; used when the
@@ -53,10 +57,11 @@ export class CameraRig implements Updatable {
     this.width = width;
     this.height = height;
     this.padding = padding;
-    // Shift the projection so the scene centre lands in the middle of the free area.
-    const offsetX = (padding.right - padding.left) / 2;
-    const offsetY = (padding.bottom - padding.top) / 2;
-    this.camera.setViewOffset(width, height, offsetX, offsetY, width, height);
+    this.wantedOffset.set((padding.right - padding.left) / 2, (padding.bottom - padding.top) / 2);
+    // The first framing is taken at once; later changes glide, so a panel opening never jolts the map.
+    if (!this.framed || this.instant) this.offset.copy(this.wantedOffset);
+    this.framed = true;
+    this.shift();
     this.measure();
   }
 
@@ -96,6 +101,12 @@ export class CameraRig implements Updatable {
     this.target.lerp(this.wantedTarget, blend);
     this.distanceNow = MathUtils.lerp(this.distanceNow, this.wantedDistance, blend);
     this.pitchNow = MathUtils.lerp(this.pitchNow, this.wantedPitch, blend);
+    if (!this.offset.equals(this.wantedOffset)) {
+      this.offset.lerp(this.wantedOffset, blend);
+      if (this.offset.distanceToSquared(this.wantedOffset) < 0.01)
+        this.offset.copy(this.wantedOffset);
+      this.shift();
+    }
     this.apply();
   }
 
@@ -109,6 +120,17 @@ export class CameraRig implements Updatable {
     );
     this.camera.lookAt(this.target);
     this.measure();
+  }
+
+  private shift(): void {
+    this.camera.setViewOffset(
+      this.width,
+      this.height,
+      this.offset.x,
+      this.offset.y,
+      this.width,
+      this.height,
+    );
   }
 
   private measure(): void {
