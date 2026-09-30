@@ -3,6 +3,7 @@
   "category": "kultur",
   "summary": "Pamukkale travertenleri, Efes Antik Kenti ve Şirince dört günlük bir programda gezilir; dönüş yolunda Gordion ziyaret edilir.",
   "emblem": "antik-kent",
+  "scene": "kutuphane",
   "destination": "Efes",
   "nights": 3,
   "distanceFromAnkaraKm": 610,
@@ -56,7 +57,8 @@
           "kind": "departure",
           "lat": 39.9208,
           "lon": 32.8541,
-          "summary": "Saat 07.00'de Kızılay'daki buluşma noktasından hareket edilir."
+          "summary": "Saat 07.00'de Kızılay'daki buluşma noktasından hareket edilir.",
+          "scene": "sehir"
         },
         {
           "id": "afyon-mola",
@@ -65,6 +67,7 @@
           "lat": 38.757,
           "lon": 30.539,
           "summary": "Öğle yemeği molası verilir.",
+          "scene": "mola",
           "durationMinutes": 60
         },
         {
@@ -74,6 +77,17 @@
           "lat": 37.924,
           "lon": 29.123,
           "summary": "Beyaz traverten teraslarında çıplak ayakla yürünür.",
+          "scene": "traverten",
+          "facts": [
+            {
+              "label": "UNESCO Dünya Mirası",
+              "value": "1988"
+            },
+            {
+              "label": "Su Sıcaklığı",
+              "value": "yaklaşık 35 °C"
+            }
+          ],
           "durationMinutes": 120
         },
         {
@@ -83,6 +97,13 @@
           "lat": 37.927,
           "lon": 29.127,
           "summary": "Antik tiyatro ve nekropol gezilir.",
+          "scene": "antik-tiyatro",
+          "facts": [
+            {
+              "label": "Kuruluş",
+              "value": "MÖ 2. yüzyıl"
+            }
+          ],
           "durationMinutes": 60
         },
         {
@@ -91,7 +112,8 @@
           "kind": "lodging",
           "lat": 37.966,
           "lon": 29.104,
-          "summary": "Termal otele yerleşilir; akşam yemeği otelde alınır."
+          "summary": "Termal otele yerleşilir; akşam yemeği otelde alınır.",
+          "scene": "otel"
         }
       ]
     },
@@ -106,6 +128,17 @@
           "lat": 37.941,
           "lon": 27.342,
           "summary": "Celsus Kütüphanesi, Büyük Tiyatro ve Kuretler Caddesi rehber anlatımıyla gezilir.",
+          "scene": "kutuphane",
+          "facts": [
+            {
+              "label": "UNESCO Dünya Mirası",
+              "value": "2015"
+            },
+            {
+              "label": "Büyük Tiyatro",
+              "value": "yaklaşık 25.000 kişilik"
+            }
+          ],
           "durationMinutes": 150
         },
         {
@@ -115,6 +148,13 @@
           "lat": 37.912,
           "lon": 27.334,
           "summary": "Bülbül Dağı'ndaki ziyaret yeri görülür.",
+          "scene": "sapel",
+          "facts": [
+            {
+              "label": "Konum",
+              "value": "Bülbül Dağı"
+            }
+          ],
           "durationMinutes": 45
         },
         {
@@ -124,6 +164,13 @@
           "lat": 37.943,
           "lon": 27.433,
           "summary": "Taş döşeli sokaklarda serbest zaman verilir.",
+          "scene": "koy",
+          "facts": [
+            {
+              "label": "Mimari",
+              "value": "Taş ve ahşap köy evleri"
+            }
+          ],
           "durationMinutes": 90
         },
         {
@@ -132,7 +179,8 @@
           "kind": "lodging",
           "lat": 37.86,
           "lon": 27.26,
-          "summary": "Otele yerleşilir; akşam yemeği otelde alınır."
+          "summary": "Otele yerleşilir; akşam yemeği otelde alınır.",
+          "scene": "otel"
         }
       ]
     },
@@ -147,6 +195,17 @@
           "lat": 38.4189,
           "lon": 27.1287,
           "summary": "Saat Kulesi görülür; Kemeraltı Çarşısı'nda serbest zaman verilir.",
+          "scene": "saat-kulesi",
+          "facts": [
+            {
+              "label": "Saat Kulesi",
+              "value": "1901"
+            },
+            {
+              "label": "Yükseklik",
+              "value": "25 m"
+            }
+          ],
           "durationMinutes": 120
         },
         {
@@ -156,6 +215,13 @@
           "lat": 38.488,
           "lon": 28.04,
           "summary": "Lidya başkentindeki hamam yapısı ve sinagog kalıntıları gezilir.",
+          "scene": "sutunlar",
+          "facts": [
+            {
+              "label": "Önemi",
+              "value": "Lidya Krallığı'nın başkenti"
+            }
+          ],
           "durationMinutes": 75
         },
         {
@@ -164,7 +230,8 @@
           "kind": "lodging",
           "lat": 38.757,
           "lon": 30.539,
-          "summary": "Termal otele yerleşilir; akşam yemeği otelde alınır."
+          "summary": "Termal otele yerleşilir; akşam yemeği otelde alınır.",
+          "scene": "otel"
         }
       ]
     },
@@ -179,6 +246,17 @@
           "lat": 39.65,
           "lon": 31.978,
           "summary": "UNESCO Dünya Mirası Listesi'ndeki Frig başkentinde Midas Tümülüsü ve müze gezilir.",
+          "scene": "tumulus",
+          "facts": [
+            {
+              "label": "UNESCO Dünya Mirası",
+              "value": "2023"
+            },
+            {
+              "label": "Önemi",
+              "value": "Frig Krallığı'nın başkenti"
+            }
+          ],
           "durationMinutes": 90
         },
         {
@@ -187,7 +265,8 @@
           "kind": "arrival",
           "lat": 39.9208,
           "lon": 32.8541,
-          "summary": "Saat 17.30 civarında Kızılay'a varılır."
+          "summary": "Saat 17.30 civarında Kızılay'a varılır.",
+          "scene": "sehir"
         }
       ]
     }

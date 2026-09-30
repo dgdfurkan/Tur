@@ -10,7 +10,7 @@ import {
   RingGeometry,
   Vector3,
 } from 'three';
-import type { RoutePlan } from '@/domain/tour/RoutePlan';
+import type { RoutePlace, RoutePlan } from '@/domain/tour/RoutePlan';
 import type { StopKind } from '@/domain/tour/Tour';
 import type { RouteTrack } from './RouteTrack';
 import { MARKER_RADIUS } from './world';
@@ -44,7 +44,7 @@ export class StopMarkers implements Disposable {
   private scale = 1;
   private activeIndex: number | null = null;
 
-  constructor(plan: RoutePlan, track: RouteTrack) {
+  constructor(plan: RoutePlan<RoutePlace>, track: RouteTrack) {
     const rimMaterial = new MeshBasicMaterial({ color: '#ffffff' });
     const coreMaterial = new MeshBasicMaterial({ color: '#ffffff' });
     this.pulseMaterial = new MeshBasicMaterial({

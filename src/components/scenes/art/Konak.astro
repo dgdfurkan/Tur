@@ -1,0 +1,90 @@
+---
+import { ink } from '../palette';
+import Cloud from '../parts/Cloud.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyDay}></rect>
+<Cloud x={262} y={30} scale={1.1} />
+<path d="M0 110q80-30 170-16t150-20v90H0z" fill={ink.farGreen}></path>
+<!-- House at the back -->
+<g>
+  <rect x="214" y="78" width="84" height="84" fill={ink.wallShade}></rect>
+  <path d="M204 80l52-26 52 26z" fill={ink.roofShade}></path>
+  <g fill={ink.glass}>
+    <rect x="226" y="92" width="12" height="18"></rect>
+    <rect x="246" y="92" width="12" height="18"></rect>
+    <rect x="266" y="92" width="12" height="18"></rect>
+  </g>
+</g>
+<!-- Left house: stone ground floor, timber-framed upper floor jutting out -->
+<g>
+  <rect x="20" y="118" width="92" height="46" fill={ink.stoneShade}></rect>
+  <rect x="12" y="62" width="108" height="58" fill={ink.wall}></rect>
+  <path d="M2 64l64-30 64 30z" fill={ink.roof}></path>
+  <path d="M66 34l64 30h-14l-50-24z" fill={ink.roofShade}></path>
+  <g fill={ink.wood}>
+    <rect x="12" y="62" width="108" height="3"></rect>
+    <rect x="12" y="117" width="108" height="3"></rect>
+    <rect x="12" y="62" width="3" height="58"></rect>
+    <rect x="117" y="62" width="3" height="58"></rect>
+    <rect x="47" y="62" width="2.5" height="58"></rect>
+    <rect x="83" y="62" width="2.5" height="58"></rect>
+    <path d="M14 120l8 0 0-10z"></path>
+    <path d="M118 120l-8 0 0-10z"></path>
+  </g>
+  <g fill={ink.glass}>
+    <rect x="21" y="74" width="9" height="22"></rect>
+    <rect x="33" y="74" width="9" height="22"></rect>
+    <rect x="55" y="74" width="9" height="22"></rect>
+    <rect x="67" y="74" width="9" height="22"></rect>
+    <rect x="91" y="74" width="9" height="22"></rect>
+    <rect x="103" y="74" width="9" height="22"></rect>
+  </g>
+  <path d="M52 164v-26q10-10 20 0v26z" fill={ink.woodDeep}></path>
+  <rect x="84" y="134" width="14" height="14" fill={ink.glass}></rect>
+</g>
+<!-- Right house -->
+<g>
+  <rect x="140" y="126" width="80" height="38" fill={ink.stone}></rect>
+  <rect x="132" y="80" width="96" height="48" fill={ink.wall}></rect>
+  <path d="M122 82l58-26 58 26z" fill={ink.roof}></path>
+  <path d="M180 56l58 26h-13l-45-20z" fill={ink.roofShade}></path>
+  <g fill={ink.wood}>
+    <rect x="132" y="80" width="96" height="3"></rect>
+    <rect x="132" y="125" width="96" height="3"></rect>
+    <rect x="132" y="80" width="3" height="48"></rect>
+    <rect x="225" y="80" width="3" height="48"></rect>
+    <rect x="178" y="80" width="2.5" height="48"></rect>
+  </g>
+  <g fill={ink.glass}>
+    <rect x="142" y="92" width="9" height="20"></rect>
+    <rect x="155" y="92" width="9" height="20"></rect>
+    <rect x="188" y="92" width="9" height="20"></rect>
+    <rect x="201" y="92" width="9" height="20"></rect>
+  </g>
+  <rect x="172" y="140" width="16" height="24" fill={ink.woodDeep}></rect>
+</g>
+<!-- Cobbled street and a lamp -->
+<rect x="0" y="164" width="320" height="36" fill={ink.rockShade}></rect>
+<g fill={ink.rock}>
+  <rect x="6" y="170" width="28" height="8" rx="3"></rect>
+  <rect x="42" y="170" width="24" height="8" rx="3"></rect>
+  <rect x="74" y="170" width="30" height="8" rx="3"></rect>
+  <rect x="112" y="170" width="26" height="8" rx="3"></rect>
+  <rect x="146" y="170" width="30" height="8" rx="3"></rect>
+  <rect x="184" y="170" width="24" height="8" rx="3"></rect>
+  <rect x="216" y="170" width="30" height="8" rx="3"></rect>
+  <rect x="254" y="170" width="26" height="8" rx="3"></rect>
+  <rect x="288" y="170" width="28" height="8" rx="3"></rect>
+  <rect x="20" y="184" width="30" height="8" rx="3"></rect>
+  <rect x="58" y="184" width="26" height="8" rx="3"></rect>
+  <rect x="92" y="184" width="30" height="8" rx="3"></rect>
+  <rect x="130" y="184" width="24" height="8" rx="3"></rect>
+  <rect x="162" y="184" width="30" height="8" rx="3"></rect>
+  <rect x="200" y="184" width="26" height="8" rx="3"></rect>
+  <rect x="234" y="184" width="30" height="8" rx="3"></rect>
+  <rect x="272" y="184" width="28" height="8" rx="3"></rect>
+</g>
+<rect x="246" y="118" width="2.5" height="48" fill={ink.dark}></rect>
+<path d="M240 108h14l-3 12h-8z" fill={ink.lit}></path>
+<rect x="240" y="105" width="14" height="3" fill={ink.dark}></rect>

@@ -1,0 +1,63 @@
+---
+import { ink } from '../palette';
+import Cloud from '../parts/Cloud.astro';
+import Tree from '../parts/Tree.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyDay}></rect>
+<Cloud x={262} y={32} scale={1.1} />
+<rect x="0" y="112" width="320" height="30" fill={ink.sea}></rect>
+<path d="M0 112h320v6H0z" fill={ink.seaDeep} opacity="0.45"></path>
+<!-- Bell tower -->
+<g>
+  <rect x="40" y="58" width="30" height="104" fill={ink.stone}></rect>
+  <rect x="60" y="58" width="10" height="104" fill={ink.stoneShade}></rect>
+  <path d="M36 60l19-22 19 22z" fill={ink.roof}></path>
+  <path d="M47 84v-12q8-8 16 0v12z" fill={ink.dark}></path>
+  <rect x="50" y="102" width="9" height="12" rx="4.5" fill={ink.stoneDeep}></rect>
+  <rect x="50" y="128" width="9" height="12" rx="4.5" fill={ink.stoneDeep}></rect>
+</g>
+<!-- Church -->
+<g>
+  <rect x="104" y="106" width="150" height="56" fill={ink.stone}></rect>
+  <rect x="224" y="106" width="30" height="56" fill={ink.stoneShade}></rect>
+  <path d="M96 108l83-30 83 30z" fill={ink.roof}></path>
+  <path d="M179 78l83 30h-22l-61-22z" fill={ink.roofShade}></path>
+  <!-- Drum and dome -->
+  <rect x="158" y="60" width="42" height="30" fill={ink.marble}></rect>
+  <rect x="188" y="60" width="12" height="30" fill={ink.marbleShade}></rect>
+  <path d="M152 62q27-38 54 0z" fill={ink.roof}></path>
+  <rect x="178" y="22" width="2" height="12" fill={ink.stoneDeep}></rect>
+  <g fill={ink.stoneDeep}>
+    <rect x="164" y="68" width="6" height="14" rx="3"></rect>
+    <rect x="176" y="68" width="6" height="14" rx="3"></rect>
+    <rect x="188" y="68" width="6" height="14" rx="3"></rect>
+  </g>
+  <!-- Porch with three arches -->
+  <rect x="136" y="122" width="86" height="40" fill={ink.marble}></rect>
+  <path d="M130 124l49-18 49 18z" fill={ink.roofShade}></path>
+  <g fill={ink.dark}>
+    <path d="M144 162v-22q8-10 16 0v22z"></path>
+    <path d="M171 162v-26q8-10 16 0v26z"></path>
+    <path d="M198 162v-22q8-10 16 0v22z"></path>
+  </g>
+  <g fill={ink.stoneDeep}>
+    <rect x="112" y="124" width="7" height="14" rx="3.5"></rect>
+    <rect x="236" y="124" width="7" height="14" rx="3.5"></rect>
+  </g>
+</g>
+<!-- Garden -->
+<rect x="0" y="160" width="320" height="40" fill={ink.grass}></rect>
+<path d="M160 162h38l30 38h-98z" fill={ink.sand}></path>
+<Tree x={286} y={164} size={16} fill={ink.grassDeep} />
+<Tree x={20} y={168} size={12} fill={ink.forest} />
+<g fill={ink.red}>
+  <circle cx="92" cy="180" r="2.5"></circle>
+  <circle cx="104" cy="186" r="2.5"></circle>
+  <circle cx="250" cy="184" r="2.5"></circle>
+</g>
+<g fill={ink.yellow}>
+  <circle cx="98" cy="190" r="2.5"></circle>
+  <circle cx="262" cy="190" r="2.5"></circle>
+  <circle cx="240" cy="192" r="2.5"></circle>
+</g>

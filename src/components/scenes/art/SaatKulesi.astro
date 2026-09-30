@@ -1,0 +1,59 @@
+---
+import { ink } from '../palette';
+import Birds from '../parts/Birds.astro';
+import Cloud from '../parts/Cloud.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyDay}></rect>
+<Cloud x={60} y={36} scale={1.1} />
+<Birds x={236} y={44} />
+<!-- Gulf and the far shore -->
+<path d="M0 118q80-16 160-8t160-10v30H0z" fill={ink.farBlue}></path>
+<rect x="0" y="126" width="320" height="30" fill={ink.sea}></rect>
+<g fill={ink.foam} opacity="0.7">
+  <rect x="24" y="136" width="26" height="2" rx="1"></rect>
+  <rect x="230" y="140" width="30" height="2" rx="1"></rect>
+  <rect x="270" y="132" width="20" height="2" rx="1"></rect>
+</g>
+<!-- Square -->
+<rect x="0" y="154" width="320" height="46" fill={ink.marble}></rect>
+<g fill="none" stroke={ink.marbleShade} stroke-width="1.2">
+  <path d="M0 168h320M0 184h320M40 154l-30 46M100 154l-16 46M160 154v46M220 154l16 46M280 154l30 46"></path>
+</g>
+<!-- Palms -->
+<g>
+  <rect x="58" y="108" width="4" height="50" fill={ink.wood}></rect>
+  <g fill="none" stroke={ink.forest} stroke-width="4" stroke-linecap="round">
+    <path d="M60 108q-16-10-26 2M60 108q-6-16-20-14M60 108q6-16 20-14M60 108q16-10 26 2M60 108q0-16 2-20"></path>
+  </g>
+  <rect x="258" y="112" width="4" height="46" fill={ink.wood}></rect>
+  <g fill="none" stroke={ink.forest} stroke-width="4" stroke-linecap="round">
+    <path d="M260 112q-16-10-26 2M260 112q-6-16-20-14M260 112q6-16 20-14M260 112q16-10 26 2M260 112q0-16 2-20"></path>
+  </g>
+</g>
+<!-- The tower -->
+<g>
+  <path d="M128 158v-30l8-8h48l8 8v30z" fill={ink.marble}></path>
+  <g fill={ink.stoneShade}>
+    <path d="M136 158v-20q6-8 12 0v20z"></path>
+    <path d="M154 158v-20q6-8 12 0v20z"></path>
+    <path d="M172 158v-20q6-8 12 0v20z"></path>
+  </g>
+  <rect x="140" y="92" width="40" height="28" fill={ink.marbleShade}></rect>
+  <rect x="136" y="88" width="48" height="6" fill={ink.marble}></rect>
+  <rect x="144" y="52" width="32" height="38" fill={ink.marble}></rect>
+  <circle cx="160" cy="70" r="12" fill={ink.wall}></circle>
+  <circle cx="160" cy="70" r="12" fill="none" stroke={ink.blue} stroke-width="2.5"></circle>
+  <path
+    d="M160 70v-8M160 70l6 3"
+    fill="none"
+    stroke={ink.dark}
+    stroke-width="1.8"
+    stroke-linecap="round"
+  ></path>
+  <rect x="140" y="46" width="40" height="7" fill={ink.marbleShade}></rect>
+  <rect x="150" y="30" width="20" height="16" fill={ink.marble}></rect>
+  <path d="M148 30q12-18 24 0z" fill={ink.blue}></path>
+  <rect x="159" y="10" width="2.4" height="10" fill={ink.stoneDeep}></rect>
+  <path d="M152 100v-2q8-8 16 0v2zM152 116v-8q8-8 16 0v8z" fill={ink.stoneDeep}></path>
+</g>

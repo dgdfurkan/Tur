@@ -3,6 +3,7 @@
   "category": "kultur",
   "summary": "Osmanlı konaklarıyla tanınan Safranbolu'da konaklanır; ertesi gün Karadeniz kıyısındaki Amasra gezilir.",
   "emblem": "konak",
+  "scene": "konak",
   "destination": "Safranbolu",
   "nights": 1,
   "distanceFromAnkaraKm": 225,
@@ -42,7 +43,8 @@
           "kind": "departure",
           "lat": 39.9208,
           "lon": 32.8541,
-          "summary": "Saat 07.00'de Kızılay'daki buluşma noktasından hareket edilir."
+          "summary": "Saat 07.00'de Kızılay'daki buluşma noktasından hareket edilir.",
+          "scene": "sehir"
         },
         {
           "id": "gerede",
@@ -51,6 +53,7 @@
           "lat": 40.8,
           "lon": 32.2,
           "summary": "Kahvaltı molası verilir.",
+          "scene": "mola",
           "durationMinutes": 45
         },
         {
@@ -60,6 +63,7 @@
           "lat": 41.243,
           "lon": 32.696,
           "summary": "Safranbolu'nun kırmızı kiremitli konakları tepeden izlenir.",
+          "scene": "seyir",
           "durationMinutes": 30
         },
         {
@@ -69,6 +73,13 @@
           "lat": 41.244,
           "lon": 32.693,
           "summary": "Cinci Hanı, Kaymakamlar Evi ve Yemeniciler Arastası gezilir.",
+          "scene": "carsi",
+          "facts": [
+            {
+              "label": "UNESCO Dünya Mirası",
+              "value": "1994"
+            }
+          ],
           "durationMinutes": 180
         },
         {
@@ -78,6 +89,17 @@
           "lat": 41.279,
           "lon": 32.685,
           "summary": "Tokatlı Kanyonu üzerindeki su kemeri ve cam seyir terası görülür.",
+          "scene": "su-kemeri",
+          "facts": [
+            {
+              "label": "Uzunluk",
+              "value": "116 m"
+            },
+            {
+              "label": "Yaptıran",
+              "value": "İzzet Mehmet Paşa"
+            }
+          ],
           "durationMinutes": 60
         },
         {
@@ -86,7 +108,8 @@
           "kind": "lodging",
           "lat": 41.249,
           "lon": 32.691,
-          "summary": "Tarihî konağa yerleşilir; akşam yemeği konakta alınır."
+          "summary": "Tarihî konağa yerleşilir; akşam yemeği konakta alınır.",
+          "scene": "konak"
         }
       ]
     },
@@ -101,6 +124,13 @@
           "lat": 41.749,
           "lon": 32.383,
           "summary": "Ceneviz armalı surlar ve Kemere Köprüsü yürüyerek gezilir.",
+          "scene": "sahil-kalesi",
+          "facts": [
+            {
+              "label": "Dönem",
+              "value": "Bizans ve Ceneviz"
+            }
+          ],
           "durationMinutes": 90
         },
         {
@@ -110,6 +140,13 @@
           "lat": 41.747,
           "lon": 32.385,
           "summary": "Ahşap oyma ustalarının çarşısında ve sahilde öğle yemeği için serbest zaman verilir.",
+          "scene": "carsi",
+          "facts": [
+            {
+              "label": "Zanaat",
+              "value": "Ahşap oymacılığı"
+            }
+          ],
           "durationMinutes": 120
         },
         {
@@ -118,7 +155,8 @@
           "kind": "arrival",
           "lat": 39.9208,
           "lon": 32.8541,
-          "summary": "Saat 21.00 civarında Kızılay'a varılır."
+          "summary": "Saat 21.00 civarında Kızılay'a varılır.",
+          "scene": "sehir"
         }
       ]
     }

@@ -1,0 +1,46 @@
+---
+import { ink } from '../palette';
+import Birds from '../parts/Birds.astro';
+import Cloud from '../parts/Cloud.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyDay}></rect>
+<Cloud x={54} y={40} scale={1.1} />
+<Birds x={236} y={52} />
+<path d="M0 132q90-20 170-8t150-12v50H0z" fill={ink.farSand}></path>
+<!-- The rock citadel -->
+<path d="M84 160l14-52 18-12 8-40 22-24 20 8 14 30 22 10 10 36 24 44z" fill={ink.tuff}></path>
+<path d="M166 40l14 30 22 10 10 36 24 44h-40l-10-40-16-24z" fill={ink.tuffShade}></path>
+<g fill={ink.rockDeep}>
+  <rect x="128" y="70" width="7" height="9" rx="3"></rect>
+  <rect x="146" y="58" width="7" height="9" rx="3"></rect>
+  <rect x="150" y="84" width="7" height="9" rx="3"></rect>
+  <rect x="118" y="100" width="7" height="9" rx="3"></rect>
+  <rect x="136" y="108" width="7" height="9" rx="3"></rect>
+  <rect x="164" y="104" width="7" height="9" rx="3"></rect>
+  <rect x="184" y="92" width="7" height="9" rx="3"></rect>
+  <rect x="106" y="126" width="7" height="9" rx="3"></rect>
+  <rect x="154" y="126" width="7" height="9" rx="3"></rect>
+  <rect x="198" y="120" width="7" height="9" rx="3"></rect>
+</g>
+<!-- Flag on the summit -->
+<rect x="145" y="14" width="1.8" height="20" fill={ink.woodDeep}></rect>
+<path d="M147 15h15v9h-15z" fill={ink.red}></path>
+<!-- Village at the foot -->
+<g>
+  <rect x="40" y="138" width="34" height="22" fill={ink.stone}></rect>
+  <rect x="66" y="128" width="30" height="32" fill={ink.marble}></rect>
+  <rect x="210" y="134" width="36" height="26" fill={ink.marble}></rect>
+  <rect x="240" y="144" width="38" height="16" fill={ink.stone}></rect>
+  <g fill={ink.rockDeep}>
+    <rect x="48" y="144" width="6" height="8"></rect>
+    <rect x="60" y="144" width="6" height="8"></rect>
+    <rect x="74" y="136" width="6" height="8"></rect>
+    <rect x="84" y="136" width="6" height="8"></rect>
+    <rect x="218" y="142" width="6" height="8"></rect>
+    <rect x="232" y="142" width="6" height="8"></rect>
+    <rect x="254" y="148" width="6" height="7"></rect>
+  </g>
+</g>
+<rect x="0" y="160" width="320" height="40" fill={ink.sand}></rect>
+<path d="M0 174q80-10 160 0t160-4v30H0z" fill={ink.sandDeep}></path>

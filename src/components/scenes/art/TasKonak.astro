@@ -1,0 +1,90 @@
+---
+import { ink } from '../palette';
+---
+
+<rect width="320" height="200" fill={ink.skyDay}></rect>
+<!-- Neighbouring walls -->
+<rect x="0" y="70" width="56" height="100" fill={ink.stoneShade}></rect>
+<rect x="264" y="60" width="56" height="110" fill={ink.stoneShade}></rect>
+<!-- Mansion front -->
+<rect x="46" y="38" width="228" height="132" fill={ink.stone}></rect>
+<rect x="40" y="30" width="240" height="10" fill={ink.stoneShade}></rect>
+<rect x="46" y="100" width="228" height="5" fill={ink.stoneShade}></rect>
+<g fill="none" stroke={ink.stoneShade} stroke-width="1">
+  <path d="M46 56h228M46 72h228M46 88h228M46 122h228M46 138h228M46 154h228"></path>
+</g>
+<!-- Upper windows with blue shutters -->
+<g>
+  <g fill={ink.marble}>
+    <path d="M64 96V62q13-14 26 0v34z"></path>
+    <path d="M230 96V62q13-14 26 0v34z"></path>
+  </g>
+  <g fill={ink.blue}>
+    <path d="M68 96V64q9-9 18 0v32z"></path>
+    <path d="M234 96V64q9-9 18 0v32z"></path>
+  </g>
+  <g fill={ink.marble}>
+    <rect x="76" y="58" width="2" height="38"></rect>
+    <rect x="242" y="58" width="2" height="38"></rect>
+  </g>
+</g>
+<!-- Balcony over the door -->
+<path d="M128 96V56q32-22 64 0v40z" fill={ink.marble}></path>
+<path d="M134 96V60q26-17 52 0v36z" fill={ink.glass}></path>
+<rect x="159" y="48" width="2.5" height="48" fill={ink.marble}></rect>
+<rect x="120" y="94" width="80" height="6" fill={ink.stoneDeep}></rect>
+<g fill={ink.dark}>
+  <rect x="122" y="80" width="76" height="2"></rect>
+  <rect x="126" y="80" width="1.6" height="14"></rect>
+  <rect x="138" y="80" width="1.6" height="14"></rect>
+  <rect x="150" y="80" width="1.6" height="14"></rect>
+  <rect x="162" y="80" width="1.6" height="14"></rect>
+  <rect x="174" y="80" width="1.6" height="14"></rect>
+  <rect x="186" y="80" width="1.6" height="14"></rect>
+  <rect x="196" y="80" width="1.6" height="14"></rect>
+</g>
+<!-- Carved doorway with a painted lunette -->
+<path d="M132 170v-46q28-22 56 0v46z" fill={ink.marble}></path>
+<path d="M140 170v-42q20-15 40 0v42z" fill={ink.wood}></path>
+<path d="M140 128q20-15 40 0z" fill={ink.clay}></path>
+<rect x="159" y="128" width="2" height="42" fill={ink.woodDeep}></rect>
+<!-- Lower windows -->
+<g fill={ink.blue}>
+  <rect x="68" y="120" width="22" height="30" rx="2"></rect>
+  <rect x="230" y="120" width="22" height="30" rx="2"></rect>
+</g>
+<g fill={ink.marble}>
+  <rect x="78" y="120" width="2" height="30"></rect>
+  <rect x="240" y="120" width="2" height="30"></rect>
+</g>
+<!-- Vine and cobbles -->
+<path
+  d="M268 170c-4-30 6-50-2-76s4-30 0-46"
+  fill="none"
+  stroke={ink.forest}
+  stroke-width="3"
+></path>
+<g fill={ink.grassDeep}>
+  <circle cx="264" cy="70" r="6"></circle>
+  <circle cx="272" cy="96" r="7"></circle>
+  <circle cx="262" cy="122" r="6"></circle>
+  <circle cx="270" cy="148" r="7"></circle>
+</g>
+<rect x="0" y="170" width="320" height="30" fill={ink.rockShade}></rect>
+<g fill={ink.rock}>
+  <rect x="8" y="176" width="26" height="8" rx="3"></rect>
+  <rect x="44" y="176" width="30" height="8" rx="3"></rect>
+  <rect x="84" y="176" width="24" height="8" rx="3"></rect>
+  <rect x="118" y="176" width="32" height="8" rx="3"></rect>
+  <rect x="160" y="176" width="26" height="8" rx="3"></rect>
+  <rect x="196" y="176" width="30" height="8" rx="3"></rect>
+  <rect x="236" y="176" width="26" height="8" rx="3"></rect>
+  <rect x="272" y="176" width="34" height="8" rx="3"></rect>
+  <rect x="24" y="188" width="30" height="8" rx="3"></rect>
+  <rect x="64" y="188" width="26" height="8" rx="3"></rect>
+  <rect x="100" y="188" width="32" height="8" rx="3"></rect>
+  <rect x="142" y="188" width="26" height="8" rx="3"></rect>
+  <rect x="178" y="188" width="30" height="8" rx="3"></rect>
+  <rect x="218" y="188" width="26" height="8" rx="3"></rect>
+  <rect x="254" y="188" width="32" height="8" rx="3"></rect>
+</g>

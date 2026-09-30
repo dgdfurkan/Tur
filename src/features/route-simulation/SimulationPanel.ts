@@ -2,6 +2,7 @@ import type { RouteStop } from '@/domain/tour/RoutePlan';
 import { tr } from '@/i18n/tr';
 import type { ViewPadding } from '@/shared/lifecycle';
 import { formatMinutes } from '@/shared/format';
+import { PlaceCard } from './PlaceCard';
 
 export interface PanelHandlers {
   start(): void;
@@ -43,6 +44,7 @@ export class SimulationPanel {
   private readonly sheetToggle: HTMLElement;
   private readonly sheetLabel: HTMLElement;
   private readonly stopButtons: HTMLButtonElement[];
+  private readonly place: PlaceCard;
   private readonly wide = matchMedia(WIDE_LAYOUT);
   /** Height of the closed sheet that stays on screen, in pixels. */
   private peek = 0;
@@ -64,6 +66,7 @@ export class SimulationPanel {
     this.sheetToggle = this.find('[data-action="sheet"]');
     this.sheetLabel = this.find('[data-sheet-label]');
     this.stopButtons = [...root.querySelectorAll<HTMLButtonElement>('[data-stop-index]')];
+    this.place = new PlaceCard(this.find('[data-place]'));
 
     // The card grows and shrinks with its text; the closed sheet always shows down to the list button.
     const observer = new ResizeObserver(() => this.syncPeek());
@@ -111,6 +114,7 @@ export class SimulationPanel {
     this.title.textContent = tr.route.heading;
     this.text.textContent = summary;
     this.setDuration(undefined);
+    this.place.hide();
   }
 
   showStop(stop: RouteStop): void {
@@ -119,6 +123,7 @@ export class SimulationPanel {
     this.title.textContent = stop.stop.name;
     this.text.textContent = stop.stop.summary;
     this.setDuration(stop.stop.durationMinutes);
+    this.place.show(stop.stop);
   }
 
   /** Shown between stops: where the coach is heading and how far it still is. */
@@ -128,6 +133,7 @@ export class SimulationPanel {
     this.title.textContent = next.stop.name;
     this.text.textContent = tr.route.roadAhead(distance);
     this.setDuration(undefined);
+    this.place.hide();
   }
 
   showFinished(badge: string, summary: string): void {
@@ -136,6 +142,7 @@ export class SimulationPanel {
     this.title.textContent = tr.route.finished;
     this.text.textContent = summary;
     this.setDuration(undefined);
+    this.place.hide();
   }
 
   /** Read out by screen readers; visual users see the same change on the card. */
@@ -182,7 +189,15 @@ export class SimulationPanel {
     const bar = this.bar.getBoundingClientRect();
     if (this.wide.matches) {
       const panel = this.panel.getBoundingClientRect();
-      return { left: panel.right + EDGE_GAP, right: EDGE_GAP, top: bar.bottom, bottom: EDGE_GAP };
+      // On the journey a column beside the map is kept free for the place card, shown or not,
+      // so the map does not shift each time the card comes and goes.
+      const running = this.root.dataset['state'] === 'running';
+      return {
+        left: panel.right + EDGE_GAP,
+        right: running ? this.place.width + 2 * EDGE_GAP : EDGE_GAP,
+        top: bar.bottom,
+        bottom: EDGE_GAP,
+      };
     }
     // Taken from the layout rather than the panel's rectangle, which may still be sliding.
     const safeArea = parseFloat(getComputedStyle(this.panel).paddingBottom) || 0;

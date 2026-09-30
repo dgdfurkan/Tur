@@ -1,0 +1,48 @@
+---
+import { ink } from '../palette';
+import Pine from '../parts/Pine.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyPale}></rect>
+<!-- Ranges fading into mist -->
+<path d="M0 70q60-40 120-10t80-30 120 30v140H0z" fill={ink.farBlue}></path>
+<path d="M0 104q70-36 140-12t100-26 80 22v112H0z" fill={ink.farGreen}></path>
+<rect x="0" y="96" width="320" height="10" rx="5" fill={ink.cloud} opacity="0.55"></rect>
+<!-- The crag -->
+<path d="M96 200l24-70 22-34 40-6 26 30 28 80z" fill={ink.forestDeep}></path>
+<path d="M122 110l24-22h36l22 24-10 12h-62z" fill={ink.cliff}></path>
+<path d="M182 88l22 24-10 12h-20z" fill={ink.cliffShade}></path>
+<!-- Castle -->
+<g>
+  <rect x="134" y="66" width="64" height="30" fill={ink.stone}></rect>
+  <rect x="178" y="66" width="20" height="30" fill={ink.stoneShade}></rect>
+  <g fill={ink.stone}>
+    <rect x="134" y="60" width="8" height="7"></rect>
+    <rect x="148" y="60" width="8" height="7"></rect>
+    <rect x="162" y="60" width="8" height="7"></rect>
+    <rect x="176" y="60" width="8" height="7"></rect>
+    <rect x="190" y="60" width="8" height="7"></rect>
+  </g>
+  <rect x="152" y="36" width="24" height="60" fill={ink.marble}></rect>
+  <rect x="168" y="36" width="8" height="60" fill={ink.stoneShade}></rect>
+  <g fill={ink.marble}>
+    <rect x="150" y="30" width="7" height="7"></rect>
+    <rect x="160.5" y="30" width="7" height="7"></rect>
+    <rect x="171" y="30" width="7" height="7"></rect>
+  </g>
+  <rect x="160" y="48" width="5" height="10" rx="2.5" fill={ink.dark}></rect>
+  <path d="M140 96v-12q5-6 10 0v12z" fill={ink.dark}></path>
+  <rect x="163" y="12" width="1.8" height="18" fill={ink.woodDeep}></rect>
+  <path d="M165 13h14v9h-14z" fill={ink.red}></path>
+</g>
+<!-- Forest climbing the slopes -->
+<Pine x={20} y={176} height={76} fill={ink.forest} />
+<Pine x={54} y={188} height={92} fill={ink.forestDeep} />
+<Pine x={92} y={196} height={70} fill={ink.forest} />
+<Pine x={236} y={196} height={78} fill={ink.forest} />
+<Pine x={272} y={188} height={96} fill={ink.forestDeep} />
+<Pine x={304} y={178} height={72} fill={ink.forest} />
+<Pine x={122} y={166} height={40} fill={ink.forest} />
+<Pine x={206} y={168} height={44} fill={ink.forest} />
+<!-- River at the bottom of the valley -->
+<path d="M120 200q20-16 40-12t40 12z" fill={ink.water}></path>

@@ -1,6 +1,6 @@
 import { MathUtils, Vector3 } from 'three';
 import { toRoutePlan, type RouteOutline } from '@/application/dto/RouteOutline';
-import type { RoutePlan } from '@/domain/tour/RoutePlan';
+import type { RoutePlace, RoutePlan } from '@/domain/tour/RoutePlan';
 import { BusModel } from '@/features/map3d/BusModel';
 import type { MapSurface } from '@/features/map3d/MapSurface';
 import { MapWorld } from '@/features/map3d/MapWorld';
@@ -11,7 +11,7 @@ import { coachScale, KM_PER_UNIT, LAND_TOP, markerScale, roadScale } from '@/fea
 import type { Disposable } from '@/shared/lifecycle';
 
 interface ShowcaseRoute {
-  readonly plan: RoutePlan;
+  readonly plan: RoutePlan<RoutePlace>;
   readonly track: RouteTrack;
   readonly bus: BusModel;
   /** How far along its road the coach is; the coaches start spread out. */

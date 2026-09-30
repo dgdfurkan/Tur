@@ -1,0 +1,58 @@
+---
+import { ink } from '../palette';
+import Birds from '../parts/Birds.astro';
+import Cloud from '../parts/Cloud.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyDay}></rect>
+<Cloud x={66} y={32} scale={1.2} />
+<Birds x={230} y={40} />
+<path d="M0 96q70-26 150-14t170-18v60H0z" fill={ink.farBlue}></path>
+<path d="M0 116q90-22 180-8t140-10v60H0z" fill={ink.farGreen}></path>
+<!-- The town below -->
+<g>
+  <g fill={ink.wall}>
+    <rect x="24" y="118" width="26" height="18"></rect>
+    <rect x="58" y="110" width="24" height="20"></rect>
+    <rect x="92" y="120" width="28" height="18"></rect>
+    <rect x="130" y="108" width="24" height="22"></rect>
+    <rect x="164" y="118" width="28" height="18"></rect>
+    <rect x="202" y="110" width="24" height="20"></rect>
+    <rect x="236" y="120" width="28" height="18"></rect>
+    <rect x="272" y="112" width="26" height="20"></rect>
+  </g>
+  <g fill={ink.roof}>
+    <path d="M20 119l17-9 17 9z"></path>
+    <path d="M54 111l16-9 16 9z"></path>
+    <path d="M88 121l18-9 18 9z"></path>
+    <path d="M126 109l16-9 16 9z"></path>
+    <path d="M160 119l18-9 18 9z"></path>
+    <path d="M198 111l16-9 16 9z"></path>
+    <path d="M232 121l18-9 18 9z"></path>
+    <path d="M268 113l17-9 17 9z"></path>
+  </g>
+  <rect x="112" y="84" width="4" height="30" fill={ink.marble}></rect>
+  <path d="M110 84l4-10 4 10z" fill={ink.blue}></path>
+</g>
+<!-- Terrace -->
+<path d="M0 146h320v54H0z" fill={ink.stone}></path>
+<rect x="0" y="146" width="320" height="6" fill={ink.stoneShade}></rect>
+<g fill={ink.woodDeep}>
+  <rect x="0" y="122" width="320" height="4"></rect>
+  <rect x="0" y="134" width="320" height="3"></rect>
+  <rect x="16" y="118" width="5" height="30"></rect>
+  <rect x="86" y="118" width="5" height="30"></rect>
+  <rect x="156" y="118" width="5" height="30"></rect>
+  <rect x="226" y="118" width="5" height="30"></rect>
+  <rect x="296" y="118" width="5" height="30"></rect>
+</g>
+<!-- Viewing binoculars -->
+<rect x="200" y="122" width="5" height="40" fill={ink.dark}></rect>
+<rect x="190" y="106" width="26" height="16" rx="6" fill={ink.blue}></rect>
+<circle cx="192" cy="114" r="5" fill={ink.glass}></circle>
+<rect x="194" y="160" width="17" height="4" fill={ink.dark}></rect>
+<!-- Bench -->
+<rect x="52" y="162" width="62" height="5" fill={ink.wood}></rect>
+<rect x="52" y="150" width="62" height="4" fill={ink.wood}></rect>
+<rect x="58" y="150" width="4" height="26" fill={ink.woodDeep}></rect>
+<rect x="104" y="150" width="4" height="26" fill={ink.woodDeep}></rect>

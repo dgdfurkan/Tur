@@ -1,0 +1,32 @@
+---
+import { ink } from '../palette';
+import Birds from '../parts/Birds.astro';
+import Poplar from '../parts/Poplar.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyDay}></rect>
+<path d="M100 90q60-20 120 0v40H100z" fill={ink.farGreen}></path>
+<Birds x={150} y={40} />
+<!-- Left wall -->
+<path d="M0 26h98l26 40-12 44 28 90H0z" fill={ink.rock}></path>
+<path d="M98 26l26 40-12 44 28 90h-22l-22-88 10-46z" fill={ink.rockShade}></path>
+<g fill="none" stroke={ink.rockShade} stroke-width="1.4">
+  <path d="M0 58h84M0 96h88M0 140h100"></path>
+</g>
+<!-- A chapel cut into the rock -->
+<path d="M34 128v-16q8-10 16 0v16z" fill={ink.dark}></path>
+<rect x="58" y="112" width="6" height="8" rx="3" fill={ink.rockDeep}></rect>
+<rect x="20" y="112" width="6" height="8" rx="3" fill={ink.rockDeep}></rect>
+<!-- Right wall -->
+<path d="M320 32H214l-22 46 18 40-30 82h140z" fill={ink.rockShade}></path>
+<path d="M214 32l-22 46 18 40-30 82h22l24-80-14-42z" fill={ink.rockDeep}></path>
+<g fill="none" stroke={ink.rockDeep} stroke-width="1.4">
+  <path d="M232 66h88M236 106h84M228 150h92"></path>
+</g>
+<!-- Valley floor and stream -->
+<path d="M140 200l-26-84q46-14 96 2l-30 82z" fill={ink.grass}></path>
+<path d="M148 200c10-26-8-40 6-58s-4-24 6-28h8c-8 8 8 14-4 30s8 30 0 56z" fill={ink.water}></path>
+<Poplar x={128} y={150} height={40} fill={ink.grassDeep} />
+<Poplar x={182} y={146} height={46} />
+<Poplar x={194} y={160} height={34} fill={ink.grassDeep} />
+<Poplar x={136} y={180} height={44} />

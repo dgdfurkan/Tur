@@ -1,0 +1,18 @@
+---
+/** A round-crowned tree standing on the point (`x`, `y`). */
+interface Props {
+  x: number;
+  y: number;
+  size?: number;
+  fill?: string;
+}
+
+const { x, y, size = 14, fill = '#6fa45c' } = Astro.props;
+---
+
+<g>
+  <rect x={x - 1.3} y={y - size * 0.9} width="2.6" height={size * 0.9} fill="#553c28"></rect>
+  <circle cx={x} cy={y - size * 1.25} r={size * 0.62} fill={fill}></circle>
+  <circle cx={x - size * 0.42} cy={y - size * 0.98} r={size * 0.42} fill={fill}></circle>
+  <circle cx={x + size * 0.42} cy={y - size * 0.98} r={size * 0.42} fill={fill}></circle>
+</g>

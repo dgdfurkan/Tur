@@ -1,5 +1,6 @@
 ---
 import BoardingPass from '@/components/route/BoardingPass.astro';
+import SceneSprite from '@/components/scenes/SceneSprite.astro';
 import RouteThumb from '@/components/tour/RouteThumb.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { loadTourSnapshots, tourCatalog } from '@/composition/catalog';
@@ -158,6 +159,19 @@ const days = tour.days.map((day) => ({
       </nav>
     </section>
 
+    <div class="place" data-place data-shown="false" aria-hidden="true">
+      <div class="place__art">
+        <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" focusable="false">
+          <use data-place-scene href={`#scene-${tour.scene}`}></use>
+        </svg>
+      </div>
+      <div class="place__body">
+        <p class="place__name" data-place-name></p>
+        <dl class="place__facts" data-place-facts></dl>
+      </div>
+    </div>
+    <SceneSprite scenes={[tour.scene, ...tour.stops.map((stop) => stop.scene)]} />
+
     <BoardingPass tour={tour} departure={tour.nextDeparture(todayIso())} />
   </div>
 </BaseLayout>
@@ -290,6 +304,75 @@ const days = tour.days.map((day) => ({
 
   .route[data-muted='true'] .icon-off {
     display: inline-flex;
+  }
+
+  /*
+   * The place card: a picture of the stop and a fact or two. On a phone it is a
+   * strip under the top bar; on a wide screen a card in the column beside the map.
+   */
+  .place {
+    position: absolute;
+    top: calc(4.25rem + env(safe-area-inset-top, 0px));
+    left: var(--space-4);
+    right: var(--space-4);
+    display: grid;
+    grid-template-columns: 6.75rem minmax(0, 1fr);
+    border-radius: var(--radius-md);
+    background: var(--c-white);
+    box-shadow: var(--shadow-2);
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-1.25rem) scale(0.97);
+    transition:
+      opacity var(--dur-ui) ease,
+      transform var(--dur-panel) var(--ease-out);
+  }
+
+  .place[data-shown='true'] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .place__art {
+    min-height: 4.75rem;
+  }
+
+  .place__art svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .place__body {
+    display: grid;
+    align-content: center;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .place__name {
+    font-stretch: var(--wdth-sign);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .place__facts {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0 var(--space-2);
+    margin: 0;
+    font-size: var(--text-caption);
+    line-height: 1.35;
+  }
+
+  .place__facts :global(dt) {
+    color: var(--c-muted);
+  }
+
+  .place__facts :global(dd) {
+    margin: 0;
+    font-weight: 600;
   }
 
   .panel {
@@ -637,6 +720,33 @@ const days = tour.days.map((day) => ({
 
     .stops {
       visibility: visible;
+    }
+
+    .place {
+      top: 4.5rem;
+      left: auto;
+      width: 19rem;
+      grid-template-columns: minmax(0, 1fr);
+      border-radius: var(--radius-lg);
+      transform: translateX(1.5rem) scale(0.98);
+    }
+
+    .place__art {
+      aspect-ratio: 16 / 10;
+    }
+
+    .place__body {
+      gap: var(--space-2);
+      padding: var(--space-4);
+    }
+
+    .place__name {
+      font-size: 1.1875rem;
+    }
+
+    .place__facts {
+      gap: var(--space-1) var(--space-3);
+      font-size: var(--text-small);
     }
   }
 </style>

@@ -1,0 +1,48 @@
+---
+import { ink } from '../palette';
+import Balloon from '../parts/Balloon.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyWarm}></rect>
+<circle cx="250" cy="46" r="20" fill={ink.sunPale}></circle>
+<Balloon x={60} y={44} scale={1.1} fill={ink.clay} />
+<Balloon x={118} y={28} scale={0.7} fill={ink.blue} />
+<path d="M0 116q50-20 110-10t100-16 110 6v64H0z" fill={ink.farSand}></path>
+<!-- Far chimneys -->
+<g fill={ink.tuffShade}>
+  <path d="M20 150l6-36q4-6 8 0l6 36z"></path>
+  <path d="M292 150l5-30q4-6 8 0l5 30z"></path>
+  <path d="M196 148l5-32q4-6 8 0l5 32z"></path>
+</g>
+<!-- Three-headed chimney -->
+<g>
+  <path d="M120 166l10-62q20-12 44 0l10 62z" fill={ink.tuff}></path>
+  <path d="M160 100q8 2 14 4l10 62h-22z" fill={ink.tuffShade}></path>
+  <path d="M128 104l6-30q5-7 10 0l4 28z" fill={ink.tuff}></path>
+  <path d="M146 100l5-40q6-8 12 0l5 40z" fill={ink.tuff}></path>
+  <path d="M164 104l5-30q5-7 10 0l4 32z" fill={ink.tuffShade}></path>
+  <path d="M126 76q13-22 26 0l-5 6h-16z" fill={ink.tuffCap}></path>
+  <path d="M143 62q14-24 28 0l-5 7h-18z" fill={ink.tuffCap}></path>
+  <path d="M162 76q12-20 24 0l-4 6h-16z" fill={ink.tuffCap}></path>
+  <rect x="148" y="134" width="9" height="13" rx="4.5" fill={ink.rockDeep}></rect>
+</g>
+<!-- Single chimneys -->
+<g>
+  <path d="M58 168l8-52q9-8 18 0l8 52z" fill={ink.tuff}></path>
+  <path d="M78 114q4 1 6 2l8 52H80z" fill={ink.tuffShade}></path>
+  <path d="M60 118q15-26 30 0l-5 7H65z" fill={ink.tuffCap}></path>
+  <path d="M226 170l8-46q8-7 16 0l8 46z" fill={ink.tuff}></path>
+  <path d="M244 122q4 1 6 2l8 46h-12z" fill={ink.tuffShade}></path>
+  <path d="M228 126q14-24 28 0l-5 6h-18z" fill={ink.tuffCap}></path>
+</g>
+<!-- Vineyard rows -->
+<rect x="0" y="164" width="320" height="36" fill={ink.steppe}></rect>
+<g fill={ink.grassDeep}>
+  <ellipse cx="24" cy="180" rx="9" ry="3.5"></ellipse>
+  <ellipse cx="52" cy="186" rx="9" ry="3.5"></ellipse>
+  <ellipse cx="104" cy="182" rx="9" ry="3.5"></ellipse>
+  <ellipse cx="196" cy="184" rx="9" ry="3.5"></ellipse>
+  <ellipse cx="270" cy="182" rx="9" ry="3.5"></ellipse>
+  <ellipse cx="300" cy="190" rx="9" ry="3.5"></ellipse>
+  <ellipse cx="150" cy="190" rx="9" ry="3.5"></ellipse>
+</g>

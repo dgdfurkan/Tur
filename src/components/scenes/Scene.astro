@@ -1,0 +1,34 @@
+---
+import type { SceneKey } from '@/domain/tour/Tour';
+
+/**
+ * Shows one place illustration. The page must include the drawing itself with
+ * <SceneSprite>; this only refers to it, so a scene can be swapped from script
+ * by changing one attribute.
+ */
+interface Props {
+  scene: SceneKey;
+  class?: string;
+}
+
+const { scene, class: className } = Astro.props;
+---
+
+<svg
+  class:list={['scene', className]}
+  viewBox="0 0 320 200"
+  preserveAspectRatio="xMidYMid slice"
+  aria-hidden="true"
+  focusable="false"
+  data-scene
+>
+  <use href={`#scene-${scene}`}></use>
+</svg>
+
+<style>
+  .scene {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+</style>

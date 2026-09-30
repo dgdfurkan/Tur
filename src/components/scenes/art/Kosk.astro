@@ -1,0 +1,66 @@
+---
+import { ink } from '../palette';
+import Pine from '../parts/Pine.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyDay}></rect>
+<path d="M0 80q80-30 160-16t160-24v80H0z" fill={ink.farGreen}></path>
+<Pine x={22} y={164} height={116} fill={ink.forestDeep} />
+<Pine x={58} y={164} height={88} />
+<Pine x={264} y={164} height={96} />
+<Pine x={300} y={164} height={124} fill={ink.forestDeep} />
+<!-- The mansion -->
+<g>
+  <rect x="96" y="70" width="128" height="94" fill={ink.wall}></rect>
+  <rect x="198" y="70" width="26" height="94" fill={ink.wallShade}></rect>
+  <path d="M86 72l74-34 74 34z" fill={ink.roof}></path>
+  <path d="M160 38l74 34h-20l-54-25z" fill={ink.roofShade}></path>
+  <!-- Central bay with a gable -->
+  <rect x="138" y="52" width="44" height="112" fill={ink.wall}></rect>
+  <path d="M132 54l28-22 28 22z" fill={ink.roofShade}></path>
+  <g fill={ink.glass}>
+    <rect x="106" y="84" width="12" height="20" rx="1.5"></rect>
+    <rect x="202" y="84" width="12" height="20" rx="1.5"></rect>
+    <rect x="106" y="122" width="12" height="20" rx="1.5"></rect>
+    <rect x="202" y="122" width="12" height="20" rx="1.5"></rect>
+    <path d="M148 86V68q12-10 24 0v18z"></path>
+    <path d="M148 122v-16h24v16z"></path>
+  </g>
+  <!-- Balconies -->
+  <g fill={ink.marbleShade}>
+    <rect x="140" y="86" width="40" height="3"></rect>
+    <rect x="140" y="122" width="40" height="3"></rect>
+  </g>
+  <g fill={ink.dark}>
+    <rect x="142" y="78" width="36" height="1.5"></rect>
+    <rect x="144" y="78" width="1.5" height="8"></rect>
+    <rect x="153" y="78" width="1.5" height="8"></rect>
+    <rect x="162" y="78" width="1.5" height="8"></rect>
+    <rect x="171" y="78" width="1.5" height="8"></rect>
+    <rect x="176" y="78" width="1.5" height="8"></rect>
+  </g>
+  <path d="M150 164v-26q10-10 20 0v26z" fill={ink.woodDeep}></path>
+</g>
+<!-- Steps and flower garden -->
+<rect x="0" y="162" width="320" height="38" fill={ink.grass}></rect>
+<g fill={ink.marble}>
+  <rect x="142" y="162" width="36" height="5"></rect>
+  <rect x="136" y="167" width="48" height="5"></rect>
+  <rect x="130" y="172" width="60" height="5"></rect>
+</g>
+<g fill={ink.pink}>
+  <circle cx="40" cy="180" r="3"></circle>
+  <circle cx="58" cy="188" r="3"></circle>
+  <circle cx="88" cy="182" r="3"></circle>
+  <circle cx="232" cy="182" r="3"></circle>
+  <circle cx="262" cy="190" r="3"></circle>
+  <circle cx="288" cy="180" r="3"></circle>
+</g>
+<g fill={ink.yellow}>
+  <circle cx="50" cy="192" r="3"></circle>
+  <circle cx="74" cy="176" r="3"></circle>
+  <circle cx="100" cy="192" r="3"></circle>
+  <circle cx="220" cy="192" r="3"></circle>
+  <circle cx="248" cy="176" r="3"></circle>
+  <circle cx="276" cy="192" r="3"></circle>
+</g>

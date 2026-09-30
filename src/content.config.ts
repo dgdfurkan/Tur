@@ -2,9 +2,12 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 import type { TourData } from '@/application/dto/TourData';
+import { SCENE_KEYS } from '@/domain/tour/Tour';
 
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD');
 const clockTime = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Expected HH:MM');
+
+const scene = z.enum(SCENE_KEYS);
 
 const stop = z.object({
   id: z.string().min(1),
@@ -14,6 +17,11 @@ const stop = z.object({
   lat: z.number().min(35.5).max(42.5),
   lon: z.number().min(25.5).max(45),
   summary: z.string().min(1),
+  scene,
+  facts: z
+    .array(z.object({ label: z.string().min(1), value: z.string().min(1) }))
+    .max(3)
+    .optional(),
   durationMinutes: z.number().int().positive().optional(),
 });
 
@@ -22,6 +30,7 @@ const tour = z.object({
   category: z.enum(['kultur', 'doga', 'gunubirlik']),
   summary: z.string().min(1),
   emblem: z.enum(['peribacasi', 'yayla', 'antik-kent', 'konak', 'vadi']),
+  scene,
   destination: z.string().min(1),
   nights: z.number().int().min(0),
   distanceFromAnkaraKm: z.number().int().positive(),

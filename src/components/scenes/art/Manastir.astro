@@ -1,0 +1,54 @@
+---
+import { ink } from '../palette';
+import Pine from '../parts/Pine.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyPale}></rect>
+<path d="M0 70q60-30 120-40v170H0z" fill={ink.farGreen}></path>
+<!-- The cliff -->
+<path d="M70 200V64l30-44h220v180z" fill={ink.cliff}></path>
+<path d="M70 200V64l30-44 20 50-14 60 20 70z" fill={ink.cliffShade}></path>
+<g fill="none" stroke={ink.cliffShade} stroke-width="1.6">
+  <path d="M140 30l20 40M206 22l-10 36M262 30l14 44M296 50l-8 40M160 150l16 40M250 150l-10 44"></path>
+</g>
+<!-- Ledge and the monastery clinging to it -->
+<path d="M120 132h176l10 10H110z" fill={ink.cliffShade}></path>
+<g>
+  <rect x="150" y="84" width="130" height="48" fill={ink.wall}></rect>
+  <rect x="256" y="84" width="24" height="48" fill={ink.wallShade}></rect>
+  <rect x="146" y="78" width="138" height="7" fill={ink.roof}></rect>
+  <g fill={ink.glass}>
+    <rect x="158" y="92" width="7" height="10"></rect>
+    <rect x="172" y="92" width="7" height="10"></rect>
+    <rect x="186" y="92" width="7" height="10"></rect>
+    <rect x="200" y="92" width="7" height="10"></rect>
+    <rect x="214" y="92" width="7" height="10"></rect>
+    <rect x="228" y="92" width="7" height="10"></rect>
+    <rect x="242" y="92" width="7" height="10"></rect>
+    <rect x="158" y="112" width="7" height="10"></rect>
+    <rect x="172" y="112" width="7" height="10"></rect>
+    <rect x="186" y="112" width="7" height="10"></rect>
+    <rect x="200" y="112" width="7" height="10"></rect>
+    <rect x="214" y="112" width="7" height="10"></rect>
+    <rect x="228" y="112" width="7" height="10"></rect>
+    <rect x="242" y="112" width="7" height="10"></rect>
+  </g>
+  <!-- Aqueduct arches leading in -->
+  <rect x="100" y="104" width="50" height="28" fill={ink.stone}></rect>
+  <g fill={ink.cliffShade}>
+    <path d="M106 132v-14q5-7 10 0v14z"></path>
+    <path d="M120 132v-14q5-7 10 0v14z"></path>
+    <path d="M134 132v-14q5-7 10 0v14z"></path>
+  </g>
+</g>
+<!-- Forest and mist below -->
+<Pine x={20} y={178} height={84} fill={ink.forestDeep} />
+<Pine x={52} y={186} height={100} />
+<Pine x={92} y={190} height={70} fill={ink.forestDeep} />
+<Pine x={128} y={196} height={58} />
+<Pine x={168} y={200} height={54} fill={ink.forestDeep} />
+<Pine x={206} y={200} height={62} />
+<Pine x={246} y={202} height={52} fill={ink.forestDeep} />
+<Pine x={284} y={200} height={60} />
+<rect x="0" y="150" width="320" height="10" rx="5" fill={ink.cloud} opacity="0.6"></rect>
+<rect x="40" y="166" width="240" height="8" rx="4" fill={ink.cloud} opacity="0.45"></rect>

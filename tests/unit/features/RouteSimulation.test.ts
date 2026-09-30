@@ -6,7 +6,15 @@ import { Tour, type Stop, type StopKind } from '@/domain/tour/Tour';
 import { easeLeg, RouteSimulation } from '@/features/route-simulation/RouteSimulation';
 
 function stop(id: string, kind: StopKind, lat: number, lon: number): Stop {
-  return { id, name: id, kind, location: new GeoPoint(lat, lon), summary: id };
+  return {
+    id,
+    name: id,
+    kind,
+    location: new GeoPoint(lat, lon),
+    summary: id,
+    scene: 'sehir',
+    facts: [],
+  };
 }
 
 function plan(): RoutePlan {
@@ -16,6 +24,7 @@ function plan(): RoutePlan {
     category: 'kultur',
     summary: 's',
     emblem: 'konak',
+    scene: 'konak',
     destination: 'D',
     nights: 1,
     distanceFromOriginKm: 100,

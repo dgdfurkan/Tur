@@ -1,0 +1,57 @@
+---
+import { ink } from '../palette';
+import Cloud from '../parts/Cloud.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyDay}></rect>
+<Cloud x={64} y={32} scale={1.1} />
+<path d="M0 104q60-40 120-28t90-30 110 20v94H0z" fill={ink.farBlue}></path>
+<path d="M0 130q90-22 180-10t140-12v60H0z" fill={ink.farGreen}></path>
+<rect x="0" y="158" width="320" height="42" fill={ink.grass}></rect>
+<!-- Restored two-storey front in the background -->
+<g>
+  <rect x="176" y="92" width="116" height="66" fill={ink.stoneShade}></rect>
+  <g fill={ink.marble}>
+    <rect x="172" y="88" width="124" height="6"></rect>
+    <rect x="172" y="122" width="124" height="5"></rect>
+    <rect x="180" y="94" width="6" height="28"></rect>
+    <rect x="204" y="94" width="6" height="28"></rect>
+    <rect x="228" y="94" width="6" height="28"></rect>
+    <rect x="252" y="94" width="6" height="28"></rect>
+    <rect x="276" y="94" width="6" height="28"></rect>
+    <rect x="180" y="127" width="6" height="31"></rect>
+    <rect x="204" y="127" width="6" height="31"></rect>
+    <rect x="252" y="127" width="6" height="31"></rect>
+    <rect x="276" y="127" width="6" height="31"></rect>
+  </g>
+  <path d="M222 158v-22q10-10 20 0v22z" fill={ink.dark}></path>
+</g>
+<!-- Standing columns -->
+<g>
+  <rect x="40" y="52" width="18" height="108" fill={ink.marble}></rect>
+  <rect x="52" y="52" width="6" height="108" fill={ink.marbleShade}></rect>
+  <path d="M34 52q15-14 30 0z" fill={ink.marble}></path>
+  <rect x="32" y="40" width="34" height="6" fill={ink.marbleShade}></rect>
+  <circle cx="36" cy="49" r="5" fill={ink.marble}></circle>
+  <circle cx="62" cy="49" r="5" fill={ink.marble}></circle>
+  <rect x="34" y="158" width="30" height="6" fill={ink.marbleShade}></rect>
+  <rect x="92" y="68" width="18" height="92" fill={ink.marble}></rect>
+  <rect x="104" y="68" width="6" height="92" fill={ink.marbleShade}></rect>
+  <path d="M86 68q15-14 30 0z" fill={ink.marble}></path>
+  <rect x="84" y="56" width="34" height="6" fill={ink.marbleShade}></rect>
+  <circle cx="88" cy="65" r="5" fill={ink.marble}></circle>
+  <circle cx="114" cy="65" r="5" fill={ink.marble}></circle>
+  <rect x="86" y="158" width="30" height="6" fill={ink.marbleShade}></rect>
+</g>
+<!-- Broken shafts and fallen blocks -->
+<g fill={ink.marble}>
+  <path d="M136 164v-38l8-6 8 4v40z"></path>
+  <rect x="22" y="176" width="34" height="12" rx="2"></rect>
+  <rect x="120" y="178" width="28" height="10" rx="2"></rect>
+  <circle cx="176" cy="180" r="9"></circle>
+</g>
+<g fill={ink.marbleShade}>
+  <path d="M148 124l4 2v38h-4z"></path>
+  <circle cx="176" cy="180" r="4"></circle>
+  <rect x="22" y="184" width="34" height="4"></rect>
+</g>

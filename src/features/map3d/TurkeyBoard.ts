@@ -5,6 +5,7 @@ import {
   Mesh,
   MeshBasicMaterial,
   PlaneGeometry,
+  RepeatWrapping,
   Shape,
   SRGBColorSpace,
   type BufferGeometry,
@@ -21,6 +22,8 @@ const BEVEL = 0.06;
 /** Open sea beyond the painted surroundings; large enough to reach the fog. */
 const SEA_SIZE = 1400;
 const SURROUNDINGS_LIFT = 0.02;
+/** World units one detail tile covers before it repeats. */
+const DETAIL_TILE = 3;
 
 function toShapes(rings: readonly Ring[]): Shape[] {
   return rings.map((ring) => {
@@ -44,6 +47,8 @@ function layFlat<T extends BufferGeometry>(geometry: T): T {
 export interface BoardTextures {
   readonly surroundings: HTMLCanvasElement;
   readonly land: LandTexture;
+  /** A repeating tile of fine marks laid over the land painting. */
+  readonly detail: HTMLCanvasElement;
   readonly anisotropy: number;
 }
 
@@ -97,7 +102,12 @@ export class TurkeyBoard implements Disposable {
       -land.extent.minY / KM_PER_UNIT / height,
     );
 
-    this.landMaterial = new MeshBasicMaterial({ map: landTexture });
+    const detail = this.texture(textures.detail, textures.anisotropy);
+    detail.wrapS = RepeatWrapping;
+    detail.wrapT = RepeatWrapping;
+    detail.repeat.set(1 / DETAIL_TILE, 1 / DETAIL_TILE);
+    // Used as an occlusion map, the tile multiplies the painting underneath.
+    this.landMaterial = new MeshBasicMaterial({ map: landTexture, aoMap: detail });
     const slab = layFlat(
       new ExtrudeGeometry(toShapes(data.turkey), {
         depth: LAND_TOP - BEVEL,

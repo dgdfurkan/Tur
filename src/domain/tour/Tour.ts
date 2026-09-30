@@ -6,12 +6,62 @@ export type TourCategory = 'kultur' | 'doga' | 'gunubirlik';
 export type StopKind = 'departure' | 'sight' | 'rest' | 'lodging' | 'arrival';
 export type EmblemKey = 'peribacasi' | 'yayla' | 'antik-kent' | 'konak' | 'vadi';
 
+/** The illustrations a place can be shown with; each key has a drawing in the presentation layer. */
+export const SCENE_KEYS = [
+  'sehir',
+  'mola',
+  'otel',
+  'seyir',
+  'konak',
+  'carsi',
+  'vadi',
+  'tuz-golu',
+  'kervansaray',
+  'yeralti',
+  'kaya-kilise',
+  'kaya-kale',
+  'peribacasi',
+  'uc-guzeller',
+  'comlek',
+  'tas-konak',
+  'traverten',
+  'antik-tiyatro',
+  'kutuphane',
+  'sapel',
+  'koy',
+  'saat-kulesi',
+  'sutunlar',
+  'tumulus',
+  'vapur',
+  'teleferik',
+  'sahil-kalesi',
+  'ayasofya',
+  'kosk',
+  'manastir',
+  'gol',
+  'cay',
+  'tas-kopru',
+  'orman-kalesi',
+  'selale',
+  'yayla',
+  'su-kemeri',
+] as const;
+export type SceneKey = (typeof SCENE_KEYS)[number];
+
+/** A short fact about a place: what it is about and the figure or name that answers it. */
+export interface StopFact {
+  readonly label: string;
+  readonly value: string;
+}
+
 export interface Stop {
   readonly id: string;
   readonly name: string;
   readonly kind: StopKind;
   readonly location: GeoPoint;
   readonly summary: string;
+  readonly scene: SceneKey;
+  readonly facts: readonly StopFact[];
   readonly durationMinutes?: number;
 }
 
@@ -36,6 +86,8 @@ export interface TourProps {
   readonly category: TourCategory;
   readonly summary: string;
   readonly emblem: EmblemKey;
+  /** The illustration that stands for the whole tour. */
+  readonly scene: SceneKey;
   readonly destination: string;
   readonly nights: number;
   readonly distanceFromOriginKm: number;
@@ -57,6 +109,7 @@ export class Tour {
   readonly category: TourCategory;
   readonly summary: string;
   readonly emblem: EmblemKey;
+  readonly scene: SceneKey;
   readonly destination: string;
   readonly nights: number;
   readonly distanceFromOriginKm: number;
@@ -80,6 +133,7 @@ export class Tour {
     this.category = props.category;
     this.summary = props.summary;
     this.emblem = props.emblem;
+    this.scene = props.scene;
     this.destination = props.destination;
     this.nights = props.nights;
     this.distanceFromOriginKm = props.distanceFromOriginKm;

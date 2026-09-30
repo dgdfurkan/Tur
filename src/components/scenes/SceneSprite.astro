@@ -1,0 +1,112 @@
+---
+import type { SceneKey } from '@/domain/tour/Tour';
+import AntikTiyatro from './art/AntikTiyatro.astro';
+import Ayasofya from './art/Ayasofya.astro';
+import Carsi from './art/Carsi.astro';
+import Cay from './art/Cay.astro';
+import Comlek from './art/Comlek.astro';
+import Gol from './art/Gol.astro';
+import KayaKale from './art/KayaKale.astro';
+import KayaKilise from './art/KayaKilise.astro';
+import Kervansaray from './art/Kervansaray.astro';
+import Konak from './art/Konak.astro';
+import Kosk from './art/Kosk.astro';
+import Koy from './art/Koy.astro';
+import Kutuphane from './art/Kutuphane.astro';
+import Manastir from './art/Manastir.astro';
+import Mola from './art/Mola.astro';
+import OrmanKalesi from './art/OrmanKalesi.astro';
+import Otel from './art/Otel.astro';
+import Peribacasi from './art/Peribacasi.astro';
+import SaatKulesi from './art/SaatKulesi.astro';
+import SahilKalesi from './art/SahilKalesi.astro';
+import Sapel from './art/Sapel.astro';
+import Sehir from './art/Sehir.astro';
+import Selale from './art/Selale.astro';
+import Seyir from './art/Seyir.astro';
+import SuKemeri from './art/SuKemeri.astro';
+import Sutunlar from './art/Sutunlar.astro';
+import TasKonak from './art/TasKonak.astro';
+import TasKopru from './art/TasKopru.astro';
+import Teleferik from './art/Teleferik.astro';
+import Traverten from './art/Traverten.astro';
+import Tumulus from './art/Tumulus.astro';
+import TuzGolu from './art/TuzGolu.astro';
+import UcGuzeller from './art/UcGuzeller.astro';
+import Vadi from './art/Vadi.astro';
+import Vapur from './art/Vapur.astro';
+import Yayla from './art/Yayla.astro';
+import Yeralti from './art/Yeralti.astro';
+
+/**
+ * The drawings behind every scene key, as SVG symbols. A page includes the
+ * symbols it needs once and shows them anywhere with <Scene>. Because the
+ * record is keyed by SceneKey, a key without a drawing fails the build.
+ */
+interface Props {
+  scenes: readonly SceneKey[];
+}
+
+const ART: Record<SceneKey, typeof Sehir> = {
+  sehir: Sehir,
+  mola: Mola,
+  otel: Otel,
+  seyir: Seyir,
+  konak: Konak,
+  carsi: Carsi,
+  vadi: Vadi,
+  'tuz-golu': TuzGolu,
+  kervansaray: Kervansaray,
+  yeralti: Yeralti,
+  'kaya-kilise': KayaKilise,
+  'kaya-kale': KayaKale,
+  peribacasi: Peribacasi,
+  'uc-guzeller': UcGuzeller,
+  comlek: Comlek,
+  'tas-konak': TasKonak,
+  traverten: Traverten,
+  'antik-tiyatro': AntikTiyatro,
+  kutuphane: Kutuphane,
+  sapel: Sapel,
+  koy: Koy,
+  'saat-kulesi': SaatKulesi,
+  sutunlar: Sutunlar,
+  tumulus: Tumulus,
+  vapur: Vapur,
+  teleferik: Teleferik,
+  'sahil-kalesi': SahilKalesi,
+  ayasofya: Ayasofya,
+  kosk: Kosk,
+  manastir: Manastir,
+  gol: Gol,
+  cay: Cay,
+  'tas-kopru': TasKopru,
+  'orman-kalesi': OrmanKalesi,
+  selale: Selale,
+  yayla: Yayla,
+  'su-kemeri': SuKemeri,
+};
+
+const scenes = [...new Set(Astro.props.scenes)];
+---
+
+<svg class="scene-sprite" aria-hidden="true" focusable="false">
+  {scenes.map((key) => {
+    const Art = ART[key];
+    return (
+      <symbol id={`scene-${key}`} viewBox="0 0 320 200">
+        <Art />
+      </symbol>
+    );
+  })}
+</svg>
+
+<style>
+  /* Kept out of sight without display: none, which would stop the symbols from rendering when used. */
+  .scene-sprite {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+</style>

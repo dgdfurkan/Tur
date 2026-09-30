@@ -5,6 +5,7 @@ import { yieldToMain } from '@/shared/scheduling';
 import type { TimeOfDay } from '@/features/route-simulation/RouteView';
 import { CameraRig } from './CameraRig';
 import { Daylight } from './Daylight';
+import { GroundDetail } from './GroundDetail';
 import { LabelLayer } from './LabelLayer';
 import { LandmarkFactory } from './LandmarkFactory';
 import { LandTexture } from './LandTexture';
@@ -74,7 +75,12 @@ export class MapWorld implements Disposable {
     await yieldToMain();
     const land = new LandTexture(mapData, quality.texturePixels);
     await yieldToMain();
-    const board = new TurkeyBoard(mapData, kit, { surroundings, land, anisotropy: ANISOTROPY });
+    const board = new TurkeyBoard(mapData, kit, {
+      surroundings,
+      land,
+      detail: new GroundDetail().canvas,
+      anisotropy: ANISOTROPY,
+    });
     await yieldToMain();
 
     const landmarks = new LandmarkFactory();

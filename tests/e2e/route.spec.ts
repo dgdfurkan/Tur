@@ -50,6 +50,24 @@ for (const map of MAPS) {
       await expect(app).toHaveAttribute('data-state', 'running');
     });
 
+    test('a stop brings up a picture of the place and facts about it', async ({ page }) => {
+      await page.goto(map.address);
+      await expect(page.locator('[data-route-app]')).toHaveAttribute('data-ready', 'true');
+      const place = page.locator('[data-place]');
+      await expect(place).toHaveAttribute('data-shown', 'false');
+
+      const sheetToggle = page.getByRole('button', { name: 'Durakları Göster' });
+      if (await sheetToggle.isVisible()) await sheetToggle.click();
+      await page.getByRole('button', { name: 'Ihlara Vadisi' }).click();
+
+      await expect(place).toHaveAttribute('data-shown', 'true');
+      await expect(place.locator('[data-place-name]')).toHaveText('Ihlara Vadisi');
+      await expect(place.locator('[data-place-facts]')).toContainText('14 km');
+      await expect(place.locator('[data-place-scene]')).toHaveAttribute('href', '#scene-vadi');
+      // The drawing the card points at is in the page.
+      await expect(page.locator('#scene-vadi')).toBeAttached();
+    });
+
     test.describe('with reduced motion', () => {
       test.use({ reducedMotion: 'reduce' });
 
