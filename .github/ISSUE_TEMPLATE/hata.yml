@@ -1,0 +1,26 @@
+name: Hata Bildirimi
+description: Sitede veya panelde karşılaşılan bir hatayı bildirin.
+labels: [hata]
+body:
+  - type: textarea
+    id: ozet
+    attributes:
+      label: Ne Oldu
+      description: Beklenen davranışı ve gerçekleşen davranışı yazın.
+    validations:
+      required: true
+  - type: textarea
+    id: adimlar
+    attributes:
+      label: Yeniden Üretme Adımları
+      placeholder: |
+        1. Hangi sayfa açıldı
+        2. Hangi işlem yapıldı
+        3. Ne görüldü
+    validations:
+      required: true
+  - type: input
+    id: ortam
+    attributes:
+      label: Cihaz ve Tarayıcı
+      placeholder: 'Örnek: iPhone 15, Safari 26'
