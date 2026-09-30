@@ -4,6 +4,11 @@
  * runtime and spans more than one page.
  */
 
+/* The hidden attribute wins over any display value set below. */
+.admin [hidden] {
+  display: none;
+}
+
 .admin {
   --tabs-height: 4.25rem;
   min-height: 100dvh;
@@ -465,5 +470,254 @@
   .admin__lock:hover {
     background: var(--c-mist);
     color: var(--c-asphalt);
+  }
+}
+
+/* The video studio: a screen with its controls, and the settings that shape the film. */
+.admin__body--wide {
+  max-width: 70rem;
+}
+
+.studio {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.studio__head {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.studio__head h1 {
+  font-size: var(--text-h2);
+  font-stretch: var(--wdth-display);
+}
+
+.studio__head h1:focus {
+  outline: none;
+}
+
+.studio__head p,
+.studio__summary {
+  color: var(--c-muted);
+}
+
+.studio__layout {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.studio__stage {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+}
+
+/* The frame takes the shape of the chosen format and never grows taller than the window allows. */
+.studio__screen {
+  --ratio: 9 / 16;
+  justify-self: center;
+  width: min(100%, calc(62dvh * var(--ratio)));
+  aspect-ratio: var(--ratio);
+  border-radius: var(--radius-lg);
+  background: #cfe4f2;
+  box-shadow: var(--shadow-2);
+  overflow: hidden;
+}
+
+.studio[data-format='portrait'] .studio__screen {
+  --ratio: 4 / 5;
+}
+
+.studio[data-format='square'] .studio__screen {
+  --ratio: 1;
+}
+
+.studio[data-format='wide'] .studio__screen {
+  --ratio: 16 / 9;
+  width: 100%;
+}
+
+.studio__canvas,
+.studio__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.studio__video,
+.studio[data-state='done'] .studio__canvas {
+  display: none;
+}
+
+.studio[data-state='done'] .studio__video {
+  display: block;
+}
+
+.studio__message {
+  min-height: 1.5em;
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+.studio__transport {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.studio__position {
+  width: 100%;
+  min-height: 2.75rem;
+  accent-color: var(--c-blue);
+}
+
+.studio__time {
+  min-width: 4.5rem;
+  color: var(--c-muted);
+  font-size: var(--text-small);
+  text-align: right;
+}
+
+.studio .icon-stop,
+.studio[data-state='playing'] .icon-play {
+  display: none;
+}
+
+.studio[data-state='playing'] .icon-stop,
+.studio .icon-play {
+  display: inline-flex;
+}
+
+.studio[data-state='playing'] .icon-play {
+  display: none;
+}
+
+.studio__progress,
+.studio__result {
+  display: none;
+  gap: var(--space-3);
+}
+
+.studio__progress {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.studio__progress progress {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 0.75rem;
+  accent-color: var(--c-blue);
+}
+
+.studio[data-state='exporting'] .studio__progress,
+.studio[data-state='done'] .studio__result {
+  display: grid;
+}
+
+/* What can be pressed follows the state the studio is in. */
+.studio[data-state='loading'] :is(.studio__transport, .studio__create, .studio__summary),
+.studio[data-state='unavailable']
+  :is(.studio__screen, .studio__transport, .studio__create, .studio__summary, .studio__form),
+.studio[data-state='exporting'] :is(.studio__transport, .studio__create),
+.studio[data-state='done'] :is(.studio__transport, .studio__create) {
+  display: none;
+}
+
+.studio__form .field input[type='file'] {
+  width: 100%;
+  min-height: 3rem;
+  padding: var(--space-2);
+  border: 0.09375rem dashed var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-white);
+  font-size: var(--text-small);
+}
+
+.studio__form ::file-selector-button {
+  min-height: 2.25rem;
+  margin-right: var(--space-3);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--c-mist);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.studio__group {
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  background: var(--c-white);
+}
+
+.studio__group > legend {
+  float: left;
+  width: 100%;
+  margin-bottom: var(--space-2);
+}
+
+.options {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.option {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 0.09375rem solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-white);
+  cursor: pointer;
+}
+
+.option:has(input:checked) {
+  border-color: var(--c-blue);
+  background: var(--c-blue-tint);
+}
+
+.option input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.125rem;
+  accent-color: var(--c-blue);
+}
+
+.option__body {
+  display: grid;
+  gap: 0.125rem;
+}
+
+.option__body span {
+  color: var(--c-muted);
+  font-size: var(--text-small);
+}
+
+@media (min-width: 60rem) {
+  .studio__layout {
+    grid-template-columns: minmax(0, 24rem) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .studio[data-format='wide'] .studio__layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  /* The screen stays in view while the settings scroll. */
+  .studio__stage {
+    position: sticky;
+    top: var(--space-4);
+  }
+
+  .options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

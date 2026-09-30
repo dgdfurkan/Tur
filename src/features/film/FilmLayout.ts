@@ -15,6 +15,8 @@ export interface Rect {
  */
 export interface FilmLayout {
   readonly format: FilmFormat;
+  /** The band that Instagram's own controls leave clear, from `top` down to `bottom`. */
+  readonly safe: { readonly top: number; readonly bottom: number };
   /** Top-left corner of the brand plate. */
   readonly brand: { readonly x: number; readonly y: number };
   /** Right edge and top of the day badge. */
@@ -40,6 +42,8 @@ export interface FilmLayout {
 const SIDE = 16;
 const BRAND_HEIGHT = 40;
 const GAP = 12;
+/** The sign of the stop the coach is at stands this far above it; the map leaves that much room on top. */
+const SIGN_ROOM = 44;
 
 function tall(
   format: FilmFormat,
@@ -55,6 +59,7 @@ function tall(
   const below = top + BRAND_HEIGHT + GAP;
   return {
     format,
+    safe: { top, bottom: height - bottom },
     brand: { x: SIDE, y: top },
     badge: { right: width - SIDE, y: top },
     sign: { x: SIDE, y: below, width: inner },
@@ -68,7 +73,7 @@ function tall(
       // The signs take the upper part of the frame; the route is shown below them.
       overview: { left: SIDE, right: SIDE, top: below + height * 0.3, bottom: bottom + GAP },
       drive: { left: SIDE, right: SIDE, top: below, bottom: bottom + 56 + GAP * 2 },
-      stop: { left: SIDE, right: SIDE, top: below + GAP, bottom: height - cardY + GAP },
+      stop: { left: SIDE, right: SIDE, top: below + SIGN_ROOM, bottom: height - cardY + GAP },
     },
   };
 }
@@ -80,6 +85,7 @@ function strip(format: FilmFormat, margin: number, cardHeight: number): FilmLayo
   const below = margin + BRAND_HEIGHT + GAP;
   return {
     format,
+    safe: { top: margin, bottom: height - margin },
     brand: { x: SIDE, y: margin },
     badge: { right: width - SIDE, y: margin },
     sign: { x: SIDE, y: below, width: inner },
@@ -92,7 +98,7 @@ function strip(format: FilmFormat, margin: number, cardHeight: number): FilmLayo
     framing: {
       overview: { left: SIDE, right: SIDE, top: below + height * 0.36, bottom: margin },
       drive: { left: SIDE, right: SIDE, top: below, bottom: margin + 56 + GAP },
-      stop: { left: SIDE, right: SIDE, top: below + GAP, bottom: height - cardY + GAP },
+      stop: { left: SIDE, right: SIDE, top: below + SIGN_ROOM, bottom: height - cardY + GAP },
     },
   };
 }
@@ -107,6 +113,7 @@ function wide(format: FilmFormat, margin: number): FilmLayout {
   const signWidth = 270;
   return {
     format,
+    safe: { top: margin, bottom: height - margin },
     brand: { x: SIDE, y: margin },
     badge: { right: width - SIDE, y: margin },
     sign: { x: SIDE, y: below, width: signWidth },
@@ -120,7 +127,7 @@ function wide(format: FilmFormat, margin: number): FilmLayout {
       // The signs stand on the left; the route is shown beside them.
       overview: { left: SIDE + signWidth + GAP, right: SIDE, top: margin, bottom: margin },
       drive: { left: SIDE, right: SIDE, top: below, bottom: margin + 56 + GAP },
-      stop: { left: SIDE, right: width - cardX + GAP, top: below, bottom: margin },
+      stop: { left: SIDE, right: width - cardX + GAP, top: below + SIGN_ROOM, bottom: margin },
     },
   };
 }
@@ -129,7 +136,7 @@ function wide(format: FilmFormat, margin: number): FilmLayout {
 export function layoutFor(format: FilmFormat): FilmLayout {
   switch (format.id) {
     case 'reels':
-      return tall(format, 76, 116, 140, 122);
+      return tall(format, 76, 116, 128, 122);
     case 'portrait':
       return tall(format, 14, 14, 96, 112);
     case 'square':

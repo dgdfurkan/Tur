@@ -84,6 +84,15 @@ export function formatMinutes(minutes: number): string {
   return rest === 0 ? `${hours} saat` : `${hours} saat ${rest} dakika`;
 }
 
+/** "48 saniye", "1 dakika 12 saniye" */
+export function formatSeconds(seconds: number): string {
+  const whole = Math.round(seconds);
+  const minutes = Math.floor(whole / 60);
+  const rest = whole % 60;
+  if (minutes === 0) return `${rest} saniye`;
+  return rest === 0 ? `${minutes} dakika` : `${minutes} dakika ${rest} saniye`;
+}
+
 export function formatDuration(nights: number, days: number): string {
   return nights === 0 ? 'Günübirlik' : `${nights} Gece ${days} Gün`;
 }

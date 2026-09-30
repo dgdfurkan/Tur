@@ -1,0 +1,279 @@
+---
+import PanelShell from '@/components/panel/PanelShell.astro';
+import SceneSprite from '@/components/scenes/SceneSprite.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { loadTourSnapshots } from '@/composition/catalog';
+import { siteConfig } from '@/config/site';
+import { SCENE_KEYS } from '@/domain/tour/Tour';
+import { FILM_FORMATS, FILM_QUALITIES, FRAME_RATES } from '@/features/film/formats';
+import { tr } from '@/i18n/tr';
+
+// A finished film is played back from memory; only this page may do so.
+Astro.csp?.insertDirective("media-src 'self' blob:");
+
+const tours = await loadTourSnapshots();
+// "<" is escaped so the JSON can never close its own script element.
+const toursJson = JSON.stringify(tours).replaceAll('<', '\\u003c');
+const { studio } = tr;
+const templates = ['journey', 'day', 'highlights', 'outline'] as const;
+---
+
+<PanelShell title={studio.title} description={studio.intro} current="video">
+  <div class="admin__body admin__body--wide">
+    <section class="studio" data-studio data-state="loading" data-format="reels">
+      <script is:inline type="application/json" data-tours set:html={toursJson} />
+      <header class="studio__head">
+        <h1 tabindex="-1">{studio.title}</h1>
+        <p>{studio.intro}</p>
+      </header>
+
+      <div class="studio__layout">
+        <div class="studio__stage">
+          <div class="studio__screen">
+            <canvas
+              class="studio__canvas"
+              data-film-canvas
+              role="img"
+              aria-label={studio.screen}
+            ></canvas>
+            <video
+              class="studio__video"
+              data-film-video
+              controls
+              playsinline
+              aria-label={studio.result}
+            ></video>
+          </div>
+
+          <p class="studio__message" data-studio-message role="status"></p>
+
+          <div class="studio__transport">
+            <button class="button button--secondary" type="button" data-action="preview">
+              <span class="icon-play">
+                <Icon name="play" />
+              </span>
+              <span class="icon-stop">
+                <Icon name="stop" />
+              </span>
+              <span data-preview-label>{studio.preview}</span>
+            </button>
+            <label class="visually-hidden" for="studio-position">
+              {studio.position}
+            </label>
+            <input
+              id="studio-position"
+              class="studio__position"
+              type="range"
+              min="0"
+              max="10"
+              step="0.1"
+              value="0"
+              data-position
+            />
+            <output class="studio__time tabular" for="studio-position" data-time>
+              0,0 sn
+            </output>
+          </div>
+
+          <p class="studio__summary" data-summary></p>
+
+          <button
+            class="button button--primary button--block studio__create"
+            type="button"
+            data-action="create"
+          >
+            <Icon name="film" />
+            <span>{studio.create}</span>
+          </button>
+
+          <div class="studio__progress" data-progress>
+            <progress max="1" value="0" aria-label={studio.create}></progress>
+            <span class="tabular" data-progress-text></span>
+            <button class="button button--quiet" type="button" data-action="cancel">
+              {studio.cancel}
+            </button>
+          </div>
+
+          <div class="studio__result">
+            <a class="button button--primary button--block" data-download>
+              <Icon name="download" />
+              <span>{studio.download}</span>
+            </a>
+            <button
+              class="button button--secondary button--block"
+              type="button"
+              data-action="again"
+            >
+              {studio.again}
+            </button>
+          </div>
+        </div>
+
+        <form class="form studio__form" data-studio-form novalidate>
+          <div class="field">
+            <label for="studio-tour">{studio.tour}</label>
+            <select id="studio-tour" name="tour">
+              {tours.map((tour) => (
+                <option value={tour.id}>{tour.title}</option>
+              ))}
+            </select>
+          </div>
+
+          <fieldset class="field">
+            <legend>{studio.template}</legend>
+            <div class="options">
+              {templates.map((template, index) => (
+                <label class="option">
+                  <input type="radio" name="template" value={template} checked={index === 0} />
+                  <span class="option__body">
+                    <strong>{studio.templates[template].label}</strong>
+                    <span>{studio.templates[template].hint}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <div class="field" data-day-field hidden>
+            <label for="studio-day">{studio.day}</label>
+            <select id="studio-day" name="day"></select>
+          </div>
+
+          <fieldset class="field">
+            <legend>{studio.format}</legend>
+            <div class="choices">
+              {FILM_FORMATS.map((format, index) => (
+                <label class="choice">
+                  <input
+                    class="visually-hidden"
+                    type="radio"
+                    name="format"
+                    value={format.id}
+                    checked={index === 0}
+                  />
+                  <span>{studio.formats[format.id]}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset class="field">
+            <legend>{studio.quality}</legend>
+            <div class="choices">
+              {FILM_QUALITIES.map((quality, index) => (
+                <label class="choice">
+                  <input
+                    class="visually-hidden"
+                    type="radio"
+                    name="quality"
+                    value={quality.id}
+                    checked={index === 0}
+                  />
+                  <span>{studio.qualities[quality.id]}</span>
+                </label>
+              ))}
+            </div>
+            <p class="field__hint">{studio.qualityHint}</p>
+          </fieldset>
+
+          <fieldset class="field">
+            <legend>{studio.frameRate}</legend>
+            <div class="choices">
+              {FRAME_RATES.map((rate, index) => (
+                <label class="choice">
+                  <input
+                    class="visually-hidden"
+                    type="radio"
+                    name="frameRate"
+                    value={rate}
+                    checked={index === 0}
+                  />
+                  <span>
+                    {rate} {studio.frameRateUnit}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <label class="check">
+            <input type="checkbox" name="sound" checked />
+            <span>{studio.sound}</span>
+          </label>
+
+          <fieldset class="field studio__group">
+            <legend>{studio.brand}</legend>
+            <div class="field">
+              <label for="studio-logo">{studio.logo}</label>
+              <input
+                id="studio-logo"
+                name="logo"
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                aria-describedby="studio-logo-hint studio-logo-error"
+              />
+              <p class="field__hint" id="studio-logo-hint">
+                {studio.logoHint}
+              </p>
+              <p class="field__error" id="studio-logo-error" role="alert" data-logo-error></p>
+              <button class="button button--quiet" type="button" data-action="remove-logo" hidden>
+                {studio.removeLogo}
+              </button>
+            </div>
+            <div class="field">
+              <label for="studio-brand">{studio.brandName}</label>
+              <input
+                id="studio-brand"
+                name="brandName"
+                type="text"
+                maxlength="40"
+                autocomplete="organization"
+                value={siteConfig.brand.name}
+              />
+            </div>
+            <div class="field">
+              <label for="studio-contact">{studio.contactLine}</label>
+              <input
+                id="studio-contact"
+                name="contactLine"
+                type="text"
+                maxlength="40"
+                autocomplete="off"
+                aria-describedby="studio-contact-hint"
+              />
+              <p class="field__hint" id="studio-contact-hint">
+                {studio.contactHint}
+              </p>
+            </div>
+          </fieldset>
+
+          <fieldset class="field">
+            <legend>{studio.show}</legend>
+            <label class="check">
+              <input type="checkbox" name="showDate" checked />
+              <span>{studio.showDate}</span>
+            </label>
+            <label class="check">
+              <input type="checkbox" name="showPrice" />
+              <span>{studio.showPrice}</span>
+            </label>
+          </fieldset>
+        </form>
+      </div>
+    </section>
+    <SceneSprite scenes={SCENE_KEYS} />
+  </div>
+</PanelShell>
+
+<script>
+  import { whenPanelOpens } from '@/features/admin/access/gate';
+
+  const root = document.querySelector<HTMLElement>('[data-admin]');
+  const studio = document.querySelector<HTMLElement>('[data-studio]');
+  // The studio and its libraries are fetched only once the panel has been opened.
+  if (root && studio) {
+    void whenPanelOpens(root)
+      .then(() => import('@/features/film/bootstrap'))
+      .then(({ mountStudio }) => mountStudio(studio));
+  }
+</script>

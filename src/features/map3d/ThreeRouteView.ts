@@ -7,7 +7,7 @@ import type { ViewPadding } from '@/shared/lifecycle';
 import type { TimeOfDay } from '@/shared/timeOfDay';
 import { BusModel } from './BusModel';
 import { DustTrail } from './DustTrail';
-import type { MapSurface } from './MapSurface';
+import type { FixedFrame, MapSurface } from './MapSurface';
 import { MapWorld } from './MapWorld';
 import type { QualityProfile } from './QualityProfile';
 import { RouteTrack } from './RouteTrack';
@@ -30,7 +30,9 @@ const MIN_STOP_DISTANCE = 7;
 /** Camera distance per unit of free room around a stop: crowded stops are viewed from closer. */
 const STOP_DISTANCE_PER_CLEARANCE = 14;
 const MIN_FOLLOW_DISTANCE = 9;
-const MAX_FOLLOW_DISTANCE = 48;
+const MAX_FOLLOW_DISTANCE = 34;
+/** Camera distance per unit of leg length: near enough for the coach to be the subject. */
+const FOLLOW_DISTANCE_PER_UNIT = 1.15;
 const OVERVIEW_MARGIN = 5;
 const HEADING_RESPONSE = 7;
 /** The camera aims this far ahead of the coach in time, a little more than it trails behind. */
@@ -164,7 +166,11 @@ export class ThreeRouteView implements RouteView {
     this.velocity.set(0, 0, 0);
     // A long motorway leg is watched from further away than a hop between valleys.
     const legUnits = this.plan.legKm(legIndex) / KM_PER_UNIT;
-    this.followDistance = MathUtils.clamp(legUnits * 1.7, MIN_FOLLOW_DISTANCE, MAX_FOLLOW_DISTANCE);
+    this.followDistance = MathUtils.clamp(
+      legUnits * FOLLOW_DISTANCE_PER_UNIT,
+      MIN_FOLLOW_DISTANCE,
+      MAX_FOLLOW_DISTANCE,
+    );
   }
 
   focusStop(stopIndex: number): void {
@@ -229,6 +235,11 @@ export class ThreeRouteView implements RouteView {
   /** The canvas the map is drawn on. */
   get canvas(): HTMLCanvasElement {
     return this.world.canvas;
+  }
+
+  /** Gives a map that is drawn frame by frame another size or sharpness. */
+  reframe(frame: FixedFrame): void {
+    this.world.reframe(frame);
   }
 
   dispose(): void {

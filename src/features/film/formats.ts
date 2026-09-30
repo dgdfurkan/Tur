@@ -8,7 +8,7 @@ export interface FilmFormat {
 
 /** How many device pixels each layout pixel becomes in the file. */
 export interface FilmQuality {
-  readonly id: '4k' | 'hd';
+  readonly id: '4k' | 'hd' | 'draft';
   readonly pixelRatio: number;
   /** Megabits per second for a frame the size of 9:16. */
   readonly megabits: number;
@@ -24,6 +24,8 @@ export const FILM_FORMATS: readonly FilmFormat[] = [
 export const FILM_QUALITIES: readonly FilmQuality[] = [
   { id: '4k', pixelRatio: 6, megabits: 36 },
   { id: 'hd', pixelRatio: 3, megabits: 12 },
+  // Quick to make; for checking a film before spending time on the full-size one.
+  { id: 'draft', pixelRatio: 2, megabits: 6 },
 ];
 
 export const FRAME_RATES = [30, 60] as const;

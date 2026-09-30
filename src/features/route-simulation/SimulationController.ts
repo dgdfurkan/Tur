@@ -1,5 +1,5 @@
 import type { RoutePlan } from '@/domain/tour/RoutePlan';
-import { ROAD_WINDING_FACTOR } from '@/domain/tour/Tour';
+import { roadKm } from '@/domain/tour/Tour';
 import { tr } from '@/i18n/tr';
 import { formatKm } from '@/shared/format';
 import type { Disposable } from '@/shared/lifecycle';
@@ -191,10 +191,8 @@ export class SimulationController implements Disposable {
     if (next) this.panel.showTravelling(next, this.legDistance(fromIndex));
   }
 
-  /** Road distance of a leg, rounded to a figure that reads naturally. */
   private legDistance(legIndex: number): string {
-    const km = this.plan.legKm(legIndex) * ROAD_WINDING_FACTOR;
-    return formatKm(km < 10 ? Math.max(1, Math.round(km)) : Math.round(km / 5) * 5);
+    return formatKm(roadKm(this.plan.legKm(legIndex)));
   }
 
   private onStopReached(stopIndex: number): void {

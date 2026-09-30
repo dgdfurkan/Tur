@@ -103,6 +103,13 @@ export interface TourProps {
 /** Roads are longer than the straight lines between stops. */
 export const ROAD_WINDING_FACTOR = 1.3;
 
+/** The road distance for a straight-line distance, rounded to a figure that reads naturally. */
+export function roadKm(straightKm: number): number {
+  const km = straightKm * ROAD_WINDING_FACTOR;
+  if (km < 10) return Math.max(1, Math.round(km));
+  return km < 200 ? Math.round(km / 5) * 5 : Math.round(km / 10) * 10;
+}
+
 export class Tour {
   readonly id: string;
   readonly title: string;
@@ -163,7 +170,7 @@ export class Tour {
     return this.stops.filter((stop) => stop.kind === 'sight').length;
   }
 
-  /** Approximate road distance of the whole route, rounded to 10 km. */
+  /** Approximate road distance of the whole route. */
   get routeDistanceKm(): number {
     const stops = this.stops;
     let straight = 0;
@@ -172,7 +179,7 @@ export class Tour {
       const to = stops[i];
       if (from && to) straight += from.location.distanceKmTo(to.location);
     }
-    return Math.round((straight * ROAD_WINDING_FACTOR) / 10) * 10;
+    return roadKm(straight);
   }
 
   upcomingDepartures(today: string): readonly Departure[] {

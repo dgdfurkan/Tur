@@ -14,7 +14,7 @@ export class SceneManager implements Disposable {
   private readonly renderer: WebGLRenderer;
   private readonly updatables = new Set<Updatable>();
   private readonly resizeObserver: ResizeObserver | undefined;
-  private readonly frame: FixedFrame | undefined;
+  private frame: FixedFrame | undefined;
   private readonly backdrop = new Color();
   private readonly fog = new Fog(this.backdrop, 1, 2);
   private elapsed = 0;
@@ -83,6 +83,13 @@ export class SceneManager implements Disposable {
     this.elapsed += deltaSeconds;
     for (const updatable of this.updatables) updatable.update(deltaSeconds, this.elapsed);
     this.renderer.render(this.scene, this.camera);
+  }
+
+  /** Gives a map that is drawn frame by frame another size or sharpness. */
+  reframe(frame: FixedFrame): void {
+    this.frame = frame;
+    this.applyPixelRatio();
+    this.resize();
   }
 
   /** Drops to the next cheaper profile; returns false when there is none. */

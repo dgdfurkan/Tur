@@ -27,6 +27,19 @@ const PROFILES = {
   },
 } as const satisfies Record<string, QualityProfile>;
 
+/**
+ * For film frames, which are not drawn in real time: everything at its best,
+ * and paintings large enough to stay sharp on a 4K frame. A film's own frame
+ * sets the pixel ratio, so the cap here is never reached.
+ */
+export const STUDIO_QUALITY: QualityProfile = {
+  name: 'high',
+  pixelRatioCap: Number.POSITIVE_INFINITY,
+  antialias: true,
+  sceneryDensity: 1,
+  texturePixels: 4096,
+};
+
 interface DeviceHints {
   readonly coarsePointer: boolean;
   readonly cores: number;

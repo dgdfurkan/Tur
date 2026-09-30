@@ -12,7 +12,7 @@ import type { LabelSurface } from './LabelSurface';
 import { LandmarkFactory } from './LandmarkFactory';
 import { LandTexture } from './LandTexture';
 import { mapData, ringsExtent } from './MapData';
-import type { MapSurface } from './MapSurface';
+import type { FixedFrame, MapSurface } from './MapSurface';
 import { CITIES, SEAS } from './places';
 import type { QualityProfile } from './QualityProfile';
 import { SceneManager } from './SceneManager';
@@ -218,6 +218,13 @@ export class MapWorld implements Disposable {
   /** The canvas the map is drawn on. */
   get canvas(): HTMLCanvasElement {
     return this.manager.canvas;
+  }
+
+  /** Gives a map that is drawn frame by frame another size or sharpness. */
+  reframe(frame: FixedFrame): void {
+    this.manager.reframe(frame);
+    this.viewportKey = '';
+    this.syncViewport();
   }
 
   dispose(): void {
