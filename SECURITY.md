@@ -13,11 +13,16 @@ Bildirimler yedi gün içinde yanıtlanır. Doğrulanan açıklar için düzeltm
 ## Alınan Önlemler
 
 - İçerik Güvenliği Politikası (CSP) her sayfada hash tabanlı olarak üretilir; `default-src 'self'` uygulanır.
+- Trusted Types zorunludur ve hiçbir politikaya izin verilmez; destekleyen tarayıcılarda metin HTML'e veya koda dönüştürülemez.
+- Değişken veri sayfaya yalnızca `textContent` ile yazılır; tarayıcı deposundan okunan kayıtlar doğrulanır.
+- Operasyon paneli, başka bir sayfanın çerçevesi içinde açıldığında çalışmaz.
 - Üçüncü taraf betik, analitik, yazı tipi sunucusu ve CDN kullanılmaz.
-- Bağımlılıklar Dependabot ile haftalık olarak denetlenir; kod CodeQL ile taranır.
-- GitHub Actions adımları commit SHA değerine sabitlenir.
+- Bağımlılıklar Dependabot ile haftalık olarak denetlenir.
 - Depoya gerçek kişisel veri, parola veya erişim anahtarı eklenmez.
 
 ## Bilinen Sınırlar
 
-GitHub Pages özel HTTP başlığı tanımlamaya izin vermez. Bu nedenle `frame-ancestors`, HSTS ve `Permissions-Policy` gibi başlıklar, site Cloudflare üzerine taşındığında etkinleştirilecektir. Ayrıntılar `docs/yol-haritasi.md` dosyasındadır.
+- GitHub Pages özel HTTP başlığı tanımlamaya izin vermez. Bu nedenle `frame-ancestors`, HSTS ve `Permissions-Policy` gibi başlıklar, site Cloudflare üzerine taşındığında etkinleştirilecektir.
+- Site, `dgdfurkan.github.io` adresindeki diğer projelerle aynı tarayıcı deposunu paylaşır. Bu nedenle panel yalnızca demo verisiyle kullanılmalıdır.
+
+Ayrıntılar `docs/yol-haritasi.md` dosyasındadır.

@@ -10,20 +10,20 @@ Ankara çıkışlı kültür turları için hazırlanan tanıtım sitesi, 3D rot
 
 - **Tur Vitrini:** Her tur için ayrı sayfa, günlük program, konaklama, fiyata dâhil olan ve olmayan hizmetler.
 - **Doluluk Görünümü:** Kalkış tarihine göre doluluk oranı, kalan koltuk sayısı ve koltuk durumu.
-- **Rota Ön İzlemesi:** Çizim tarzında 3D Türkiye haritası üzerinde biniş kartı, mühür ve otobüs animasyonuyla ilerleyen rota simülasyonu.
+- **Rota Ön İzlemesi:** Çizim tarzında 3D Türkiye haritası üzerinde biniş kartı, mühür ve otobüs animasyonuyla ilerleyen rota simülasyonu. Grafik işlemcisi bulunmayan cihazlarda aynı simülasyon düz harita üzerinde çalışır.
 - **Demo Operasyon Paneli:** Telefondan yolcu ve kapora kaydı, anlık doluluk, sigorta listesi dışa aktarımı. Veriler yalnızca cihazda saklanır.
 - **Erişilebilirlik:** Klavye ile kullanım, ekran okuyucu duyuruları ve azaltılmış hareket tercihi desteklenir.
 
 ## Teknoloji
 
-| Katman    | Seçim                          |
-| --------- | ------------------------------ |
-| Çatı      | Astro 7 (statik çıktı)         |
-| Dil       | TypeScript 6 (strict)          |
-| 3D        | three.js                       |
-| Animasyon | GSAP                           |
-| Test      | Vitest, Playwright, axe        |
-| Yayın     | GitHub Actions ve GitHub Pages |
+| Katman    | Seçim                   |
+| --------- | ----------------------- |
+| Çatı      | Astro 7 (statik çıktı)  |
+| Dil       | TypeScript 6 (strict)   |
+| 3D        | three.js                |
+| Animasyon | GSAP                    |
+| Test      | Vitest, Playwright, axe |
+| Yayın     | GitHub Pages            |
 
 ## Kurulum
 
@@ -41,21 +41,21 @@ Site `http://localhost:4321/Tur/` adresinde açılır.
 
 ## Komutlar
 
-| Komut               | Açıklama                                                            |
-| ------------------- | ------------------------------------------------------------------- |
-| `npm run dev`       | Geliştirme sunucusunu başlatır                                      |
-| `npm run build`     | Siteyi `dist/` klasörüne derler                                     |
-| `npm run preview`   | Derlenen siteyi yerelde sunar                                       |
-| `npm run verify`    | Tip denetimi, lint, birim testleri ve derlemeyi birlikte çalıştırır |
-| `npm run test:e2e`  | Uçtan uca testleri çalıştırır (önce `npm run build`)                |
-| `npm run format`    | Kodu Prettier ile biçimlendirir                                     |
-| `npm run map:build` | Harita verisini yeniden üretir                                      |
+| Komut               | Açıklama                                                                     |
+| ------------------- | ---------------------------------------------------------------------------- |
+| `npm run dev`       | Geliştirme sunucusunu başlatır                                               |
+| `npm run build`     | Siteyi `dist/` klasörüne derler                                              |
+| `npm run preview`   | Derlenen siteyi yerelde sunar                                                |
+| `npm run verify`    | Tip denetimi, lint, birim testleri ve derlemeyi birlikte çalıştırır          |
+| `npm run test:e2e`  | Uçtan uca testleri derlenmiş site üzerinde çalıştırır (önce `npm run build`) |
+| `npm run format`    | Kodu Prettier ile biçimlendirir                                              |
+| `npm run map:build` | Harita verisini yeniden üretir                                               |
 
 ## Klasör Yapısı
 
 ```
 .claude/skills/     Geliştirmede kullanılan skill paketleri ve Türkçe içerik standardı
-.github/            CI, yayın, CodeQL ve Dependabot ayarları
+.github/            Dependabot ayarları, issue ve PR şablonları
 docs/               Mimari, yol haritası ve üçüncü taraf lisansları
 scripts/            Harita verisini üreten betik
 src/
@@ -74,7 +74,7 @@ Mimari ayrıntıları `docs/mimari.md`, sonraki aşamalar `docs/yol-haritasi.md`
 
 ## Yayın
 
-`main` dalına yapılan her push, doğrulama adımlarından geçtikten sonra GitHub Pages'e yayınlanır. Marka adı ve iletişim bilgileri `src/config/site.ts` dosyasından değiştirilir. Site farklı bir alan adına taşınırken `SITE_URL` ve `BASE_PATH` ortam değişkenleri ayarlanır.
+Site GitHub Pages üzerinde yayınlanır. Marka adı ve iletişim bilgileri `src/config/site.ts` dosyasından değiştirilir. Site farklı bir alan adına taşınırken `SITE_URL` ve `BASE_PATH` ortam değişkenleri ayarlanır.
 
 ## Güvenlik ve Veri
 
