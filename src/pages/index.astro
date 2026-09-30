@@ -1,6 +1,7 @@
 ---
 import DistanceSign from '@/components/home/DistanceSign.astro';
 import ServiceSign from '@/components/home/ServiceSign.astro';
+import TourMap from '@/components/home/TourMap.astro';
 import TourTicket from '@/components/tour/TourTicket.astro';
 import Button from '@/components/ui/Button.astro';
 import Icon from '@/components/ui/Icon.astro';
@@ -88,7 +89,18 @@ const services = [
     </div>
   </section>
 
-  <section class="section" aria-labelledby="hizmetler">
+  <section class="section" aria-labelledby="tur-haritasi">
+    <div class="container">
+      <SectionHeading
+        id="tur-haritasi"
+        title="Tur Haritası"
+        lead="Tüm rotalar tek haritada gösterilir; otobüsler güzergâhlarını izler."
+      />
+      <TourMap tours={tours} />
+    </div>
+  </section>
+
+  <section class="section section--mist" aria-labelledby="hizmetler">
     <div class="container">
       <SectionHeading id="hizmetler" title="Her Turda Standart Olan Hizmetler" />
       <ul class="services">

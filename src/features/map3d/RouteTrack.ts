@@ -22,6 +22,7 @@ const DASH_LENGTH = 0.9;
 const PLANNED_COLOR = '#6f7a84';
 const CASING_COLOR = '#ffffff';
 const ACTIVE_COLOR = '#0b5a8f';
+const MUTED_COLOR = '#9aa6b0';
 
 /**
  * The road a tour follows: a smooth curve through its stops, drawn as flat
@@ -39,6 +40,7 @@ export class RouteTrack implements Disposable {
   private readonly materials: MeshBasicMaterial[] = [];
   private readonly casing: BufferGeometry;
   private readonly active: BufferGeometry;
+  private readonly activeMaterial: MeshBasicMaterial;
 
   constructor(plan: RoutePlan) {
     // Consecutive stops in the same spot (a sight and the hotel next to it)
@@ -70,6 +72,7 @@ export class RouteTrack implements Disposable {
     const active = this.ribbon(ACTIVE_WIDTH, 0.06, ACTIVE_COLOR, false);
     this.casing = casing.geometry;
     this.active = active.geometry;
+    this.activeMaterial = active.material;
     this.group.add(casing.mesh, active.mesh);
     this.reveal(0, 0);
   }
@@ -119,6 +122,17 @@ export class RouteTrack implements Disposable {
     this.active.setDrawRange(0, count);
   }
 
+  /** Shows the whole road as travelled. */
+  revealAll(): void {
+    this.casing.setDrawRange(0, Infinity);
+    this.active.setDrawRange(0, Infinity);
+  }
+
+  /** Greys the road out so another route can stand in front of it. */
+  setMuted(muted: boolean): void {
+    this.activeMaterial.color.set(muted ? MUTED_COLOR : ACTIVE_COLOR);
+  }
+
   dispose(): void {
     for (const geometry of this.geometries) geometry.dispose();
     for (const material of this.materials) material.dispose();
@@ -149,7 +163,7 @@ export class RouteTrack implements Disposable {
     lift: number,
     color: string,
     dashed: boolean,
-  ): { mesh: Mesh; geometry: BufferGeometry } {
+  ): { mesh: Mesh; geometry: BufferGeometry; material: MeshBasicMaterial } {
     const positions: number[] = [];
     const indices: number[] = [];
     const side = new Vector3();
@@ -185,6 +199,6 @@ export class RouteTrack implements Disposable {
     });
     this.geometries.push(geometry);
     this.materials.push(material);
-    return { mesh: new Mesh(geometry, material), geometry };
+    return { mesh: new Mesh(geometry, material), geometry, material };
   }
 }

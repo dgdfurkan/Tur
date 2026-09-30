@@ -9,7 +9,7 @@ import { MapWorld } from './MapWorld';
 import type { QualityProfile } from './QualityProfile';
 import { RouteTrack } from './RouteTrack';
 import { StopMarkers } from './StopMarkers';
-import { KM_PER_UNIT, LAND_TOP } from './world';
+import { coachScale, KM_PER_UNIT, LAND_TOP, markerScale } from './world';
 
 const STOP_PRIORITY: Record<StopKind, number> = {
   departure: 90,
@@ -181,9 +181,8 @@ export class ThreeRouteView implements RouteView {
 
   private animate(deltaSeconds: number, elapsedSeconds: number): void {
     const distance = this.world.rig.distance;
-    // Coach and markers hold a readable size on screen whatever the zoom.
-    this.bus.group.scale.setScalar(MathUtils.clamp(distance * 0.045, 0.9, 8));
-    this.markers?.setScale(MathUtils.clamp(distance * 0.022, 0.8, 3.4));
+    this.bus.group.scale.setScalar(coachScale(distance));
+    this.markers?.setScale(markerScale(distance));
     this.markers?.update(elapsedSeconds);
 
     if (!Number.isNaN(this.heading)) {

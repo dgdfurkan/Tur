@@ -4,6 +4,7 @@ import { RoutePlan } from '@/domain/tour/RoutePlan';
 import { tr } from '@/i18n/tr';
 import { SafeStorage } from '@/infrastructure/storage/SafeStorage';
 import { formatDuration, formatKm } from '@/shared/format';
+import { supportsWebGL } from '@/shared/webgl';
 import { RouteSimulation } from './RouteSimulation';
 import type { RouteView } from './RouteView';
 import { SimulationController, type BoardingRitual } from './SimulationController';
@@ -14,14 +15,6 @@ function required<T extends Element>(root: ParentNode, selector: string): T {
   const element = root.querySelector<T>(selector);
   if (!element) throw new Error(`Route page is missing ${selector}`);
   return element;
-}
-
-function supportsWebGL(): boolean {
-  try {
-    return document.createElement('canvas').getContext('webgl2') !== null;
-  } catch {
-    return false;
-  }
 }
 
 /** Prefers the 3D map and falls back to the flat one; both are loaded on demand. */

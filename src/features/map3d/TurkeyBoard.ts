@@ -8,20 +8,20 @@ import {
   Shape,
   SRGBColorSpace,
   type BufferGeometry,
-  type Material,
 } from 'three';
 import { LandTexture } from './LandTexture';
 import type { MapData, Ring } from './MapData';
+import { SeaTexture } from './SeaTexture';
 import type { ToonKit } from './ToonKit';
 import { KM_PER_UNIT, LAND_TOP } from './world';
 import type { Disposable } from '@/shared/lifecycle';
 
 const SEA_COLOR = '#a8d3ea';
-const NEIGHBOUR_COLOR = '#e3e5d8';
 const CLIFF_COLOR = '#b89b6a';
-const NEIGHBOUR_HEIGHT = 0.28;
 const BEVEL = 0.06;
-const SEA_SIZE = 900;
+/** Open sea beyond the painted surroundings; large enough to reach the fog. */
+const SEA_SIZE = 1400;
+const SURROUNDINGS_LIFT = 0.02;
 
 function toShapes(rings: readonly Ring[]): Shape[] {
   return rings.map((ring) => {
@@ -47,16 +47,16 @@ export interface BoardOptions {
 }
 
 /**
- * The static map: sea, neighbouring land and Turkey as a raised, bevelled slab
- * whose top carries the painted land texture.
+ * The static map: open sea, a painted plane of coastal water and neighbouring
+ * land, and Turkey as a raised, bevelled slab whose top carries the land painting.
  */
 export class TurkeyBoard implements Disposable {
   readonly group = new Group();
   private readonly geometries: BufferGeometry[] = [];
-  private readonly ownMaterials: Material[] = [];
-  private readonly texture: CanvasTexture;
+  private readonly textures: CanvasTexture[] = [];
   private readonly landMaterial: MeshBasicMaterial;
   private readonly seaMaterial: MeshBasicMaterial;
+  private readonly surroundingsMaterial: MeshBasicMaterial;
 
   constructor(data: MapData, kit: ToonKit, options: BoardOptions) {
     this.seaMaterial = new MeshBasicMaterial({ color: SEA_COLOR });
@@ -64,28 +64,42 @@ export class TurkeyBoard implements Disposable {
     sea.rotation.x = -Math.PI / 2;
     this.group.add(sea);
 
-    const neighbours = layFlat(
-      new ExtrudeGeometry(toShapes(data.neighbours), {
-        depth: NEIGHBOUR_HEIGHT,
-        bevelEnabled: false,
-      }),
+    // Neighbouring land and the coastal shallows are a painting laid on the sea.
+    const { bounds } = data;
+    const surroundings = this.texture(
+      new SeaTexture(data, bounds, options.texturePixels).canvas,
+      options.anisotropy,
     );
-    this.group.add(new Mesh(this.track(neighbours), kit.solid(NEIGHBOUR_COLOR)));
+    this.surroundingsMaterial = new MeshBasicMaterial({ map: surroundings });
+    const frame = new Mesh(
+      this.track(
+        new PlaneGeometry(
+          (bounds.maxX - bounds.minX) / KM_PER_UNIT,
+          (bounds.maxY - bounds.minY) / KM_PER_UNIT,
+        ),
+      ),
+      this.surroundingsMaterial,
+    );
+    frame.rotation.x = -Math.PI / 2;
+    frame.position.set(
+      (bounds.minX + bounds.maxX) / 2 / KM_PER_UNIT,
+      SURROUNDINGS_LIFT,
+      -(bounds.minY + bounds.maxY) / 2 / KM_PER_UNIT,
+    );
+    this.group.add(frame);
 
     const land = new LandTexture(data, options.texturePixels);
-    this.texture = new CanvasTexture(land.canvas);
-    this.texture.colorSpace = SRGBColorSpace;
-    this.texture.anisotropy = options.anisotropy;
+    const landTexture = this.texture(land.canvas, options.anisotropy);
     // ExtrudeGeometry writes the cap's UVs in shape units; map them onto the painting.
     const width = land.extent.width / KM_PER_UNIT;
     const height = land.extent.height / KM_PER_UNIT;
-    this.texture.repeat.set(1 / width, 1 / height);
-    this.texture.offset.set(
+    landTexture.repeat.set(1 / width, 1 / height);
+    landTexture.offset.set(
       -land.extent.minX / KM_PER_UNIT / width,
       -land.extent.minY / KM_PER_UNIT / height,
     );
 
-    this.landMaterial = new MeshBasicMaterial({ map: this.texture });
+    this.landMaterial = new MeshBasicMaterial({ map: landTexture });
     const slab = layFlat(
       new ExtrudeGeometry(toShapes(data.turkey), {
         depth: LAND_TOP - BEVEL,
@@ -96,20 +110,29 @@ export class TurkeyBoard implements Disposable {
       }),
     );
     this.group.add(new Mesh(this.track(slab), [this.landMaterial, kit.solid(CLIFF_COLOR)]));
-
-    this.ownMaterials.push(this.seaMaterial, this.landMaterial);
   }
 
   /** Multiplies the unlit surfaces so they follow the time of day like the lit ones. */
   setTint(tint: { r: number; g: number; b: number }): void {
     this.landMaterial.color.setRGB(tint.r, tint.g, tint.b);
+    this.surroundingsMaterial.color.copy(this.landMaterial.color);
     this.seaMaterial.color.set(SEA_COLOR).multiply(this.landMaterial.color);
   }
 
   dispose(): void {
     for (const geometry of this.geometries) geometry.dispose();
-    for (const material of this.ownMaterials) material.dispose();
-    this.texture.dispose();
+    for (const texture of this.textures) texture.dispose();
+    this.landMaterial.dispose();
+    this.seaMaterial.dispose();
+    this.surroundingsMaterial.dispose();
+  }
+
+  private texture(canvas: HTMLCanvasElement, anisotropy: number): CanvasTexture {
+    const texture = new CanvasTexture(canvas);
+    texture.colorSpace = SRGBColorSpace;
+    texture.anisotropy = anisotropy;
+    this.textures.push(texture);
+    return texture;
   }
 
   private track<T extends BufferGeometry>(geometry: T): T {

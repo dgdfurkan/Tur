@@ -13,11 +13,12 @@ const MAX_DELTA_SECONDS = 0.1;
  */
 export class SceneManager implements Disposable {
   readonly scene = new Scene();
-  readonly camera = new PerspectiveCamera(32, 1, 1, 900);
+  readonly camera = new PerspectiveCamera(32, 1, 1, 1600);
   private readonly renderer: WebGLRenderer;
   private readonly updatables = new Set<Updatable>();
   private readonly resizeObserver: ResizeObserver;
   private readonly visibilityObserver: IntersectionObserver;
+  private fog: Fog | undefined;
   private frameHandle = 0;
   private lastTime = 0;
   private elapsed = 0;
@@ -56,9 +57,17 @@ export class SceneManager implements Disposable {
     return { width: this.canvas.clientWidth, height: this.canvas.clientHeight };
   }
 
-  setBackdrop(color: Color, fogNear: number, fogFar: number): void {
+  setBackdrop(color: Color): void {
+    this.fog = new Fog(color, 1, 2);
     this.scene.background = color;
-    this.scene.fog = new Fog(color, fogNear, fogFar);
+    this.scene.fog = this.fog;
+  }
+
+  /** Haze begins behind the subject and thickens towards the horizon. */
+  setHaze(near: number, far: number): void {
+    if (!this.fog) return;
+    this.fog.near = near;
+    this.fog.far = far;
   }
 
   add(updatable: Updatable): void {

@@ -1,0 +1,115 @@
+---
+import { TURKEY_PROJECTION } from '@/domain/geo/MapProjection';
+import { smoothPath } from '@/domain/geo/spline';
+import type { Tour } from '@/domain/tour/Tour';
+import { mapData, ringsExtent, ringsToSvgPath } from '@/features/map3d/MapData';
+import { CITIES } from '@/features/map3d/places';
+
+/** Static map of Turkey with every tour's route; stands in until the 3D map loads. */
+interface Props {
+  tours: readonly Tour[];
+}
+
+const { tours } = Astro.props;
+
+// SVG's y axis points down, so north is negated.
+const toSvg = (location: { lat: number; lon: number }) => {
+  const plane = TURKEY_PROJECTION.project(location);
+  return { x: plane.x, y: -plane.y };
+};
+
+// SVG's y axis points down, so the northern edge becomes the top of the frame.
+const extent = ringsExtent(mapData.turkeyCoarse);
+const margin = extent.width * 0.06;
+const width = extent.width + margin * 2;
+const height = extent.height + margin * 2;
+const viewBox = [extent.minX - margin, -(extent.minY + extent.height) - margin, width, height]
+  .map((value) => value.toFixed(1))
+  .join(' ');
+const unit = width / 100;
+
+const routes = tours.map((tour) => smoothPath(tour.stops.map((stop) => toSvg(stop.location))));
+const cities = CITIES.filter((city) => city.tier === 1).map((city) => ({
+  name: city.name,
+  ...toSvg(city),
+}));
+---
+
+<svg class="overview" viewBox={viewBox} aria-hidden="true" focusable="false">
+  <path class="overview__neighbour" d={ringsToSvgPath(mapData.neighboursCoarse)}></path>
+  <path class="overview__land" d={ringsToSvgPath(mapData.turkeyCoarse)}></path>
+  <path class="overview__lake" d={ringsToSvgPath(Object.values(mapData.lakes))}></path>
+  {routes.map((d) => (
+    <path class="overview__casing" d={d} />
+  ))}
+  {routes.map((d) => (
+    <path class="overview__route" d={d} />
+  ))}
+  {cities.map((city) => (
+    <g class="overview__city">
+      <circle cx={city.x.toFixed(1)} cy={city.y.toFixed(1)} r={unit * 0.5} />
+      <text
+        x={(city.x + unit * 1.1).toFixed(1)}
+        y={(city.y + unit * 0.7).toFixed(1)}
+        font-size={unit * 1.9}
+      >
+        {city.name}
+      </text>
+    </g>
+  ))}
+</svg>
+
+<style>
+  .overview {
+    width: 100%;
+    height: 100%;
+    background: #cfe4f2;
+  }
+
+  .overview__neighbour {
+    fill: #e9ece4;
+  }
+
+  .overview__land {
+    fill: #f6f1e1;
+    stroke: #c4b998;
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .overview__lake {
+    fill: #b5d5ea;
+  }
+
+  .overview__casing,
+  .overview__route {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .overview__casing {
+    stroke: var(--c-white);
+    stroke-width: 5;
+  }
+
+  .overview__route {
+    stroke: var(--c-blue);
+    stroke-width: 2.5;
+  }
+
+  .overview__city circle {
+    fill: #6f746b;
+  }
+
+  .overview__city text {
+    fill: #565b53;
+    font-stretch: var(--wdth-sign);
+    font-weight: 600;
+    paint-order: stroke;
+    stroke: #f6f1e1;
+    stroke-width: 3;
+    vector-effect: non-scaling-stroke;
+  }
+</style>

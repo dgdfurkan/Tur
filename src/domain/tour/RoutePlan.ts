@@ -24,20 +24,29 @@ export class RoutePlan {
   private constructor(readonly stops: readonly RouteStop[]) {}
 
   static fromTour(tour: Tour, projection: MapProjection = TURKEY_PROJECTION): RoutePlan {
+    return RoutePlan.fromStops(
+      tour.days.flatMap((day) => day.stops.map((stop) => ({ stop, day: day.number }))),
+      projection,
+    );
+  }
+
+  /** Builds a plan from stops in travel order, each tagged with its day. */
+  static fromStops(
+    visits: readonly { stop: Stop; day: number }[],
+    projection: MapProjection = TURKEY_PROJECTION,
+  ): RoutePlan {
     const stops: RouteStop[] = [];
     let travelled = 0;
-    for (const day of tour.days) {
-      for (const stop of day.stops) {
-        const previous = stops.at(-1);
-        if (previous) travelled += previous.stop.location.distanceKmTo(stop.location);
-        stops.push({
-          index: stops.length,
-          stop,
-          day: day.number,
-          point: projection.project(stop.location),
-          distanceKm: travelled,
-        });
-      }
+    for (const { stop, day } of visits) {
+      const previous = stops.at(-1);
+      if (previous) travelled += previous.stop.location.distanceKmTo(stop.location);
+      stops.push({
+        index: stops.length,
+        stop,
+        day,
+        point: projection.project(stop.location),
+        distanceKm: travelled,
+      });
     }
     return new RoutePlan(stops);
   }

@@ -4,19 +4,23 @@ import type { Disposable, ViewPadding } from '@/shared/lifecycle';
 import { CameraRig } from './CameraRig';
 import { LabelLayer } from './LabelLayer';
 import { LandmarkFactory } from './LandmarkFactory';
-import { mapData } from './MapData';
+import { mapData, ringsExtent } from './MapData';
 import { CITIES, SEAS } from './places';
 import type { QualityProfile } from './QualityProfile';
 import { SceneManager } from './SceneManager';
 import { Scenery } from './Scenery';
 import { ToonKit } from './ToonKit';
 import { TurkeyBoard } from './TurkeyBoard';
-import { LAND_TOP, toWorld } from './world';
+import { KM_PER_UNIT, LAND_TOP, toWorld } from './world';
 
 const SKY = new Color('#dcedf8');
 const NO_PADDING: ViewPadding = { left: 0, right: 0, top: 0, bottom: 0 };
 const CITY_PRIORITY = { 1: 40, 2: 20 } as const;
 const SEA_PRIORITY = 10;
+const OVERVIEW_MARGIN = 4;
+/** Haze range as multiples of the camera's distance to what it is looking at. */
+const HAZE_NEAR = 1.7;
+const HAZE_FAR = 4.2;
 
 type FrameCallback = (deltaSeconds: number, elapsedSeconds: number) => void;
 
@@ -43,7 +47,7 @@ export class MapWorld implements Disposable {
     reducedMotion = false,
   ) {
     this.manager = new SceneManager(canvas, quality);
-    this.manager.setBackdrop(SKY, 260, 600);
+    this.manager.setBackdrop(SKY);
 
     const { scene, camera } = this.manager;
     scene.add(new HemisphereLight('#ffffff', '#c4d2dc', 1.5));
@@ -77,6 +81,7 @@ export class MapWorld implements Disposable {
         for (const callback of this.frameCallbacks) callback(delta, elapsed);
         this.scenery.update(delta, elapsed);
         this.rig.update(delta);
+        this.manager.setHaze(this.rig.distance * HAZE_NEAR, this.rig.distance * HAZE_FAR);
         const { width, height } = this.manager.size;
         this.labels.update(camera, width, height);
       },
@@ -90,14 +95,17 @@ export class MapWorld implements Disposable {
   /** Frames the whole country. */
   overviewPose(): { target: Vector3; distance: number; pitch: number } {
     this.syncViewport();
-    const { bounds } = mapData;
+    const { minX, minY, width, height } = ringsExtent(mapData.turkey);
     const pitch = 54;
-    // Bounds include neighbouring land; Turkey itself spans about half of that frame.
     return {
-      target: new Vector3(1, LAND_TOP, -1),
+      target: new Vector3(
+        (minX + width / 2) / KM_PER_UNIT,
+        LAND_TOP,
+        -(minY + height / 2) / KM_PER_UNIT,
+      ),
       distance: this.rig.distanceToFit(
-        ((bounds.maxX - bounds.minX) / 20) * 0.36,
-        ((bounds.maxY - bounds.minY) / 20) * 0.26,
+        width / 2 / KM_PER_UNIT + OVERVIEW_MARGIN,
+        height / 2 / KM_PER_UNIT + OVERVIEW_MARGIN,
         pitch,
       ),
       pitch,

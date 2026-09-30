@@ -1,13 +1,6 @@
 import { TURKEY_PROJECTION, type GeoCoordinates } from '@/domain/geo/MapProjection';
-import type { MapData, Ring } from './MapData';
+import { ringsExtent, type MapData, type Ring, type RingsExtent } from './MapData';
 import { createRandom } from './random';
-
-export interface LandExtent {
-  readonly minX: number;
-  readonly minY: number;
-  readonly width: number;
-  readonly height: number;
-}
 
 interface Wash extends GeoCoordinates {
   readonly radiusKm: number;
@@ -58,33 +51,17 @@ const KIZILIRMAK: readonly GeoCoordinates[] = [
   { lat: 41.73, lon: 35.95 },
 ];
 
-function extentOf(rings: readonly Ring[]): LandExtent {
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-  for (const ring of rings) {
-    for (const [x, y] of ring) {
-      minX = Math.min(minX, x);
-      minY = Math.min(minY, y);
-      maxX = Math.max(maxX, x);
-      maxY = Math.max(maxY, y);
-    }
-  }
-  return { minX, minY, width: maxX - minX, height: maxY - minY };
-}
-
 /**
  * Paints the top face of the country slab on a 2D canvas: regional colour
  * washes, a shaded coastline, lakes and one river. Painting once into a texture
  * gives the map its illustrated look at no per-frame cost.
  */
 export class LandTexture {
-  readonly extent: LandExtent;
+  readonly extent: RingsExtent;
   readonly canvas: HTMLCanvasElement;
 
   constructor(data: MapData, pixelWidth: number) {
-    this.extent = extentOf(data.turkey);
+    this.extent = ringsExtent(data.turkey);
     this.canvas = document.createElement('canvas');
     this.canvas.width = pixelWidth;
     this.canvas.height = Math.round((pixelWidth * this.extent.height) / this.extent.width);
