@@ -76,6 +76,10 @@ export default defineConfig({
       },
     },
   ],
+  vite: {
+    // three.js is one large chunk by nature; it is loaded lazily on the map pages only.
+    build: { chunkSizeWarningLimit: 700 },
+  },
   security: {
     csp: {
       directives: [

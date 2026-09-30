@@ -1,5 +1,5 @@
 import type { Departure } from '@/domain/tour/Departure';
-import type { Tour, TourCategory } from '@/domain/tour/Tour';
+import type { Tour } from '@/domain/tour/Tour';
 import type { TourRepository } from '@/domain/tour/TourRepository';
 
 export interface ScheduledTour {
@@ -17,12 +17,16 @@ export class TourCatalogService {
     return [...tours].sort((a, b) => a.distanceFromOriginKm - b.distanceFromOriginKm);
   }
 
-  async listByCategory(category: TourCategory): Promise<readonly Tour[]> {
-    return (await this.listTours()).filter((tour) => tour.category === category);
-  }
-
-  async findTour(id: string): Promise<Tour | undefined> {
-    return (await this.repository.findAll()).find((tour) => tour.id === id);
+  /** Each tour that still has a departure ahead, with that departure, soonest first. */
+  async nextDepartures(today: string, limit?: number): Promise<readonly ScheduledTour[]> {
+    const tours = await this.repository.findAll();
+    const scheduled = tours
+      .flatMap((tour) => {
+        const departure = tour.nextDeparture(today);
+        return departure ? [{ tour, departure }] : [];
+      })
+      .sort((a, b) => a.departure.startDate.localeCompare(b.departure.startDate));
+    return limit === undefined ? scheduled : scheduled.slice(0, limit);
   }
 
   /** Every upcoming departure across all tours, soonest first. */

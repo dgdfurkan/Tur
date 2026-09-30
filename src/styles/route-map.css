@@ -1,0 +1,194 @@
+/*
+ * Styles for elements the map creates at runtime (place-name signs and the
+ * flat SVG fallback). They cannot live in a component's scoped styles because
+ * the elements do not exist when the page is rendered.
+ */
+
+.map-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding-bottom: 0.625rem;
+  opacity: 0;
+  will-change: transform;
+  transition: opacity var(--dur-ui) ease;
+}
+
+.map-label--shown {
+  opacity: 1;
+}
+
+/* The post that carries the sign down to its place on the map. */
+.map-label::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 0.125rem;
+  height: 0.625rem;
+  margin-left: -0.0625rem;
+  background: var(--c-asphalt);
+  opacity: 0.55;
+}
+
+.map-label__plate {
+  display: block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.375rem;
+  box-shadow:
+    inset 0 0 0 0.0625rem currentColor,
+    0 0 0 0.125rem var(--plate),
+    0 2px 6px rgb(27 31 36 / 0.3);
+  background: var(--plate);
+  color: var(--c-white);
+  font-stretch: var(--wdth-sign);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.map-label--stop {
+  --plate: var(--c-brown);
+}
+
+.map-label--city {
+  --plate: var(--c-blue);
+}
+
+.map-label--city .map-label__plate {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.map-label--sea {
+  padding-bottom: 0;
+}
+
+.map-label--sea::after {
+  display: none;
+}
+
+.map-label--sea .map-label__plate {
+  background: none;
+  box-shadow: none;
+  color: #4d7fa3;
+  font-size: 0.875rem;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+.map-label[data-state='visited'] .map-label__plate {
+  --plate: #8a7567;
+}
+
+.map-label[data-state='active'] {
+  z-index: 1;
+}
+
+.map-label[data-state='active'] .map-label__plate {
+  padding: 0.25rem 0.75rem;
+  box-shadow:
+    inset 0 0 0 0.0625rem currentColor,
+    0 0 0 0.125rem var(--plate),
+    0 0 0 0.3125rem var(--c-yellow),
+    0 4px 12px rgb(27 31 36 / 0.35);
+  font-size: 1rem;
+}
+
+.flat-map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #cfe4f2;
+}
+
+.flat-map__neighbour {
+  fill: #e9ece4;
+}
+
+.flat-map__land {
+  fill: #f6f1e1;
+  stroke: #c4b998;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.flat-map__lake {
+  fill: #b5d5ea;
+}
+
+.flat-map__plan,
+.flat-map__leg {
+  fill: none;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.flat-map__plan {
+  stroke: #8a949c;
+  stroke-width: 2;
+  stroke-dasharray: 6 6;
+}
+
+.flat-map__leg {
+  stroke: var(--c-blue);
+  stroke-width: 4;
+}
+
+.flat-map__stop circle {
+  r: calc(var(--unit) * 1px);
+  fill: var(--c-brown);
+  stroke: var(--c-white);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.flat-map__stop--departure circle,
+.flat-map__stop--arrival circle {
+  fill: var(--c-blue);
+}
+
+.flat-map__stop--rest circle {
+  fill: var(--c-muted);
+}
+
+.flat-map__stop--lodging circle {
+  fill: var(--c-asphalt);
+}
+
+.flat-map__stop text {
+  display: none;
+  fill: var(--c-asphalt);
+  font-stretch: var(--wdth-sign);
+  font-size: calc(var(--unit) * 2.6px);
+  font-weight: 650;
+  paint-order: stroke;
+  stroke: var(--c-white);
+  stroke-width: calc(var(--unit) * 0.7px);
+  transform: translate(calc(var(--unit) * 1.6px), calc(var(--unit) * 0.9px));
+}
+
+.flat-map__stop--active text {
+  display: block;
+}
+
+.flat-map__stop--active circle {
+  r: calc(var(--unit) * 1.5px);
+  stroke: var(--c-yellow);
+  stroke-width: 4;
+}
+
+.flat-map__stop--visited:not(.flat-map__stop--active) circle {
+  fill: #8a7567;
+}
+
+.flat-map__coach {
+  r: calc(var(--unit) * 1.3px);
+  fill: var(--c-white);
+  stroke: var(--c-blue);
+  stroke-width: 4;
+  vector-effect: non-scaling-stroke;
+}

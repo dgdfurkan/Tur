@@ -17,23 +17,37 @@ type Ring = [number, number][];
 
 const atlas = atlasJson as unknown as Topology<{ countries: GeometryCollection }>;
 
-/** Visible frame in degrees; neighbours are clipped to it. */
-const FRAME = { west: 24.2, east: 46.6, south: 34.2, north: 43.6 };
+/**
+ * Frame in degrees. It reaches well past Turkey so that the straight edges
+ * where neighbours are clipped stay outside every camera view.
+ */
+const FRAME = { west: 20.5, east: 50.5, south: 30.5, north: 46.5 };
 
 const TURKEY_ID = '792';
 const NEIGHBOUR_IDS = new Set([
   '300', // Greece
   '100', // Bulgaria
   '642', // Romania
+  '498', // Moldova
+  '804', // Ukraine
+  '643', // Russia
   '268', // Georgia
   '051', // Armenia
   '031', // Azerbaijan
   '364', // Iran
   '368', // Iraq
   '760', // Syria
-  '196', // Cyprus
   '422', // Lebanon
-  '643', // Russia
+  '376', // Israel
+  '275', // Palestine
+  '400', // Jordan
+  '682', // Saudi Arabia
+  '414', // Kuwait
+  '818', // Egypt
+  '196', // Cyprus
+  '807', // North Macedonia
+  '688', // Serbia
+  '008', // Albania
 ]);
 
 /** Lakes are absent from country data; these outlines are hand-approximated. */
@@ -222,7 +236,8 @@ const data = {
   },
   turkey: prepare(turkeyRings, 1.2, 150),
   turkeyCoarse: prepare(turkeyRings, 6, 600),
-  neighbours: prepare(neighbourRings, 4, 250),
+  neighbours: prepare(neighbourRings, 5, 300),
+  neighboursCoarse: prepare(neighbourRings, 14, 1500),
   lakes: Object.fromEntries(
     Object.entries(LAKES).map(([name, points]) => [
       name,
@@ -237,5 +252,6 @@ writeFileSync(target, `${JSON.stringify(data)}\n`);
 const count = (rings: Ring[]): number => rings.reduce((sum, ring) => sum + ring.length, 0);
 console.warn(
   `turkey.json written: ${data.turkey.length} rings / ${count(data.turkey)} points, ` +
-    `coarse ${count(data.turkeyCoarse)} points, neighbours ${data.neighbours.length} rings / ${count(data.neighbours)} points`,
+    `coarse ${count(data.turkeyCoarse)} points, neighbours ${data.neighbours.length} rings / ` +
+    `${count(data.neighbours)} points, coarse ${count(data.neighboursCoarse)} points`,
 );

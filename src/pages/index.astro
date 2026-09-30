@@ -14,11 +14,7 @@ import { todayIso } from '@/shared/format';
 const today = todayIso();
 const tours = await tourCatalog.listTours();
 
-const upcoming = tours
-  .map((tour) => ({ tour, departure: tour.nextDeparture(today) }))
-  .filter((item) => item.departure !== undefined)
-  .sort((a, b) => (a.departure?.startDate ?? '').localeCompare(b.departure?.startDate ?? ''))
-  .slice(0, 4);
+const upcoming = await tourCatalog.nextDepartures(today, 4);
 
 const services = [
   {

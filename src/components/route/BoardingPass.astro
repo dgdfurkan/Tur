@@ -1,0 +1,218 @@
+---
+import BrandMark from '@/components/ui/BrandMark.astro';
+import { siteConfig } from '@/config/site';
+import type { Departure } from '@/domain/tour/Departure';
+import type { Tour } from '@/domain/tour/Tour';
+import { tr } from '@/i18n/tr';
+import { formatDate, formatTime } from '@/shared/format';
+
+/** The boarding pass stamped at the start of the route simulation. Decorative, so hidden from assistive technology. */
+interface Props {
+  tour: Tour;
+  departure?: Departure | undefined;
+}
+
+const { tour, departure } = Astro.props;
+const seat = departure?.freeSeats[0];
+---
+
+<div class="pass-overlay" data-boarding-pass hidden aria-hidden="true">
+  <div class="pass" data-pass-card>
+    <div class="pass__main" data-pass-main>
+      <div class="pass__head">
+        <BrandMark size={28} />
+        <span class="pass__brand">{siteConfig.brand.name}</span>
+        <span class="pass__type">{tr.route.boardingPass}</span>
+      </div>
+      <p class="pass__tour">{tour.title}</p>
+      <dl class="pass__facts">
+        {departure && (
+          <>
+            <div>
+              <dt>{tr.route.date}</dt>
+              <dd>{formatDate(departure.startDate)}</dd>
+            </div>
+            <div>
+              <dt>{tr.route.time}</dt>
+              <dd>{formatTime(departure.time)}</dd>
+            </div>
+          </>
+        )}
+        <div class="pass__fact--wide">
+          <dt>{tr.tour.departurePoint}</dt>
+          <dd>{departure?.meetingPoint ?? 'Ankara'}</dd>
+        </div>
+      </dl>
+      <div class="pass__barcode"></div>
+      <div class="pass__stamp" data-pass-stamp>
+        <span>{tr.route.stampTop}</span>
+        <span>{tr.route.stampBottom}</span>
+      </div>
+    </div>
+    <div class="pass__stub" data-pass-stub>
+      <span class="pass__punch" data-pass-punch></span>
+      <p class="pass__seat-label">{tr.route.seat}</p>
+      <p class="pass__seat">{seat ?? '–'}</p>
+      <p class="pass__destination">{tour.destination}</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .pass-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-overlay);
+    display: grid;
+    place-items: center;
+    padding: var(--gutter);
+    background: rgb(27 31 36 / 0.55);
+  }
+
+  .pass-overlay[hidden] {
+    display: none;
+  }
+
+  .pass {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 6.5rem;
+    width: min(100%, 30rem);
+    filter: drop-shadow(0 18px 40px rgb(0 0 0 / 0.35));
+  }
+
+  .pass__main,
+  .pass__stub {
+    background: var(--c-white);
+    color: var(--c-asphalt);
+  }
+
+  .pass__main {
+    position: relative;
+    padding: var(--space-5);
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  }
+
+  .pass__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .pass__brand {
+    font-stretch: var(--wdth-heading);
+    font-weight: 750;
+  }
+
+  .pass__type {
+    margin-left: auto;
+    color: var(--c-muted);
+    font-size: var(--text-caption);
+  }
+
+  .pass__tour {
+    margin-top: var(--space-4);
+    font-stretch: var(--wdth-heading);
+    font-size: 1.5rem;
+    font-weight: 750;
+    line-height: 1.1;
+  }
+
+  .pass__facts {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-3) var(--space-5);
+    margin: var(--space-4) 0 0;
+  }
+
+  .pass__fact--wide {
+    grid-column: 1 / -1;
+  }
+
+  .pass__facts dt,
+  .pass__seat-label {
+    color: var(--c-muted);
+    font-size: var(--text-caption);
+  }
+
+  .pass__facts dd {
+    margin: 0;
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pass__barcode {
+    height: 2.25rem;
+    margin-top: var(--space-5);
+    background: repeating-linear-gradient(
+      90deg,
+      var(--c-asphalt) 0 2px,
+      transparent 2px 5px,
+      var(--c-asphalt) 5px 6px,
+      transparent 6px 8px,
+      var(--c-asphalt) 8px 11px,
+      transparent 11px 13px
+    );
+    opacity: 0.85;
+  }
+
+  /* Rubber stamp: a double frame in red ink, set at an angle. */
+  .pass__stamp {
+    position: absolute;
+    right: var(--space-4);
+    bottom: 3.25rem;
+    display: grid;
+    justify-items: center;
+    padding: var(--space-2) var(--space-3);
+    border: 0.1875rem solid var(--c-red);
+    border-radius: var(--radius-sm);
+    outline: 0.0625rem solid var(--c-red);
+    outline-offset: 0.1875rem;
+    color: var(--c-red);
+    font-stretch: var(--wdth-display);
+    font-size: 1.125rem;
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: 0.04em;
+    mix-blend-mode: multiply;
+    opacity: 0.88;
+    transform: rotate(-12deg);
+  }
+
+  .pass__stub {
+    position: relative;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: var(--space-1);
+    padding: var(--space-4) var(--space-3);
+    border-left: 0.125rem dashed var(--c-line);
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+    text-align: center;
+  }
+
+  .pass__seat {
+    font-stretch: var(--wdth-display);
+    font-size: 2.75rem;
+    font-weight: 800;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pass__destination {
+    margin-top: var(--space-2);
+    font-size: var(--text-small);
+    font-weight: 650;
+  }
+
+  /* The hole left by the conductor's punch. */
+  .pass__punch {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: rgb(27 31 36 / 0.78);
+    box-shadow: inset 0 0.0625rem 0.125rem rgb(0 0 0 / 0.6);
+  }
+</style>

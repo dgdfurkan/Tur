@@ -64,8 +64,14 @@ describe('TourCatalogService', () => {
     expect(dates.every((date) => date >= '2026-11-10')).toBe(true);
   });
 
-  it('finds a tour by id', async () => {
-    expect((await service.findTour('kapadokya'))?.title).toBe('Kapadokya Kültür Turu');
-    expect(await service.findTour('yok')).toBeUndefined();
+  it('lists each tour once with its next departure', async () => {
+    const next = await service.nextDepartures('2026-11-10');
+    const ids = next.map((item) => item.tour.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const { tour, departure } of next) {
+      expect(departure).toBe(tour.nextDeparture('2026-11-10'));
+    }
+    expect(await service.nextDepartures('2026-11-10', 2)).toHaveLength(2);
+    expect(await service.nextDepartures('2030-01-01')).toEqual([]);
   });
 });

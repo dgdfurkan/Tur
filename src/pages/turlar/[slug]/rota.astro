@@ -1,0 +1,606 @@
+---
+import BoardingPass from '@/components/route/BoardingPass.astro';
+import RouteThumb from '@/components/tour/RouteThumb.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { loadTourSnapshots, tourCatalog } from '@/composition/catalog';
+import { pageUrl } from '@/config/paths';
+import type { Tour } from '@/domain/tour/Tour';
+import { tr } from '@/i18n/tr';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { formatDuration, todayIso } from '@/shared/format';
+import '@/styles/route-map.css';
+
+export async function getStaticPaths() {
+  const tours = await tourCatalog.listTours();
+  return tours.map((tour) => ({ params: { slug: tour.id }, props: { tour } }));
+}
+
+interface Props {
+  tour: Tour;
+}
+
+const { tour } = Astro.props;
+const snapshot = (await loadTourSnapshots()).find((item) => item.id === tour.id);
+// "<" is escaped so the JSON can never close its own script element.
+const tourJson = JSON.stringify(snapshot).replaceAll('<', '\\u003c');
+const tourUrl = pageUrl(`turlar/${tour.id}`);
+
+let stopIndex = 0;
+const days = tour.days.map((day) => ({
+  number: day.number,
+  stops: day.stops.map((stop) => ({ stop, index: stopIndex++ })),
+}));
+---
+
+<BaseLayout
+  title={`${tour.title}: ${tr.route.heading}`}
+  description={`${tour.title} rotasının harita üzerinde ön izlemesi.`}
+  chrome={false}
+>
+  <div class="route" data-route-app data-state="intro" data-sheet="closed">
+    <script is:inline type="application/json" data-tour set:html={tourJson} />
+    <div class="route__stage" data-stage>
+      <div class="route__static">
+        <RouteThumb tour={tour} />
+      </div>
+      <canvas class="route__canvas" data-map-canvas aria-hidden="true"></canvas>
+      <div class="route__labels" data-map-labels aria-hidden="true"></div>
+    </div>
+
+    <header class="bar" data-bar>
+      <a class="bar__back" href={tourUrl}>
+        <Icon name="arrow" size={22} />
+        <span class="visually-hidden">{tr.actions.backToTour}:</span>
+        <span class="bar__title">{tour.title}</span>
+      </a>
+      <button class="bar__button" type="button" data-action="sound">
+        <span class="icon-on">
+          <Icon name="sound" size={22} />
+        </span>
+        <span class="icon-off">
+          <Icon name="mute" size={22} />
+        </span>
+        <span class="visually-hidden" data-sound-label>
+          {tr.route.soundOff}
+        </span>
+      </button>
+    </header>
+
+    <section class="panel" data-panel aria-label={tr.route.heading}>
+      <div class="panel__progress" aria-hidden="true">
+        <span class="panel__progress-fill" data-progress></span>
+      </div>
+
+      <div class="card">
+        <p class="card__day" data-panel-day>
+          {formatDuration(tour.nights, tour.dayCount)}
+        </p>
+        <p class="card__kind" data-card-kind></p>
+        <h1 class="card__title" data-card-title>
+          {tr.route.heading}
+        </h1>
+        <p class="card__text" data-card-text></p>
+        <p class="card__duration" data-card-duration hidden>
+          <Icon name="clock" size={16} />
+          <span data-card-duration-text></span>
+        </p>
+        <p class="visually-hidden" aria-live="polite" data-announce></p>
+      </div>
+
+      <div class="controls">
+        <button class="control control--primary control--start" type="button" data-action="start">
+          <Icon name="play" />
+          <span>{tr.actions.startSimulation}</span>
+        </button>
+        <button class="control control--primary control--toggle" type="button" data-action="toggle">
+          <span class="icon-play">
+            <Icon name="play" />
+          </span>
+          <span class="icon-pause">
+            <Icon name="pause" />
+          </span>
+          <span class="icon-step">
+            <Icon name="arrow" />
+          </span>
+          <span data-toggle-label>{tr.route.play}</span>
+        </button>
+        <button class="control control--speed" type="button" data-action="speed">
+          <span data-speed-label>{tr.route.speed} 1x</span>
+        </button>
+        <button class="control control--restart" type="button" data-action="restart">
+          <Icon name="restart" />
+          <span class="control__restart-label">{tr.route.restart}</span>
+          <span class="control__again-label">{tr.route.watchAgain}</span>
+        </button>
+      </div>
+
+      <button class="sheet-toggle" type="button" data-action="sheet">
+        <Icon name="list" />
+        <span data-sheet-label>{tr.route.showStops}</span>
+      </button>
+
+      <nav class="stops" aria-label={tr.route.stops}>
+        <ol class="stops__days">
+          {days.map((day) => (
+            <li>
+              <p class="stops__day">
+                {day.number}. {tr.tour.day}
+              </p>
+              <ol class="stops__list">
+                {day.stops.map(({ stop, index }) => (
+                  <li>
+                    <button
+                      class="stop"
+                      type="button"
+                      data-stop-index={index}
+                      data-kind={stop.kind}
+                    >
+                      <span class="stop__dot" aria-hidden="true" />
+                      <span>{stop.name}</span>
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    </section>
+
+    <BoardingPass tour={tour} departure={tour.nextDeparture(todayIso())} />
+  </div>
+</BaseLayout>
+
+<style>
+  .route {
+    --panel-width: 23rem;
+    --peek: 15.5rem;
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background: #cfe4f2;
+    overscroll-behavior: none;
+  }
+
+  .route__stage,
+  .route__canvas,
+  .route__labels,
+  .route__static {
+    position: absolute;
+    inset: 0;
+  }
+
+  .route__canvas {
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 600ms ease;
+  }
+
+  .route__labels {
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  /* Until the interactive map is ready (or if it never loads) the static map shows. */
+  .route__static {
+    display: grid;
+    place-items: center;
+  }
+
+  .route__static :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .route[data-ready='true'] .route__canvas {
+    opacity: 1;
+  }
+
+  .route[data-ready='true'] .route__static {
+    display: none;
+  }
+
+  .route[data-map='flat'] .route__canvas,
+  .route[data-map='flat'] .route__labels {
+    display: none;
+  }
+
+  .bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: calc(var(--space-3) + env(safe-area-inset-top, 0px)) var(--space-4) var(--space-3);
+    pointer-events: none;
+  }
+
+  .bar__back,
+  .bar__button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 2.75rem;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: var(--c-white);
+    box-shadow: var(--shadow-2);
+    color: var(--c-asphalt);
+    pointer-events: auto;
+    cursor: pointer;
+    transition: transform var(--dur-press) var(--ease-out);
+  }
+
+  .bar__back {
+    min-width: 0;
+    padding: 0 var(--space-4) 0 var(--space-3);
+    font-stretch: var(--wdth-sign);
+    font-weight: 650;
+    text-decoration: none;
+  }
+
+  .bar__back :global(svg) {
+    transform: rotate(180deg);
+  }
+
+  .bar__title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .bar__button {
+    flex: none;
+    justify-content: center;
+    width: 2.75rem;
+    padding: 0;
+  }
+
+  .bar__back:active,
+  .bar__button:active {
+    transform: scale(0.96);
+  }
+
+  .icon-off,
+  .route[data-muted='true'] .icon-on {
+    display: none;
+  }
+
+  .route[data-muted='true'] .icon-off {
+    display: inline-flex;
+  }
+
+  .panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    grid-template-rows: auto auto auto auto minmax(0, 1fr);
+    height: min(78dvh, 40rem);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    border-radius: 1.25rem 1.25rem 0 0;
+    background: var(--c-white);
+    box-shadow: 0 -8px 32px rgb(27 31 36 / 0.18);
+    /* Collapsed, only the card and controls peek above the bottom edge. */
+    transform: translateY(calc(100% - var(--peek) - env(safe-area-inset-bottom, 0px)));
+    transition: transform var(--dur-panel) var(--ease-drawer);
+  }
+
+  .route[data-sheet='open'] .panel {
+    transform: none;
+  }
+
+  .panel__progress {
+    height: 0.25rem;
+    margin: var(--space-3) var(--space-5) 0;
+    border-radius: 0.125rem;
+    background: var(--c-line);
+    overflow: hidden;
+  }
+
+  .panel__progress-fill {
+    display: block;
+    height: 100%;
+    background: var(--c-blue);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .card {
+    display: grid;
+    gap: var(--space-1);
+    min-height: 7.25rem;
+    padding: var(--space-4) var(--space-5) 0;
+    align-content: start;
+  }
+
+  .card__day {
+    justify-self: start;
+    padding: 0.0625rem var(--space-2);
+    border-radius: var(--radius-sm);
+    background: var(--c-asphalt);
+    color: var(--c-white);
+    font-stretch: var(--wdth-sign);
+    font-size: var(--text-caption);
+    font-weight: 650;
+  }
+
+  .card__kind {
+    margin-top: var(--space-1);
+    color: var(--c-brown);
+    font-size: var(--text-small);
+    font-weight: 650;
+  }
+
+  .card__kind:empty {
+    display: none;
+  }
+
+  .card__title {
+    font-size: 1.375rem;
+    line-height: 1.15;
+  }
+
+  .card__text {
+    color: var(--c-muted);
+    font-size: var(--text-small);
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+  }
+
+  .route[data-sheet='open'] .card__text {
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+  }
+
+  .card__duration {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--c-muted);
+    font-size: var(--text-small);
+  }
+
+  .card__duration[hidden] {
+    display: none;
+  }
+
+  .controls {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5) 0;
+  }
+
+  .control {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: 3rem;
+    padding: 0 var(--space-4);
+    border: 0.09375rem solid var(--c-line);
+    border-radius: var(--radius-md);
+    background: var(--c-white);
+    font-stretch: var(--wdth-sign);
+    font-weight: 650;
+    cursor: pointer;
+    transition:
+      transform var(--dur-press) var(--ease-out),
+      background-color var(--dur-ui) ease;
+  }
+
+  .control:active {
+    transform: scale(0.97);
+  }
+
+  .control--primary {
+    flex: 1;
+    border-color: var(--c-blue);
+    background: var(--c-blue);
+    color: var(--c-white);
+  }
+
+  /* Which controls exist depends on where the journey is. */
+  .route[data-state='intro'] .control--toggle,
+  .route[data-state='intro'] .control--speed,
+  .route[data-state='intro'] .control--restart,
+  .route[data-state='running'] .control--start,
+  .route[data-state='finished'] .control--start,
+  .route[data-state='finished'] .control--toggle,
+  .route[data-state='finished'] .control--speed,
+  .route[data-step='true'] .control--speed {
+    display: none;
+  }
+
+  .route[data-state='finished'] .control--restart {
+    flex: 1;
+    border-color: var(--c-blue);
+    background: var(--c-blue);
+    color: var(--c-white);
+  }
+
+  .control__again-label,
+  .route[data-state='finished'] .control__restart-label {
+    display: none;
+  }
+
+  .route[data-state='finished'] .control__again-label {
+    display: inline;
+  }
+
+  .route[data-state='running'] .control__restart-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .icon-pause,
+  .icon-step,
+  .route[data-playing='true'] .icon-play,
+  .route[data-step='true'] .icon-play {
+    display: none;
+  }
+
+  .route[data-playing='true']:not([data-step='true']) .icon-pause,
+  .route[data-step='true'] .icon-step {
+    display: inline-flex;
+  }
+
+  .sheet-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: 2.75rem;
+    margin: var(--space-2) var(--space-5) 0;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: var(--c-mist);
+    font-weight: 600;
+    font-size: var(--text-small);
+    cursor: pointer;
+  }
+
+  .stops {
+    min-height: 0;
+    margin-top: var(--space-3);
+    padding: 0 var(--space-3) var(--space-4);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .stops__days {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .stops__day {
+    padding: 0 var(--space-2);
+    color: var(--c-muted);
+    font-size: var(--text-caption);
+    font-weight: 650;
+  }
+
+  .stop {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    min-height: 2.75rem;
+    padding: var(--space-2);
+    border: 0;
+    border-radius: var(--radius-md);
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color var(--dur-ui) ease;
+  }
+
+  .stop__dot {
+    width: 0.875rem;
+    height: 0.875rem;
+    border-radius: 50%;
+    background: var(--c-brown);
+    box-shadow:
+      0 0 0 0.1875rem var(--c-white),
+      0 0 0 0.25rem var(--c-line);
+  }
+
+  .stop[data-kind='departure'] .stop__dot,
+  .stop[data-kind='arrival'] .stop__dot {
+    background: var(--c-blue);
+  }
+
+  .stop[data-kind='rest'] .stop__dot {
+    background: var(--c-muted);
+  }
+
+  .stop[data-kind='lodging'] .stop__dot {
+    background: var(--c-asphalt);
+  }
+
+  .stop[data-visited='true'] {
+    color: var(--c-muted);
+  }
+
+  .stop[aria-current='step'] {
+    background: var(--c-blue-tint);
+    font-weight: 650;
+  }
+
+  .stop:active {
+    background: var(--c-mist);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .stop:hover,
+    .control:not(.control--primary):hover,
+    .sheet-toggle:hover {
+      background: var(--c-mist);
+    }
+
+    .control--primary:hover,
+    .route[data-state='finished'] .control--restart:hover {
+      background: var(--c-blue-deep);
+    }
+
+    .stop[aria-current='step']:hover {
+      background: var(--c-blue-tint);
+    }
+  }
+
+  @media (min-width: 60rem) {
+    .bar {
+      left: calc(var(--panel-width) + var(--space-4));
+    }
+
+    .panel {
+      top: var(--space-4);
+      bottom: var(--space-4);
+      left: var(--space-4);
+      right: auto;
+      width: var(--panel-width);
+      height: auto;
+      border-radius: 1.25rem;
+      box-shadow: var(--shadow-2);
+      transform: none;
+    }
+
+    .card {
+      min-height: 9.5rem;
+    }
+
+    .card__title {
+      font-size: 1.625rem;
+    }
+
+    .card__text {
+      -webkit-line-clamp: unset;
+      line-clamp: unset;
+    }
+
+    .sheet-toggle {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { mountRouteSimulation } from '@/features/route-simulation/bootstrap';
+
+  const root = document.querySelector<HTMLElement>('[data-route-app]');
+  if (root) void mountRouteSimulation(root);
+</script>

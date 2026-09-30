@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { smoothPath } from '@/domain/geo/spline';
+import { segmentPath, smoothPath, smoothSegments } from '@/domain/geo/spline';
 
 describe('smoothPath', () => {
   it('returns an empty path without points', () => {
@@ -17,15 +17,6 @@ describe('smoothPath', () => {
     expect(path.match(/C/g)).toHaveLength(2);
   });
 
-  it('ignores consecutive duplicate points', () => {
-    const path = smoothPath([
-      { x: 0, y: 0 },
-      { x: 0, y: 0 },
-      { x: 10, y: 0 },
-    ]);
-    expect(path.match(/C/g)).toHaveLength(1);
-  });
-
   it('keeps handles within a third of each segment', () => {
     const path = smoothPath([
       { x: 0, y: 0 },
@@ -34,5 +25,27 @@ describe('smoothPath', () => {
     ]);
     // Second segment is 3 units long, so its handles sit 1 unit from the ends.
     expect(path.endsWith('C301.0,0.0 302.0,0.0 303.0,0.0')).toBe(true);
+  });
+});
+
+describe('smoothSegments', () => {
+  it('returns one segment per consecutive pair of points', () => {
+    const segments = smoothSegments([
+      { x: 0, y: 0 },
+      { x: 10, y: 0 },
+      { x: 10, y: 10 },
+    ]);
+    expect(segments).toHaveLength(2);
+    expect(segments[0]?.to).toEqual(segments[1]?.from);
+  });
+
+  it('gives two points in the same place a zero-length segment', () => {
+    const [, still] = smoothSegments([
+      { x: 0, y: 0 },
+      { x: 10, y: 0 },
+      { x: 10, y: 0 },
+      { x: 20, y: 5 },
+    ]);
+    expect(still && segmentPath(still)).toBe('M10.0,0.0C10.0,0.0 10.0,0.0 10.0,0.0');
   });
 });

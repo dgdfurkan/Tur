@@ -49,7 +49,7 @@ export interface TourProps {
 }
 
 /** Roads are longer than the straight lines between stops. */
-const ROAD_WINDING_FACTOR = 1.3;
+export const ROAD_WINDING_FACTOR = 1.3;
 
 export class Tour {
   readonly id: string;

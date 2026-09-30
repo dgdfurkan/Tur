@@ -16,6 +16,8 @@ export interface MapData {
   readonly turkey: readonly Ring[];
   readonly turkeyCoarse: readonly Ring[];
   readonly neighbours: readonly Ring[];
+  /** Low-detail outlines for small static maps. */
+  readonly neighboursCoarse: readonly Ring[];
   readonly lakes: Readonly<Record<string, Ring>>;
 }
 
@@ -25,4 +27,19 @@ export const mapData = raw as unknown as MapData;
 /** SVG path for a set of rings. SVG's y axis points down, so north is negated. */
 export function ringsToSvgPath(rings: readonly Ring[]): string {
   return rings.map((ring) => `M${ring.map(([x, y]) => `${x},${-y}`).join('L')}Z`).join('');
+}
+
+/** Even-odd point-in-polygon test over a set of rings. */
+export function ringsContain(rings: readonly Ring[], x: number, y: number): boolean {
+  let inside = false;
+  for (const ring of rings) {
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i, i += 1) {
+      const a = ring[i];
+      const b = ring[j];
+      if (!a || !b) continue;
+      const crosses = a[1] > y !== b[1] > y;
+      if (crosses && x < ((b[0] - a[0]) * (y - a[1])) / (b[1] - a[1]) + a[0]) inside = !inside;
+    }
+  }
+  return inside;
 }

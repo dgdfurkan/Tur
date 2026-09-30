@@ -63,7 +63,7 @@ const route = smoothPath(stops);
 ---
 
 <svg class="thumb" viewBox={viewBox} aria-hidden="true" focusable="false">
-  <path class="thumb__neighbour" d={ringsToSvgPath(mapData.neighbours)}></path>
+  <path class="thumb__neighbour" d={ringsToSvgPath(mapData.neighboursCoarse)}></path>
   <path class="thumb__land" d={ringsToSvgPath(mapData.turkeyCoarse)}></path>
   <path class="thumb__lake" d={ringsToSvgPath(Object.values(mapData.lakes))}></path>
   {cities.map((city) => (
