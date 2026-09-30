@@ -1,4 +1,5 @@
 import { Fog, PerspectiveCamera, Scene, WebGLRenderer, type Color, type Texture } from 'three';
+import type { MapSurface } from './MapSurface';
 import { lowerQuality, type QualityProfile } from './QualityProfile';
 import type { Disposable, Updatable } from '@/shared/lifecycle';
 
@@ -27,15 +28,16 @@ export class SceneManager implements Disposable {
   private sampleCount = 0;
   private sampleTotal = 0;
 
+  private readonly canvas: HTMLCanvasElement;
+
   constructor(
-    private readonly canvas: HTMLCanvasElement,
+    surface: MapSurface,
     private profile: QualityProfile,
   ) {
-    this.renderer = new WebGLRenderer({
-      canvas,
-      antialias: profile.antialias,
-      powerPreference: 'high-performance',
-    });
+    this.canvas = surface.canvas;
+    const { canvas } = this;
+    // The context is already open: whoever chose the 3D map had to look at it first.
+    this.renderer = new WebGLRenderer({ canvas, context: surface.context });
     this.applyPixelRatio();
 
     this.resizeObserver = new ResizeObserver(() => this.resize());

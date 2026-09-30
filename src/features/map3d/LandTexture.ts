@@ -178,16 +178,19 @@ export class LandTexture {
     context.stroke();
     context.restore();
 
-    const lakeFills: Record<string, string> = { tuz: '#f8ece6' };
+    // Tuz Gölü is a salt flat, so it is painted pale rather than blue.
+    const salt = { fill: '#f8ece6', shore: 'rgb(190 165 150 / 0.55)' };
+    const water = { fill: '#9fcde8', shore: 'rgb(60 100 130 / 0.35)' };
     for (const [name, ring] of Object.entries(data.lakes)) {
+      const paint = name === 'tuz' ? salt : water;
       this.traceSmooth(
         context,
         ring.map(([x, y]) => this.toPixel(x, y)),
         true,
       );
-      context.fillStyle = lakeFills[name] ?? '#9fcde8';
+      context.fillStyle = paint.fill;
       context.fill();
-      context.strokeStyle = 'rgb(60 100 130 / 0.35)';
+      context.strokeStyle = paint.shore;
       context.lineWidth = 2 * unit;
       context.stroke();
     }

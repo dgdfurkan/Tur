@@ -8,6 +8,8 @@ interface Label {
   readonly element: HTMLElement;
   readonly position: Vector3;
   readonly priority: number;
+  /** Empty room the sign asks for around itself, in pixels. */
+  readonly spacing: number;
   state: LabelState;
   width: number;
   height: number;
@@ -17,6 +19,8 @@ interface Label {
 const RELAYOUT_EVERY = 5;
 const EDGE_MARGIN = 8;
 const ACTIVE_BONUS = 1000;
+/** City names are background: they give way rather than crowd a route's own signs. */
+const SPACING: Record<LabelTone, number> = { stop: 0, city: 18, sea: 6 };
 
 /**
  * Place names drawn as small road signs in HTML on top of the canvas, so text
@@ -43,6 +47,7 @@ export class LabelLayer implements Disposable {
       element,
       position: position.clone(),
       priority,
+      spacing: SPACING[tone],
       state: 'idle',
       width: element.offsetWidth,
       height: element.offsetHeight,
@@ -90,10 +95,10 @@ export class LabelLayer implements Disposable {
 
       if (relayout) {
         const box = {
-          left: x - label.width / 2,
-          top: y - label.height,
-          right: x + label.width / 2,
-          bottom: y,
+          left: x - label.width / 2 - label.spacing,
+          top: y - label.height - label.spacing,
+          right: x + label.width / 2 + label.spacing,
+          bottom: y + label.spacing,
         };
         const free = !placed.some(
           (other) =>

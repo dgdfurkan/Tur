@@ -7,6 +7,7 @@ import { LabelLayer } from './LabelLayer';
 import { LandmarkFactory } from './LandmarkFactory';
 import { LandTexture } from './LandTexture';
 import { mapData, ringsExtent } from './MapData';
+import type { MapSurface } from './MapSurface';
 import { CITIES, SEAS } from './places';
 import type { QualityProfile } from './QualityProfile';
 import { SceneManager } from './SceneManager';
@@ -20,7 +21,8 @@ const SKY = new Color('#dcedf8');
 const NO_PADDING: ViewPadding = { left: 0, right: 0, top: 0, bottom: 0 };
 const CITY_PRIORITY = { 1: 40, 2: 20 } as const;
 const SEA_PRIORITY = 10;
-const OVERVIEW_MARGIN = 4;
+/** The country nearly fills the frame; its neighbours only need to peek in. */
+const OVERVIEW_MARGIN = 1.08;
 const ANISOTROPY = 8;
 /** Haze range as multiples of the camera's distance to what it is looking at. */
 const HAZE_NEAR = 1.7;
@@ -51,18 +53,18 @@ export class MapWorld implements Disposable {
   private readonly frameCallbacks = new Set<FrameCallback>();
   private padding: ViewPadding = NO_PADDING;
   private viewportKey = '';
+  private disposed = false;
 
   /**
    * Builds the world in stages and yields to the browser between them, so the
    * page stays responsive while textures are painted and geometry is made.
    */
   static async create(
-    canvas: HTMLCanvasElement,
-    labelContainer: HTMLElement,
+    surface: MapSurface,
     quality: QualityProfile,
     reducedMotion = false,
   ): Promise<MapWorld> {
-    const manager = new SceneManager(canvas, quality);
+    const manager = new SceneManager(surface, quality);
     const kit = new ToonKit();
     await yieldToMain();
 
@@ -79,7 +81,7 @@ export class MapWorld implements Disposable {
 
     const world = new MapWorld(
       { manager, kit, landmarks, board, scenery },
-      labelContainer,
+      surface.labels,
       reducedMotion,
     );
     // Upload the paintings one at a time, then compile shaders off the main thread.
@@ -145,12 +147,18 @@ export class MapWorld implements Disposable {
         -(minY + height / 2) / KM_PER_UNIT,
       ),
       distance: this.rig.distanceToFit(
-        width / 2 / KM_PER_UNIT + OVERVIEW_MARGIN,
-        height / 2 / KM_PER_UNIT + OVERVIEW_MARGIN,
+        width / 2 / KM_PER_UNIT,
+        height / 2 / KM_PER_UNIT,
         pitch,
+        OVERVIEW_MARGIN,
       ),
       pitch,
     };
+  }
+
+  /** Clears trees and landmarks away from a path, or restores them all with an empty path. */
+  keepClear(path: readonly Vector3[], margin = 0): void {
+    this.scenery.keepClear(path, margin);
   }
 
   setPadding(padding: ViewPadding): void {
@@ -163,11 +171,18 @@ export class MapWorld implements Disposable {
     this.frameCallbacks.add(callback);
   }
 
+  /**
+   * Starts drawing. Whatever was added since the map was built gets its shaders
+   * compiled first, off the main thread, so the first frame does not stall.
+   */
   start(): void {
-    this.manager.start();
+    void this.manager.compile().finally(() => {
+      if (!this.disposed) this.manager.start();
+    });
   }
 
   dispose(): void {
+    this.disposed = true;
     this.manager.dispose();
     this.frameCallbacks.clear();
     this.labels.dispose();

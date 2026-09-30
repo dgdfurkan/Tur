@@ -1,4 +1,5 @@
 import { MathUtils, Vector3, type PerspectiveCamera } from 'three';
+import type { MapView } from './world';
 import type { Updatable, ViewPadding } from '@/shared/lifecycle';
 
 export interface CameraPose {
@@ -28,6 +29,7 @@ export class CameraRig implements Updatable {
   private padding: ViewPadding = NO_PADDING;
   private width = 1;
   private height = 1;
+  private readonly viewNow = { distance: 150, unitsPerPixel: 1 };
 
   /**
    * @param instant Jump straight to each pose instead of gliding; used when the
@@ -42,6 +44,11 @@ export class CameraRig implements Updatable {
     return this.distanceNow;
   }
 
+  /** How the map is seen right now; symbols on the map size themselves from it. */
+  get view(): MapView {
+    return this.viewNow;
+  }
+
   setViewport(width: number, height: number, padding: ViewPadding = NO_PADDING): void {
     this.width = width;
     this.height = height;
@@ -50,6 +57,7 @@ export class CameraRig implements Updatable {
     const offsetX = (padding.right - padding.left) / 2;
     const offsetY = (padding.bottom - padding.top) / 2;
     this.camera.setViewOffset(width, height, offsetX, offsetY, width, height);
+    this.measure();
   }
 
   moveTo(pose: CameraPose, immediate = false): void {
@@ -64,15 +72,23 @@ export class CameraRig implements Updatable {
     }
   }
 
-  /** Distance from which a ground rectangle of the given half extents fits the free area. */
-  distanceToFit(halfWidth: number, halfDepth: number, pitch: number): number {
+  /**
+   * Distance from which a ground rectangle of the given half extents fits the free area.
+   * `margin` is the room left around it, as a multiple of the tightest fit.
+   */
+  distanceToFit(
+    halfWidth: number,
+    halfDepth: number,
+    pitch: number,
+    margin = FRAME_MARGIN,
+  ): number {
     const freeWidth = Math.max(1, this.width - this.padding.left - this.padding.right);
     const freeHeight = Math.max(1, this.height - this.padding.top - this.padding.bottom);
     const halfFov = Math.tan(MathUtils.degToRad(this.camera.fov / 2));
     const horizontal = halfWidth / (halfFov * this.camera.aspect * (freeWidth / this.width));
     const foreshortened = halfDepth * Math.sin(MathUtils.degToRad(pitch));
     const vertical = foreshortened / (halfFov * (freeHeight / this.height));
-    return Math.max(horizontal, vertical) * FRAME_MARGIN;
+    return Math.max(horizontal, vertical) * margin;
   }
 
   update(deltaSeconds: number): void {
@@ -92,5 +108,12 @@ export class CameraRig implements Updatable {
       this.target.z + Math.cos(AZIMUTH) * ground,
     );
     this.camera.lookAt(this.target);
+    this.measure();
+  }
+
+  private measure(): void {
+    const halfFov = Math.tan(MathUtils.degToRad(this.camera.fov / 2));
+    this.viewNow.distance = this.distanceNow;
+    this.viewNow.unitsPerPixel = (2 * this.distanceNow * halfFov) / this.height;
   }
 }

@@ -11,11 +11,11 @@ export interface RouteView extends Disposable {
   showRoute(plan: RoutePlan): void;
   /** Places the coach part-way along the leg that starts at `legIndex`. */
   setPosition(legIndex: number, legProgress: number): void;
-  /** Frames the whole route. */
+  /** Frames the whole route and draws all of its road, as on a printed map. */
   showOverview(immediate?: boolean): void;
-  /** Keeps the coach in view while it travels along a leg. */
+  /** Keeps the coach in view while it travels along a leg; only the road behind it stays drawn. */
   followCoach(legIndex: number): void;
-  /** Moves in on one stop. */
+  /** Moves in on one stop; the road is drawn as far as the coach has come. */
   focusStop(stopIndex: number): void;
   /** Highlights the stop the coach is at, or none while it is on the road. */
   setActiveStop(stopIndex: number | null): void;

@@ -1,5 +1,6 @@
 import { segmentPath, smoothSegments } from '@/domain/geo/spline';
 import type { RoutePlan } from '@/domain/tour/RoutePlan';
+import type { StopKind } from '@/domain/tour/Tour';
 import { mapData, ringsToSvgPath } from '@/features/map3d/MapData';
 import type { ViewPadding } from '@/shared/lifecycle';
 import { easeLeg } from './RouteSimulation';
@@ -15,7 +16,13 @@ interface Box {
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const RESPONSE = 3.2;
 const STOP_FRAME_KM = 170;
+const MIN_STOP_FRAME_KM = 45;
+/** Kilometres shown across the map per kilometre of free room around a stop. */
+const STOP_FRAME_PER_CLEARANCE = 12;
 const MAX_DELTA_SECONDS = 0.1;
+const NO_PADDING: ViewPadding = { left: 0, right: 0, top: 0, bottom: 0 };
+/** Stops that carry their name on the map all the time; the others show it when the coach arrives. */
+const NAMED_KINDS: ReadonlySet<StopKind> = new Set(['departure', 'lodging']);
 
 function svg<K extends keyof SVGElementTagNameMap>(
   name: K,
@@ -39,9 +46,16 @@ export class FlatRouteView implements RouteView {
   private readonly wanted: Box = { x: 0, y: 0, width: 1, height: 1 };
   private plan: RoutePlan | undefined;
   private legs: SVGPathElement[] = [];
+  /** Length of each leg in map units, measured once. */
+  private lengths: number[] = [];
+  /** Share of each leg currently drawn as travelled road, 0 to 1. */
+  private drawn: number[] = [];
   private stops: SVGGElement[] = [];
   private following = false;
+  /** In the overview the whole road is drawn; on the journey only the part already driven. */
+  private wholeRoad = true;
   private followSpan = STOP_FRAME_KM;
+  private padding: ViewPadding = NO_PADDING;
   private frameHandle = 0;
   private lastTime = 0;
 
@@ -69,12 +83,21 @@ export class FlatRouteView implements RouteView {
       return leg;
     });
 
+    this.lengths = this.legs.map((leg) => leg.getTotalLength());
+    this.drawn = [];
+
+    const named = new Set<string>();
     this.stops = plan.stops.map((stop, index) => {
       const point = points[index] ?? { x: 0, y: 0 };
       const group = svg('g', {
         class: `flat-map__stop flat-map__stop--${stop.stop.kind}`,
         transform: `translate(${point.x.toFixed(1)} ${point.y.toFixed(1)})`,
       });
+      // A town the coach returns to is named once.
+      if (NAMED_KINDS.has(stop.stop.kind) && !named.has(stop.stop.name)) {
+        named.add(stop.stop.name);
+        group.classList.add('flat-map__stop--named');
+      }
       const label = svg('text');
       label.textContent = stop.stop.name;
       group.append(svg('circle'), label);
@@ -86,17 +109,20 @@ export class FlatRouteView implements RouteView {
   }
 
   setPosition(legIndex: number, legProgress: number): void {
-    const leg = this.legs[Math.min(legIndex, this.legs.length - 1)];
+    const current = Math.min(legIndex, this.legs.length - 1);
+    const leg = this.legs[current];
     if (!leg) return;
     const eased = easeLeg(legProgress);
-    const length = leg.getTotalLength();
-    const point = leg.getPointAtLength(length * eased);
+    const point = leg.getPointAtLength((this.lengths[current] ?? 0) * eased);
     this.coach.setAttribute('cx', point.x.toFixed(1));
     this.coach.setAttribute('cy', point.y.toFixed(1));
     this.legs.forEach((path, index) => {
-      const total = path.getTotalLength();
-      const drawn = index < legIndex ? total : index === legIndex ? total * eased : 0;
-      path.style.strokeDasharray = `${drawn.toFixed(1)} ${(total + 1).toFixed(1)}`;
+      const total = this.lengths[index] ?? 0;
+      const share = this.wholeRoad || index < legIndex ? 1 : index === legIndex ? eased : 0;
+      // This runs every frame; only a leg whose drawn length changed is touched.
+      if (share === this.drawn[index]) return;
+      this.drawn[index] = share;
+      path.style.strokeDasharray = `${(total * share).toFixed(1)} ${(total + 1).toFixed(1)}`;
     });
     if (this.following) this.frame(point.x, point.y, this.followSpan);
   }
@@ -104,8 +130,10 @@ export class FlatRouteView implements RouteView {
   showOverview(immediate = false): void {
     if (!this.plan) return;
     this.following = false;
+    this.wholeRoad = true;
     const { minX, maxX, minY, maxY } = this.plan.bounds;
-    const span = Math.max(maxX - minX, (maxY - minY) * this.aspect) * 1.35 + 80;
+    const { freeWidth, freeHeight } = this.area;
+    const span = Math.max(maxX - minX, (maxY - minY) * (freeWidth / freeHeight)) * 1.35 + 80;
     this.frame((minX + maxX) / 2, -(minY + maxY) / 2, span);
     if (immediate) Object.assign(this.box, this.wanted);
     this.applyBox();
@@ -113,6 +141,7 @@ export class FlatRouteView implements RouteView {
 
   followCoach(legIndex: number): void {
     this.following = true;
+    this.wholeRoad = false;
     this.followSpan = Math.min(
       620,
       Math.max(STOP_FRAME_KM, (this.plan?.legKm(legIndex) ?? 0) * 1.8),
@@ -123,12 +152,22 @@ export class FlatRouteView implements RouteView {
     const stop = this.plan?.stops[stopIndex];
     if (!stop) return;
     this.following = false;
-    this.frame(stop.point.x, -stop.point.y, STOP_FRAME_KM);
+    this.wholeRoad = false;
+    // Stops that crowd together are looked at from closer, so they can be told apart.
+    const span = (this.plan?.clearanceKm(stopIndex) ?? Infinity) * STOP_FRAME_PER_CLEARANCE;
+    this.frame(
+      stop.point.x,
+      -stop.point.y,
+      Math.min(STOP_FRAME_KM, Math.max(MIN_STOP_FRAME_KM, span)),
+    );
   }
 
   setActiveStop(stopIndex: number | null): void {
     this.stops.forEach((stop, index) => {
-      stop.classList.toggle('flat-map__stop--active', index === stopIndex);
+      const active = index === stopIndex;
+      stop.classList.toggle('flat-map__stop--active', active);
+      // Drawn last among the stops, so no neighbour's marker sits on its name.
+      if (active) this.routeLayer.insertBefore(stop, this.coach);
     });
   }
 
@@ -138,8 +177,8 @@ export class FlatRouteView implements RouteView {
     });
   }
 
-  setPadding(_padding: ViewPadding): void {
-    // The flat map is letterboxed by the SVG itself; panels overlap it slightly.
+  setPadding(padding: ViewPadding): void {
+    this.padding = padding;
   }
 
   onFrame(callback: (deltaSeconds: number) => void): void {
@@ -159,17 +198,36 @@ export class FlatRouteView implements RouteView {
     this.root.remove();
   }
 
-  private get aspect(): number {
-    const { clientWidth, clientHeight } = this.host;
-    return clientHeight === 0 ? 1.6 : clientWidth / clientHeight;
+  /** The map's size in pixels and the part of it that no panel covers. */
+  private get area(): {
+    width: number;
+    height: number;
+    left: number;
+    top: number;
+    freeWidth: number;
+    freeHeight: number;
+  } {
+    const width = this.host.clientWidth || 1;
+    const height = this.host.clientHeight || 1;
+    const { left, right, top, bottom } = this.padding;
+    return {
+      width,
+      height,
+      left,
+      top,
+      freeWidth: Math.max(1, width - left - right),
+      freeHeight: Math.max(1, height - top - bottom),
+    };
   }
 
-  private frame(centerX: number, centerY: number, width: number): void {
-    const height = width / this.aspect;
-    this.wanted.x = centerX - width / 2;
-    this.wanted.y = centerY - height / 2;
-    this.wanted.width = width;
-    this.wanted.height = height;
+  /** Aims the view so that `span` kilometres fit across the free part, centred on a point. */
+  private frame(centerX: number, centerY: number, span: number): void {
+    const { width, height, left, top, freeWidth, freeHeight } = this.area;
+    const pixelsPerKm = freeWidth / span;
+    this.wanted.width = width / pixelsPerKm;
+    this.wanted.height = height / pixelsPerKm;
+    this.wanted.x = centerX - (left + freeWidth / 2) / pixelsPerKm;
+    this.wanted.y = centerY - (top + freeHeight / 2) / pixelsPerKm;
   }
 
   private readonly tick = (now: number): void => {
@@ -191,7 +249,7 @@ export class FlatRouteView implements RouteView {
       'viewBox',
       `${x.toFixed(1)} ${y.toFixed(1)} ${width.toFixed(1)} ${height.toFixed(1)}`,
     );
-    // Marker and text sizes are written in this unit so they stay constant on screen.
-    this.root.style.setProperty('--unit', (width / 100).toFixed(3));
+    // Map units per pixel: sizes written with it stay constant on screen at any zoom.
+    this.root.style.setProperty('--px', (width / this.area.width).toFixed(4));
   }
 }

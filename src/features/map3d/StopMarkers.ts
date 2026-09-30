@@ -13,6 +13,7 @@ import {
 import type { RoutePlan } from '@/domain/tour/RoutePlan';
 import type { StopKind } from '@/domain/tour/Tour';
 import type { RouteTrack } from './RouteTrack';
+import { MARKER_RADIUS } from './world';
 import type { Disposable } from '@/shared/lifecycle';
 
 const KIND_COLOR: Record<StopKind, string> = {
@@ -24,6 +25,8 @@ const KIND_COLOR: Record<StopKind, string> = {
 };
 
 const LIFT = 0.09;
+/** Radius of the coloured centre as a share of the whole marker. */
+const CORE_SHARE = 0.68;
 
 /**
  * Discs on the road that mark each stop, tinted like the programme's timeline:
@@ -53,8 +56,12 @@ export class StopMarkers implements Disposable {
 
     const count = plan.stops.length;
     this.positions = plan.stops.map((stop) => track.stopPosition(stop.index, new Vector3()));
-    this.rims = new InstancedMesh(new CircleGeometry(0.34, 20), rimMaterial, count);
-    this.cores = new InstancedMesh(new CircleGeometry(0.23, 20), coreMaterial, count);
+    this.rims = new InstancedMesh(new CircleGeometry(MARKER_RADIUS, 20), rimMaterial, count);
+    this.cores = new InstancedMesh(
+      new CircleGeometry(MARKER_RADIUS * CORE_SHARE, 20),
+      coreMaterial,
+      count,
+    );
     this.rims.instanceMatrix.setUsage(DynamicDrawUsage);
     this.cores.instanceMatrix.setUsage(DynamicDrawUsage);
     const color = new Color();
@@ -62,7 +69,10 @@ export class StopMarkers implements Disposable {
       this.cores.setColorAt(index, color.set(KIND_COLOR[stop.stop.kind]));
     });
 
-    this.pulse = new Mesh(new RingGeometry(0.4, 0.52, 28), this.pulseMaterial);
+    this.pulse = new Mesh(
+      new RingGeometry(MARKER_RADIUS * 1.18, MARKER_RADIUS * 1.53, 28),
+      this.pulseMaterial,
+    );
     this.pulse.visible = false;
     this.pulse.rotation.x = -Math.PI / 2;
     this.group.add(this.rims, this.cores, this.pulse);

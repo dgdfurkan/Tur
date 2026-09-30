@@ -39,12 +39,14 @@ const cities = CITIES.filter((city) => city.tier === 1).map((city) => ({
   <path class="overview__neighbour" d={ringsToSvgPath(mapData.neighboursCoarse)}></path>
   <path class="overview__land" d={ringsToSvgPath(mapData.turkeyCoarse)}></path>
   <path class="overview__lake" d={ringsToSvgPath(Object.values(mapData.lakes))}></path>
-  {routes.map((d) => (
-    <path class="overview__casing" d={d} />
-  ))}
-  {routes.map((d) => (
-    <path class="overview__route" d={d} />
-  ))}
+  <g>
+    {routes.map((d) => (
+      <g class="overview__road">
+        <path class="overview__casing" d={d} />
+        <path class="overview__route" d={d} />
+      </g>
+    ))}
+  </g>
   {cities.map((city) => (
     <g class="overview__city">
       <circle cx={city.x.toFixed(1)} cy={city.y.toFixed(1)} r={unit * 0.5} />
@@ -95,8 +97,23 @@ const cities = CITIES.filter((city) => city.tier === 1).map((city) => ({
   }
 
   .overview__route {
-    stroke: var(--c-blue);
+    stroke: var(--road, var(--c-blue));
     stroke-width: 2.5;
+  }
+
+  /*
+   * Choosing a tour beside the map greys out every other road. The options and
+   * the roads are in the same order, so this needs no script.
+   */
+  :global(.tour-map:has(.chip:nth-of-type(2) input:checked)) .overview__road:not(:nth-child(1)),
+  :global(.tour-map:has(.chip:nth-of-type(3) input:checked)) .overview__road:not(:nth-child(2)),
+  :global(.tour-map:has(.chip:nth-of-type(4) input:checked)) .overview__road:not(:nth-child(3)),
+  :global(.tour-map:has(.chip:nth-of-type(5) input:checked)) .overview__road:not(:nth-child(4)),
+  :global(.tour-map:has(.chip:nth-of-type(6) input:checked)) .overview__road:not(:nth-child(5)),
+  :global(.tour-map:has(.chip:nth-of-type(7) input:checked)) .overview__road:not(:nth-child(6)),
+  :global(.tour-map:has(.chip:nth-of-type(8) input:checked)) .overview__road:not(:nth-child(7)),
+  :global(.tour-map:has(.chip:nth-of-type(9) input:checked)) .overview__road:not(:nth-child(8)) {
+    --road: #a9b3bb;
   }
 
   .overview__city circle {

@@ -5,11 +5,12 @@ import { easeLeg } from '@/features/route-simulation/RouteSimulation';
 import type { RouteView } from '@/features/route-simulation/RouteView';
 import type { ViewPadding } from '@/shared/lifecycle';
 import { BusModel } from './BusModel';
+import type { MapSurface } from './MapSurface';
 import { MapWorld } from './MapWorld';
 import type { QualityProfile } from './QualityProfile';
 import { RouteTrack } from './RouteTrack';
 import { StopMarkers } from './StopMarkers';
-import { coachScale, KM_PER_UNIT, LAND_TOP, markerScale } from './world';
+import { coachScale, KM_PER_UNIT, LAND_TOP, markerScale, roadScale } from './world';
 
 const STOP_PRIORITY: Record<StopKind, number> = {
   departure: 90,
@@ -23,10 +24,19 @@ const OVERVIEW_PITCH = 54;
 const FOLLOW_PITCH = 45;
 const STOP_PITCH = 41;
 const STOP_DISTANCE = 12;
-const MIN_FOLLOW_DISTANCE = 11;
+const MIN_STOP_DISTANCE = 7;
+/** Camera distance per unit of free room around a stop: crowded stops are viewed from closer. */
+const STOP_DISTANCE_PER_CLEARANCE = 14;
+const MIN_FOLLOW_DISTANCE = 9;
 const MAX_FOLLOW_DISTANCE = 48;
 const OVERVIEW_MARGIN = 5;
 const HEADING_RESPONSE = 7;
+/** The camera aims this far ahead of the coach in time, a little more than it trails behind. */
+const LOOK_AHEAD_SECONDS = 0.42;
+const VELOCITY_RESPONSE = 5;
+const MAX_LOOK_AHEAD_SPEED = 14;
+/** Width of the strip along the road that is kept free of trees and landmarks, per side. */
+const ROADSIDE_CLEARANCE = 0.45;
 
 /** The 3D map as a route view: draws one tour's road, stops and coach on the shared world. */
 export class ThreeRouteView implements RouteView {
@@ -34,11 +44,15 @@ export class ThreeRouteView implements RouteView {
   private readonly position = new Vector3();
   private readonly direction = new Vector3();
   private readonly scratch = new Vector3();
+  private readonly previous = new Vector3();
+  private readonly velocity = new Vector3();
   private plan: RoutePlan | undefined;
   private track: RouteTrack | undefined;
   private markers: StopMarkers | undefined;
   private labelOfStop: string[] = [];
   private following = false;
+  /** In the overview the whole road is drawn; on the journey only the part already driven. */
+  private wholeRoad = true;
   private heading = 0;
   private wantedHeading = 0;
   private motion = 0;
@@ -48,14 +62,11 @@ export class ThreeRouteView implements RouteView {
 
   /** Builds the map in stages; resolves when the first frame can be drawn cheaply. */
   static async create(
-    canvas: HTMLCanvasElement,
-    labelContainer: HTMLElement,
+    surface: MapSurface,
     quality: QualityProfile,
     reducedMotion = false,
   ): Promise<ThreeRouteView> {
-    return new ThreeRouteView(
-      await MapWorld.create(canvas, labelContainer, quality, reducedMotion),
-    );
+    return new ThreeRouteView(await MapWorld.create(surface, quality, reducedMotion));
   }
 
   private constructor(private readonly world: MapWorld) {
@@ -72,6 +83,7 @@ export class ThreeRouteView implements RouteView {
     this.track = new RouteTrack(plan);
     this.markers = new StopMarkers(plan, this.track);
     this.world.scene.add(this.track.group, this.markers.group);
+    this.world.keepClear(this.track.path, ROADSIDE_CLEARANCE);
 
     // Two stops at the same place (a town visited on consecutive days) share one sign.
     const signs: { id: string; name: string; position: Vector3 }[] = [];
@@ -95,6 +107,8 @@ export class ThreeRouteView implements RouteView {
 
     this.bus.group.visible = true;
     this.heading = Number.NaN;
+    this.following = false;
+    this.wholeRoad = true;
     this.setPosition(0, 0);
   }
 
@@ -103,7 +117,8 @@ export class ThreeRouteView implements RouteView {
     const distance = this.track.distanceAt(legIndex, easeLeg(legProgress));
     this.track.positionAt(distance, this.position);
     this.track.directionAt(distance, this.direction);
-    this.track.reveal(legIndex, easeLeg(legProgress));
+    if (this.wholeRoad) this.track.revealAll();
+    else this.track.reveal(legIndex, easeLeg(legProgress));
     this.bus.group.position.copy(this.position);
     this.wantedHeading = Math.atan2(-this.direction.z, this.direction.x);
     if (Number.isNaN(this.heading)) this.heading = this.wantedHeading;
@@ -114,6 +129,7 @@ export class ThreeRouteView implements RouteView {
   showOverview(immediate = false): void {
     if (!this.plan) return;
     this.following = false;
+    this.wholeRoad = true;
     const { minX, maxX, minY, maxY } = this.plan.bounds;
     const halfWidth = (maxX - minX) / 2 / KM_PER_UNIT + OVERVIEW_MARGIN;
     const halfDepth = (maxY - minY) / 2 / KM_PER_UNIT + OVERVIEW_MARGIN;
@@ -134,17 +150,26 @@ export class ThreeRouteView implements RouteView {
   followCoach(legIndex: number): void {
     if (!this.plan) return;
     this.following = true;
+    this.wholeRoad = false;
+    this.previous.copy(this.position);
+    this.velocity.set(0, 0, 0);
     // A long motorway leg is watched from further away than a hop between valleys.
     const legUnits = this.plan.legKm(legIndex) / KM_PER_UNIT;
     this.followDistance = MathUtils.clamp(legUnits * 1.7, MIN_FOLLOW_DISTANCE, MAX_FOLLOW_DISTANCE);
   }
 
   focusStop(stopIndex: number): void {
-    if (!this.track) return;
+    if (!this.track || !this.plan) return;
     this.following = false;
+    this.wholeRoad = false;
+    const clearance = this.plan.clearanceKm(stopIndex) / KM_PER_UNIT;
     this.world.rig.moveTo({
       target: this.track.stopPosition(stopIndex, new Vector3()),
-      distance: STOP_DISTANCE,
+      distance: MathUtils.clamp(
+        clearance * STOP_DISTANCE_PER_CLEARANCE,
+        MIN_STOP_DISTANCE,
+        STOP_DISTANCE,
+      ),
       pitch: STOP_PITCH,
     });
   }
@@ -185,9 +210,10 @@ export class ThreeRouteView implements RouteView {
   }
 
   private animate(deltaSeconds: number, elapsedSeconds: number): void {
-    const distance = this.world.rig.distance;
-    this.bus.group.scale.setScalar(coachScale(distance));
-    this.markers?.setScale(markerScale(distance));
+    const { view } = this.world.rig;
+    this.bus.group.scale.setScalar(coachScale(view));
+    this.track?.setScale(roadScale(view));
+    this.markers?.setScale(markerScale(view));
     this.markers?.update(elapsedSeconds);
 
     if (!Number.isNaN(this.heading)) {
@@ -201,8 +227,17 @@ export class ThreeRouteView implements RouteView {
     this.bus.bounce(elapsedSeconds, this.motion);
 
     if (this.following) {
+      // Aiming ahead of the coach makes up for the camera trailing it, so the road to come stays in view.
+      if (deltaSeconds > 0) {
+        this.scratch
+          .subVectors(this.position, this.previous)
+          .divideScalar(deltaSeconds)
+          .clampLength(0, MAX_LOOK_AHEAD_SPEED);
+        this.velocity.lerp(this.scratch, 1 - Math.exp(-deltaSeconds * VELOCITY_RESPONSE));
+      }
+      this.previous.copy(this.position);
       this.world.rig.moveTo({
-        target: this.scratch.copy(this.position),
+        target: this.scratch.copy(this.position).addScaledVector(this.velocity, LOOK_AHEAD_SECONDS),
         distance: this.followDistance,
         pitch: FOLLOW_PITCH,
       });
@@ -219,6 +254,7 @@ export class ThreeRouteView implements RouteView {
       this.markers.dispose();
     }
     this.world.labels.remove('stop:');
+    this.world.keepClear([]);
     this.track = undefined;
     this.markers = undefined;
     this.labelOfStop = [];

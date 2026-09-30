@@ -1,9 +1,10 @@
 import type { TourSnapshot } from '@/application/dto/TourData';
 import { toTour } from '@/application/tourMapper';
 import { RoutePlan } from '@/domain/tour/RoutePlan';
+import { detectQuality } from '@/features/map3d/QualityProfile';
 import { SafeStorage } from '@/infrastructure/storage/SafeStorage';
 import { formatDuration } from '@/shared/format';
-import { supportsWebGL } from '@/shared/webgl';
+import { mapChoice, openGraphics } from '@/shared/webgl';
 import { RouteSimulation } from './RouteSimulation';
 import { routeSummary } from './routeSummary';
 import type { RouteView } from './RouteView';
@@ -17,21 +18,26 @@ function required<T extends Element>(root: ParentNode, selector: string): T {
   return element;
 }
 
-/** Prefers the 3D map and falls back to the flat one; both are loaded on demand. */
+/**
+ * Prefers the 3D map where a graphics chip can draw it and falls back to the
+ * flat one; whichever is used is only downloaded once that is known.
+ */
 async function createView(root: HTMLElement, reducedMotion: boolean): Promise<RouteView> {
   const stage = required<HTMLElement>(root, '[data-stage]');
-  if (supportsWebGL()) {
+  const choice = mapChoice(location.search);
+  const quality = detectQuality();
+  const canvas = required<HTMLCanvasElement>(stage, '[data-map-canvas]');
+  const context =
+    choice === 'flat'
+      ? null
+      : openGraphics(canvas, { antialias: quality.antialias, allowSoftware: choice === '3d' });
+  if (context) {
     try {
-      const [{ ThreeRouteView }, { detectQuality }] = await Promise.all([
-        import('@/features/map3d/ThreeRouteView'),
-        import('@/features/map3d/QualityProfile'),
-      ]);
-      return await ThreeRouteView.create(
-        required<HTMLCanvasElement>(stage, '[data-map-canvas]'),
-        required<HTMLElement>(stage, '[data-map-labels]'),
-        detectQuality(),
-        reducedMotion,
-      );
+      const { ThreeRouteView } = await import('@/features/map3d/ThreeRouteView');
+      const labels = required<HTMLElement>(stage, '[data-map-labels]');
+      const view = await ThreeRouteView.create({ canvas, context, labels }, quality, reducedMotion);
+      root.dataset['map'] = '3d';
+      return view;
     } catch (error) {
       console.warn('3D map unavailable, using the flat map instead.', error);
     }

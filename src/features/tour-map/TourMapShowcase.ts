@@ -2,11 +2,12 @@ import { Vector3 } from 'three';
 import { toRoutePlan, type RouteOutline } from '@/application/dto/RouteOutline';
 import type { RoutePlan } from '@/domain/tour/RoutePlan';
 import { BusModel } from '@/features/map3d/BusModel';
+import type { MapSurface } from '@/features/map3d/MapSurface';
 import { MapWorld } from '@/features/map3d/MapWorld';
 import type { QualityProfile } from '@/features/map3d/QualityProfile';
 import { RouteTrack } from '@/features/map3d/RouteTrack';
 import { StopMarkers } from '@/features/map3d/StopMarkers';
-import { coachScale, KM_PER_UNIT, LAND_TOP, markerScale } from '@/features/map3d/world';
+import { coachScale, KM_PER_UNIT, LAND_TOP, markerScale, roadScale } from '@/features/map3d/world';
 import type { Disposable } from '@/shared/lifecycle';
 
 interface ShowcaseRoute {
@@ -37,13 +38,12 @@ export class TourMapShowcase implements Disposable {
 
   /** Builds the map in stages; resolves when the first frame can be drawn cheaply. */
   static async create(
-    canvas: HTMLCanvasElement,
-    labelContainer: HTMLElement,
+    surface: MapSurface,
     quality: QualityProfile,
     reducedMotion: boolean,
   ): Promise<TourMapShowcase> {
     return new TourMapShowcase(
-      await MapWorld.create(canvas, labelContainer, quality, reducedMotion),
+      await MapWorld.create(surface, quality, reducedMotion),
       reducedMotion,
     );
   }
@@ -140,10 +140,13 @@ export class TourMapShowcase implements Disposable {
   }
 
   private animate(elapsedSeconds: number): void {
-    const scale = coachScale(this.world.rig.distance);
-    this.markers?.setScale(markerScale(this.world.rig.distance));
+    const { view } = this.world.rig;
+    const scale = coachScale(view);
+    const width = roadScale(view);
+    this.markers?.setScale(markerScale(view));
     for (const route of this.routes.values()) {
       const { track, bus } = route;
+      track.setScale(width);
       const distance = this.reducedMotion
         ? track.length * PARKED_FRACTION
         : (elapsedSeconds * CRUISE_SPEED + route.offset) % track.length;

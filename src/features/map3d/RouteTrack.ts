@@ -9,17 +9,24 @@ import {
   Vector3,
 } from 'three';
 import type { RoutePlan } from '@/domain/tour/RoutePlan';
-import { LAND_TOP, toWorld } from './world';
+import { LAND_TOP, ROAD_WIDTH, toWorld } from './world';
 import type { Disposable } from '@/shared/lifecycle';
 
 const SAMPLES_PER_SEGMENT = 28;
 const MERGE_DISTANCE = 0.03;
-const PLANNED_WIDTH = 0.22;
-const CASING_WIDTH = 0.52;
-const ACTIVE_WIDTH = 0.34;
-const DASH_LENGTH = 0.9;
+const PLANNED_WIDTH = ROAD_WIDTH * 0.35;
+const CASING_WIDTH = ROAD_WIDTH;
+const ACTIVE_WIDTH = ROAD_WIDTH * 0.65;
+const DASH_LENGTH = 0.7;
+/** Room added to the culling sphere for the widest the road is ever drawn. */
+const CULLING_MARGIN = 4;
 
-const PLANNED_COLOR = '#6f7a84';
+const RIBBON_PROGRAM = 'route-ribbon';
+const RIBBON_DECLARATIONS = 'attribute vec3 edge;\nuniform float widthScale;';
+const RIBBON_OFFSET = 'transformed += edge * widthScale;';
+
+const PLANNED_COLOR = '#7f8b96';
+const PLANNED_OPACITY = 0.55;
 const CASING_COLOR = '#ffffff';
 const ACTIVE_COLOR = '#0b5a8f';
 const MUTED_COLOR = '#9aa6b0';
@@ -27,7 +34,8 @@ const MUTED_COLOR = '#9aa6b0';
 /**
  * The road a tour follows: a smooth curve through its stops, drawn as flat
  * ribbons on the land. The dashed ribbon shows the whole plan; the solid one is
- * revealed behind the coach as it travels.
+ * revealed behind the coach as it travels. The ribbons are widened in the vertex
+ * shader, so their width can follow the camera without rebuilding any geometry.
  */
 export class RouteTrack implements Disposable {
   readonly group = new Group();
@@ -41,6 +49,8 @@ export class RouteTrack implements Disposable {
   private readonly casing: BufferGeometry;
   private readonly active: BufferGeometry;
   private readonly activeMaterial: MeshBasicMaterial;
+  /** Shared by every ribbon of this road. */
+  private readonly widthScale = { value: 1 };
 
   constructor(plan: RoutePlan) {
     // Consecutive stops in the same spot (a sight and the hotel next to it)
@@ -67,7 +77,12 @@ export class RouteTrack implements Disposable {
     }
     this.stopSample = pointOfStop.map((pointIndex) => pointIndex * SAMPLES_PER_SEGMENT);
 
-    this.group.add(this.ribbon(PLANNED_WIDTH, 0.03, PLANNED_COLOR, true).mesh);
+    const planned = this.ribbon(PLANNED_WIDTH, 0.03, PLANNED_COLOR, true);
+    // The road still to come is only a hint under the one already driven.
+    planned.material.transparent = true;
+    planned.material.opacity = PLANNED_OPACITY;
+    planned.material.depthWrite = false;
+    this.group.add(planned.mesh);
     const casing = this.ribbon(CASING_WIDTH, 0.045, CASING_COLOR, false);
     const active = this.ribbon(ACTIVE_WIDTH, 0.06, ACTIVE_COLOR, false);
     this.casing = casing.geometry;
@@ -79,6 +94,11 @@ export class RouteTrack implements Disposable {
 
   get length(): number {
     return this.cumulative.at(-1) ?? 0;
+  }
+
+  /** The centre line of the road as closely spaced points. */
+  get path(): readonly Vector3[] {
+    return this.samples;
   }
 
   /** Distance along the road for a point part-way through a leg. */
@@ -128,6 +148,11 @@ export class RouteTrack implements Disposable {
     this.active.setDrawRange(0, Infinity);
   }
 
+  /** Widens or narrows the road; 1 is its natural width on the map. */
+  setScale(scale: number): void {
+    this.widthScale.value = scale;
+  }
+
   /** Greys the road out so another route can stand in front of it. */
   setMuted(muted: boolean): void {
     this.activeMaterial.color.set(muted ? MUTED_COLOR : ACTIVE_COLOR);
@@ -164,21 +189,18 @@ export class RouteTrack implements Disposable {
     color: string,
     dashed: boolean,
   ): { mesh: Mesh; geometry: BufferGeometry; material: MeshBasicMaterial } {
-    const positions: number[] = [];
+    // Both edges start on the centre line; the shader pushes them apart along `edge`.
+    const centres: number[] = [];
+    const edges: number[] = [];
     const indices: number[] = [];
-    const side = new Vector3();
+    const edge = new Vector3();
     const direction = new Vector3();
     this.samples.forEach((sample, i) => {
       this.directionAt(this.cumulative[i] ?? 0, direction);
-      side.set(-direction.z, 0, direction.x).multiplyScalar(width / 2);
-      positions.push(
-        sample.x + side.x,
-        sample.y + lift,
-        sample.z + side.z,
-        sample.x - side.x,
-        sample.y + lift,
-        sample.z - side.z,
-      );
+      edge.set(-direction.z, 0, direction.x).multiplyScalar(width / 2);
+      const y = sample.y + lift;
+      centres.push(sample.x, y, sample.z, sample.x, y, sample.z);
+      edges.push(edge.x, 0, edge.z, -edge.x, 0, -edge.z);
       if (i === this.samples.length - 1) return;
       const onDash = Math.floor((this.cumulative[i] ?? 0) / DASH_LENGTH) % 2 === 0;
       if (dashed && !onDash) return;
@@ -187,8 +209,11 @@ export class RouteTrack implements Disposable {
     });
 
     const geometry = new BufferGeometry();
-    geometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('position', new Float32BufferAttribute(centres, 3));
+    geometry.setAttribute('edge', new Float32BufferAttribute(edges, 3));
     geometry.setIndex(indices);
+    geometry.computeBoundingSphere();
+    if (geometry.boundingSphere) geometry.boundingSphere.radius += CULLING_MARGIN;
     // Flat on the ground: nudge the depth so the ribbon never flickers against the land.
     const material = new MeshBasicMaterial({
       color,
@@ -197,6 +222,13 @@ export class RouteTrack implements Disposable {
       polygonOffsetFactor: -2,
       polygonOffsetUnits: -2,
     });
+    material.onBeforeCompile = (shader) => {
+      shader.uniforms['widthScale'] = this.widthScale;
+      shader.vertexShader = shader.vertexShader
+        .replace('#include <common>', `#include <common>\n${RIBBON_DECLARATIONS}`)
+        .replace('#include <begin_vertex>', `#include <begin_vertex>\n${RIBBON_OFFSET}`);
+    };
+    material.customProgramCacheKey = () => RIBBON_PROGRAM;
     this.geometries.push(geometry);
     this.materials.push(material);
     return { mesh: new Mesh(geometry, material), geometry, material };

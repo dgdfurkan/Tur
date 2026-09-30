@@ -19,9 +19,23 @@ for (const [name, path] of Object.entries(PAGES)) {
   });
 }
 
-test('route preview has no accessibility violations', async ({ page }) => {
-  await page.goto('./turlar/kapadokya/rota/');
-  await expect(page.locator('[data-route-app]')).toHaveAttribute('data-ready', 'true');
+// The route preview draws either map depending on the device; both have to pass.
+for (const map of ['3b', 'duz']) {
+  test(`route preview has no accessibility violations (harita=${map})`, async ({ page }) => {
+    await page.goto(`./turlar/kapadokya/rota/?harita=${map}`);
+    await expect(page.locator('[data-route-app]')).toHaveAttribute('data-ready', 'true');
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations).toEqual([]);
+  });
+}
+
+test('the home page map has no accessibility violations once it is interactive', async ({
+  page,
+}) => {
+  await page.goto('./?harita=3b');
+  const map = page.locator('[data-tour-map]');
+  await map.scrollIntoViewIfNeeded();
+  await expect(map).toHaveAttribute('data-ready', 'true', { timeout: 15_000 });
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
 });

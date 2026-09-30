@@ -72,20 +72,22 @@ const days = tour.days.map((day) => ({
         <span class="panel__progress-fill" data-progress></span>
       </div>
 
-      <div class="card">
+      <div class="card" data-card>
         <p class="card__day" data-panel-day>
           {formatDuration(tour.nights, tour.dayCount)}
         </p>
-        <p class="card__kind" data-card-kind></p>
+        <p class="card__meta">
+          <span class="card__kind" data-card-kind></span>
+          <span class="card__duration" data-card-duration hidden>
+            <Icon name="clock" size={16} />
+            <span data-card-duration-text></span>
+          </span>
+        </p>
         <h1 class="card__title" data-card-title>
           {tr.route.heading}
         </h1>
         <p class="card__text" data-card-text>
           {routeSummary(tour)}
-        </p>
-        <p class="card__duration" data-card-duration hidden>
-          <Icon name="clock" size={16} />
-          <span data-card-duration-text></span>
         </p>
         <p class="visually-hidden" aria-live="polite" data-announce></p>
       </div>
@@ -117,12 +119,18 @@ const days = tour.days.map((day) => ({
         </button>
       </div>
 
-      <button class="sheet-toggle" type="button" data-action="sheet">
+      <button
+        class="sheet-toggle"
+        type="button"
+        data-action="sheet"
+        aria-expanded="false"
+        aria-controls="route-stops"
+      >
         <Icon name="list" />
         <span data-sheet-label>{tr.route.showStops}</span>
       </button>
 
-      <nav class="stops" aria-label={tr.route.stops}>
+      <nav class="stops" id="route-stops" aria-label={tr.route.stops}>
         <ol class="stops__days">
           {days.map((day) => (
             <li>
@@ -161,6 +169,8 @@ const days = tour.days.map((day) => ({
     position: fixed;
     inset: 0;
     overflow: hidden;
+    /* Nothing inside may scroll the page, not even focus moving to something off screen. */
+    overflow: clip;
     background: #cfe4f2;
     overscroll-behavior: none;
   }
@@ -327,6 +337,11 @@ const days = tour.days.map((day) => ({
     align-content: start;
   }
 
+  /* On the road the card keeps one height, so the sheet does not bob from stop to stop. */
+  .route[data-state='running'] .card {
+    min-height: 9.25rem;
+  }
+
   .card__day {
     justify-self: start;
     padding: 0.0625rem var(--space-2);
@@ -338,15 +353,23 @@ const days = tour.days.map((day) => ({
     font-weight: 650;
   }
 
-  .card__kind {
+  /* What kind of stop it is and how long the coach stays there. */
+  .card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 var(--space-3);
     margin-top: var(--space-1);
-    color: var(--c-brown);
     font-size: var(--text-small);
-    font-weight: 650;
   }
 
-  .card__kind:empty {
+  .card__meta:has(.card__kind:empty) {
     display: none;
+  }
+
+  .card__kind {
+    color: var(--c-brown);
+    font-weight: 650;
   }
 
   .card__title {
@@ -373,9 +396,8 @@ const days = tour.days.map((day) => ({
   .card__duration {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--space-1);
     color: var(--c-muted);
-    font-size: var(--text-small);
   }
 
   .card__duration[hidden] {
@@ -487,6 +509,14 @@ const days = tour.days.map((day) => ({
     padding: 0 var(--space-3) var(--space-4);
     overflow-y: auto;
     overscroll-behavior: contain;
+    /* Below the screen edge while the sheet is closed, so out of reach of the keyboard too. */
+    visibility: hidden;
+    transition: visibility 0s linear var(--dur-panel);
+  }
+
+  .route[data-sheet='open'] .stops {
+    visibility: visible;
+    transition-delay: 0s;
   }
 
   .stops__days {
@@ -587,7 +617,8 @@ const days = tour.days.map((day) => ({
       transform: none;
     }
 
-    .card {
+    .card,
+    .route[data-state='running'] .card {
       min-height: 9.5rem;
     }
 
@@ -603,12 +634,18 @@ const days = tour.days.map((day) => ({
     .sheet-toggle {
       display: none;
     }
+
+    .stops {
+      visibility: visible;
+    }
   }
 </style>
 
 <script>
   import { mountRouteSimulation } from '@/features/route-simulation/bootstrap';
+  import { afterFirstPaint } from '@/shared/scheduling';
 
   const root = document.querySelector<HTMLElement>('[data-route-app]');
-  if (root) void mountRouteSimulation(root);
+  // The card and the static map are on screen before the interactive map starts loading.
+  if (root) afterFirstPaint(() => void mountRouteSimulation(root));
 </script>

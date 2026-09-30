@@ -1,4 +1,4 @@
-import { Color, DynamicDrawUsage, Group, InstancedMesh, Object3D } from 'three';
+import { Color, DynamicDrawUsage, Group, InstancedMesh, Object3D, type Vector3 } from 'three';
 import { TURKEY_PROJECTION, type GeoCoordinates } from '@/domain/geo/MapProjection';
 import type { LandmarkFactory, LandmarkKind } from './LandmarkFactory';
 import { mapData, ringsContain } from './MapData';
@@ -44,7 +44,7 @@ const RANGES: readonly Region[] = [
 ];
 
 const CLUSTERS: Readonly<Record<'chimney' | 'house' | 'column', readonly Cluster[]>> = {
-  chimney: [{ lat: 38.655, lon: 34.84, radiusKm: 13, count: 16, scale: [0.4, 0.75] }],
+  chimney: [{ lat: 38.655, lon: 34.84, radiusKm: 18, count: 28, scale: [0.16, 0.3] }],
   house: [
     { lat: 41.25, lon: 32.69, radiusKm: 6, count: 6, scale: [0.55, 0.75] },
     { lat: 40.168, lon: 31.92, radiusKm: 5, count: 5, scale: [0.55, 0.75] },
@@ -61,9 +61,27 @@ const CLUSTERS: Readonly<Record<'chimney' | 'house' | 'column', readonly Cluster
   ],
 };
 
+/** Radius of each model's footprint on the ground at scale 1, in world units. */
+const FOOTPRINT: Readonly<Record<Exclude<LandmarkKind, 'balloon'>, number>> = {
+  pine: 0.34,
+  peak: 1,
+  chimney: 0.36,
+  house: 0.35,
+  column: 0.36,
+};
+
 const BALLOON_HOME: GeoCoordinates = { lat: 38.65, lon: 34.85 };
 const BALLOON_TINTS = ['#e4572e', '#f2b705', '#2a9d8f', '#0b5a8f', '#c0161c', '#f4a261', '#8e5ea2'];
 const KM_PER_DEGREE = 111;
+
+/** One kind of landmark, planted as instances of a single mesh. */
+interface Planting {
+  readonly mesh: InstancedMesh;
+  /** Instance matrices as planted, to bring back whatever was cleared away. */
+  readonly planted: Float32Array;
+  /** Ground position and footprint radius of every instance: x, z, radius. */
+  readonly footprints: Float32Array;
+}
 
 interface Balloon {
   readonly x: number;
@@ -76,7 +94,7 @@ interface Balloon {
 /** Trees, mountains and landmarks: static instanced meshes, plus a few drifting balloons. */
 export class Scenery implements Disposable, Updatable {
   readonly group = new Group();
-  private readonly meshes: InstancedMesh[] = [];
+  private readonly plantings: Planting[] = [];
   private readonly balloons: Balloon[] = [];
   private readonly balloonMesh: InstancedMesh;
   private readonly dummy = new Object3D();
@@ -84,18 +102,27 @@ export class Scenery implements Disposable, Updatable {
 
   constructor(factory: LandmarkFactory, kit: ToonKit, density: number) {
     const material = kit.vertexColors();
-    const build = (kind: LandmarkKind, placements: readonly Placement[]): void => {
+    const build = (kind: keyof typeof FOOTPRINT, placements: readonly Placement[]): void => {
       if (placements.length === 0) return;
       const mesh = new InstancedMesh(factory.geometry(kind), material, placements.length);
+      const footprints = new Float32Array(placements.length * 3);
       placements.forEach((placement, index) => {
         this.dummy.position.copy(toWorld(TURKEY_PROJECTION.project(placement.location)));
         this.dummy.rotation.set(0, this.random() * Math.PI * 2, 0);
         this.dummy.scale.set(placement.scale, placement.scale * placement.stretch, placement.scale);
         this.dummy.updateMatrix();
         mesh.setMatrixAt(index, this.dummy.matrix);
+        footprints.set(
+          [this.dummy.position.x, this.dummy.position.z, FOOTPRINT[kind] * placement.scale],
+          index * 3,
+        );
       });
       mesh.instanceMatrix.needsUpdate = true;
-      this.meshes.push(mesh);
+      this.plantings.push({
+        mesh,
+        planted: Float32Array.from(mesh.instanceMatrix.array),
+        footprints,
+      });
       this.group.add(mesh);
     };
 
@@ -121,14 +148,16 @@ export class Scenery implements Disposable, Updatable {
     this.balloonMesh.instanceMatrix.setUsage(DynamicDrawUsage);
     const home = toWorld(TURKEY_PROJECTION.project(BALLOON_HOME));
     BALLOON_TINTS.forEach((tint, index) => {
-      const angle = this.random() * Math.PI * 2;
-      const distance = (4 + this.random() * 16) / KM_PER_UNIT;
+      // The camera looks north, so balloons on the far side of the valleys never cover a road.
+      const angle = Math.PI * (1.1 + this.random() * 0.8);
+      const distance = (12 + this.random() * 20) / KM_PER_UNIT;
       this.balloons.push({
         x: home.x + Math.cos(angle) * distance,
         z: home.z + Math.sin(angle) * distance,
-        altitude: 1.3 + this.random() * 2,
+        // Low enough to stay below the camera when it comes in close to a stop.
+        altitude: 1 + this.random() * 0.8,
         phase: this.random() * Math.PI * 2,
-        scale: 0.55 + this.random() * 0.3,
+        scale: 0.22 + this.random() * 0.12,
       });
       this.balloonMesh.setColorAt(index, new Color(tint));
     });
@@ -153,8 +182,33 @@ export class Scenery implements Disposable, Updatable {
     this.balloonMesh.instanceMatrix.needsUpdate = true;
   }
 
+  /**
+   * Takes away whatever stands within `margin` of the given points, so nothing
+   * on the map covers a road drawn through it. Everything else is put back, and
+   * an empty list restores the whole map.
+   */
+  keepClear(points: readonly Vector3[], margin: number): void {
+    for (const { mesh, planted, footprints } of this.plantings) {
+      const matrices = mesh.instanceMatrix.array;
+      matrices.set(planted);
+      for (let index = 0; index < mesh.count; index += 1) {
+        const x = footprints[index * 3] ?? 0;
+        const z = footprints[index * 3 + 1] ?? 0;
+        const reach = (footprints[index * 3 + 2] ?? 0) + margin;
+        const inTheWay = points.some(
+          (point) => (point.x - x) ** 2 + (point.z - z) ** 2 < reach * reach,
+        );
+        if (!inTheWay) continue;
+        // A matrix of zeros collapses the instance into a point, which draws nothing.
+        matrices.fill(0, index * 16, index * 16 + 15);
+      }
+      mesh.instanceMatrix.needsUpdate = true;
+    }
+  }
+
   dispose(): void {
-    for (const mesh of [...this.meshes, this.balloonMesh]) mesh.dispose();
+    for (const { mesh } of this.plantings) mesh.dispose();
+    this.balloonMesh.dispose();
   }
 
   private scatter(regions: readonly Region[], density: number): Placement[] {

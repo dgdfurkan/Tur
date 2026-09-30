@@ -19,6 +19,9 @@ export interface RouteBounds {
   readonly maxY: number;
 }
 
+/** Stops closer together than this are treated as one place. */
+const SAME_PLACE_KM = 0.5;
+
 /** The geometry of a tour: its stops in travel order, laid out on the map plane. */
 export class RoutePlan {
   private constructor(readonly stops: readonly RouteStop[]) {}
@@ -64,6 +67,21 @@ export class RoutePlan {
     const from = this.stops[fromIndex];
     const to = this.stops[fromIndex + 1];
     return from && to ? to.distanceKm - from.distanceKm : 0;
+  }
+
+  /**
+   * Distance from a stop to the nearest stop that is somewhere else. Stops at
+   * the same place (a town visited on two days) do not count as neighbours.
+   */
+  clearanceKm(stopIndex: number): number {
+    const here = this.stops[stopIndex];
+    if (!here) return Infinity;
+    let nearest = Infinity;
+    for (const other of this.stops) {
+      const distance = Math.hypot(other.point.x - here.point.x, other.point.y - here.point.y);
+      if (distance > SAME_PLACE_KM && distance < nearest) nearest = distance;
+    }
+    return nearest;
   }
 
   get bounds(): RouteBounds {

@@ -83,8 +83,14 @@
   --plate: #8a7567;
 }
 
+/* The coach is parked under the active sign, so its post is taller. */
 .map-label[data-state='active'] {
   z-index: 1;
+  padding-bottom: 1.875rem;
+}
+
+.map-label[data-state='active']::after {
+  height: 1.875rem;
 }
 
 .map-label[data-state='active'] .map-label__plate {
@@ -124,26 +130,29 @@
 .flat-map__leg {
   fill: none;
   stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
 }
 
+/*
+ * Sizes are multiplied by --px, the number of map units in one pixel, so they
+ * stay the same on screen while the view zooms. Dashes are measured in map
+ * units too, which a non-scaling stroke would not allow.
+ */
 .flat-map__plan {
   stroke: #8a949c;
-  stroke-width: 2;
-  stroke-dasharray: 6 6;
+  stroke-width: calc(var(--px) * 2px);
+  stroke-dasharray: calc(var(--px) * 6px) calc(var(--px) * 6px);
 }
 
 .flat-map__leg {
   stroke: var(--c-blue);
-  stroke-width: 4;
+  stroke-width: calc(var(--px) * 4px);
 }
 
 .flat-map__stop circle {
-  r: calc(var(--unit) * 1px);
+  r: calc(var(--px) * 6px);
   fill: var(--c-brown);
   stroke: var(--c-white);
-  stroke-width: 2;
-  vector-effect: non-scaling-stroke;
+  stroke-width: calc(var(--px) * 2px);
 }
 
 .flat-map__stop--departure circle,
@@ -163,22 +172,29 @@
   display: none;
   fill: var(--c-asphalt);
   font-stretch: var(--wdth-sign);
-  font-size: calc(var(--unit) * 2.6px);
+  font-size: calc(var(--px) * 14px);
   font-weight: 650;
   paint-order: stroke;
   stroke: var(--c-white);
-  stroke-width: calc(var(--unit) * 0.7px);
-  transform: translate(calc(var(--unit) * 1.6px), calc(var(--unit) * 0.9px));
+  stroke-width: calc(var(--px) * 4px);
+  stroke-linejoin: round;
+  transform: translate(calc(var(--px) * 12px), calc(var(--px) * 5px));
 }
 
+.flat-map__stop--named text,
 .flat-map__stop--active text {
   display: block;
 }
 
+/* While the coach is at a stop, only that stop is named; its neighbours may be a few pixels away. */
+.flat-map:has(.flat-map__stop--active) .flat-map__stop:not(.flat-map__stop--active) text {
+  display: none;
+}
+
 .flat-map__stop--active circle {
-  r: calc(var(--unit) * 1.5px);
+  r: calc(var(--px) * 9px);
   stroke: var(--c-yellow);
-  stroke-width: 4;
+  stroke-width: calc(var(--px) * 4px);
 }
 
 .flat-map__stop--visited:not(.flat-map__stop--active) circle {
@@ -186,9 +202,8 @@
 }
 
 .flat-map__coach {
-  r: calc(var(--unit) * 1.3px);
+  r: calc(var(--px) * 8px);
   fill: var(--c-white);
   stroke: var(--c-blue);
-  stroke-width: 4;
-  vector-effect: non-scaling-stroke;
+  stroke-width: calc(var(--px) * 4px);
 }

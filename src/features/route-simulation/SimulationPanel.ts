@@ -18,6 +18,8 @@ export type PanelState = 'intro' | 'running' | 'finished';
 
 const WIDE_LAYOUT = '(min-width: 60rem)';
 const EDGE_GAP = 16;
+/** Room under the last control that shows above the screen edge while the sheet is closed. */
+const PEEK_GAP = 12;
 
 /**
  * The interface around the map: status card, transport controls and the list
@@ -38,9 +40,12 @@ export class SimulationPanel {
   private readonly toggleLabel: HTMLElement;
   private readonly speedLabel: HTMLElement;
   private readonly soundLabel: HTMLElement;
+  private readonly sheetToggle: HTMLElement;
   private readonly sheetLabel: HTMLElement;
   private readonly stopButtons: HTMLButtonElement[];
   private readonly wide = matchMedia(WIDE_LAYOUT);
+  /** Height of the closed sheet that stays on screen, in pixels. */
+  private peek = 0;
 
   constructor(private readonly root: HTMLElement) {
     this.panel = this.find('[data-panel]');
@@ -56,8 +61,15 @@ export class SimulationPanel {
     this.toggleLabel = this.find('[data-toggle-label]');
     this.speedLabel = this.find('[data-speed-label]');
     this.soundLabel = this.find('[data-sound-label]');
+    this.sheetToggle = this.find('[data-action="sheet"]');
     this.sheetLabel = this.find('[data-sheet-label]');
     this.stopButtons = [...root.querySelectorAll<HTMLButtonElement>('[data-stop-index]')];
+
+    // The card grows and shrinks with its text; the closed sheet always shows down to the list button.
+    const observer = new ResizeObserver(() => this.syncPeek());
+    observer.observe(this.panel);
+    observer.observe(this.find('[data-card]'));
+    this.syncPeek();
   }
 
   /** Connects the controls to whoever reacts to them. */
@@ -168,23 +180,35 @@ export class SimulationPanel {
   /** The area of the viewport the panel and top bar cover, so the map can avoid it. */
   padding(): ViewPadding {
     const bar = this.bar.getBoundingClientRect();
-    const panel = this.panel.getBoundingClientRect();
     if (this.wide.matches) {
+      const panel = this.panel.getBoundingClientRect();
       return { left: panel.right + EDGE_GAP, right: EDGE_GAP, top: bar.bottom, bottom: EDGE_GAP };
     }
+    // Taken from the layout rather than the panel's rectangle, which may still be sliding.
+    const safeArea = parseFloat(getComputedStyle(this.panel).paddingBottom) || 0;
+    const open = this.root.dataset['sheet'] === 'open';
     return {
       left: EDGE_GAP,
       right: EDGE_GAP,
       top: bar.bottom,
-      bottom: Math.max(0, innerHeight - panel.top),
+      bottom: open ? this.panel.offsetHeight : this.peek + safeArea,
     };
   }
 
   private toggleSheet(onLayout: () => void): void {
     const open = this.root.dataset['sheet'] !== 'open';
     this.root.dataset['sheet'] = open ? 'open' : 'closed';
+    this.sheetToggle.setAttribute('aria-expanded', String(open));
     this.sheetLabel.textContent = open ? tr.route.hideStops : tr.route.showStops;
-    this.panel.addEventListener('transitionend', onLayout, { once: true });
+    onLayout();
+  }
+
+  private syncPeek(): void {
+    if (this.wide.matches) return;
+    const peek = this.sheetToggle.offsetTop + this.sheetToggle.offsetHeight + PEEK_GAP;
+    if (peek === this.peek) return;
+    this.peek = peek;
+    this.root.style.setProperty('--peek', `${peek}px`);
   }
 
   private setDuration(minutes: number | undefined): void {

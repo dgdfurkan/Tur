@@ -59,6 +59,15 @@ describe('RoutePlan', () => {
     expect(minX).toBeLessThan(maxX);
     expect(minY).toBeLessThan(maxY);
   });
+
+  it('measures the room around a stop, ignoring stops at the same place', () => {
+    const route = plan();
+    // The first and last stops share a location, so the nearest neighbour is the second stop.
+    expect(route.clearanceKm(0)).toBeCloseTo(route.legKm(0), 0);
+    expect(route.clearanceKm(3)).toBeCloseTo(route.clearanceKm(0));
+    expect(route.clearanceKm(2)).toBeCloseTo(route.legKm(1), 0);
+    expect(route.clearanceKm(99)).toBe(Infinity);
+  });
 });
 
 describe('RouteSimulation', () => {
