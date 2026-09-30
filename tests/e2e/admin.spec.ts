@@ -45,6 +45,53 @@ test('a passenger recorded in the panel appears in the list and the summary', as
   expectNoErrors(errors);
 });
 
+test('a recorded passenger can be changed from the list', async ({ page }) => {
+  const errors = trackErrors(page);
+  await openPanel(page);
+  await addPassenger(page, 'Deneme Yolcu', 15);
+  await page.getByRole('button', { name: 'Yolcu Listesi' }).click();
+  await page.getByRole('button', { name: 'Düzenle: Deneme Yolcu' }).click();
+
+  // The record fills the form, its own seat chosen and free to keep.
+  await expect(page.getByRole('heading', { name: 'Yolcu Bilgilerini Düzenle' })).toBeFocused();
+  const form = page.locator('[data-form]');
+  await expect(form.getByLabel('Ad Soyad')).toHaveValue('Deneme Yolcu');
+  await expect(form.getByLabel('Kapora (TL)')).toHaveValue('1.000');
+  await expect(form.locator('input[name="seatNumber"][value="15"]')).toBeChecked();
+
+  await form.getByLabel('Ad Soyad').fill('Deneme Yolcu Kaya');
+  await page.locator('.seat-option:has(input[value="16"])').click();
+  await page.getByRole('button', { name: 'Değişiklikleri Kaydet' }).click();
+
+  await expect(page.locator('[data-toast-text]')).toHaveText('Yolcu bilgileri güncellendi.');
+  await expect(page.getByRole('heading', { name: 'Yolcu Listesi' })).toBeFocused();
+  const row = page.locator('.list__row');
+  await expect(row).toHaveCount(1);
+  await expect(row).toContainText('Deneme Yolcu Kaya');
+  await expect(row.locator('.list__seat')).toContainText('16');
+
+  // The form is for new passengers again.
+  await page.getByRole('button', { name: 'Yolcu Ekle' }).click();
+  await expect(page.getByRole('heading', { name: 'Yolcu Ekle' })).toBeVisible();
+  await expect(form.getByLabel('Ad Soyad')).toHaveValue('');
+  await expect(page.getByRole('button', { name: 'Vazgeç' })).toBeHidden();
+  expectNoErrors(errors);
+});
+
+test('a change can be abandoned without touching the record', async ({ page }) => {
+  await openPanel(page);
+  await addPassenger(page, 'Deneme Yolcu', 15);
+  await page.getByRole('button', { name: 'Yolcu Listesi' }).click();
+  await page.getByRole('button', { name: 'Düzenle: Deneme Yolcu' }).click();
+
+  await page.locator('[data-form]').getByLabel('Ad Soyad').fill('Başka Biri');
+  await page.getByRole('button', { name: 'Vazgeç' }).click();
+
+  await expect(page.getByRole('heading', { name: 'Yolcu Listesi' })).toBeFocused();
+  await expect(page.locator('.list__row')).toContainText('Deneme Yolcu');
+  await expect(page.locator('.list__row')).not.toContainText('Başka Biri');
+});
+
 test('an empty form explains what is missing', async ({ page }) => {
   await openPanel(page);
   await page.getByRole('button', { name: 'Yolcu Ekle' }).click();

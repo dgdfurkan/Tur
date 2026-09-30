@@ -30,3 +30,28 @@ export async function openPanelPage(page: Page, path: string): Promise<void> {
   await page.getByRole('button', { name: 'Paneli Aç' }).click();
   await expect(panel).toHaveAttribute('data-access', 'open');
 }
+
+/**
+ * Waits until nothing on the page is fading or moving over time. Loops that
+ * never end, motion tied to scrolling and animations still waiting out their
+ * delay do not count. Axe judges contrast on what is painted at that instant,
+ * so a label caught halfway through fading in would fail it.
+ */
+export async function waitForStillness(page: Page): Promise<void> {
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          document.getAnimations().filter((animation) => {
+            const timing = animation.effect?.getComputedTiming();
+            return (
+              animation.playState === 'running' &&
+              animation.timeline === document.timeline &&
+              timing?.iterations !== Infinity &&
+              timing?.progress !== null
+            );
+          }).length,
+      ),
+    )
+    .toBe(0);
+}

@@ -6,12 +6,13 @@ import { formatDate, formatDateRange, formatMoney } from '@/shared/format';
 import { el, required } from './dom';
 
 export interface ListHandlers {
+  edit(passenger: Passenger): void;
   remove(passenger: Passenger): void;
   exportList(table: ListTable, fileName: string): void;
   exportEmpty(): void;
 }
 
-/** The "passenger list" tab: records of one departure, removal and the insurance export. */
+/** The "passenger list" tab: records of one departure, their changes and the insurance export. */
 export class PassengerList {
   private readonly departure: HTMLSelectElement;
   private readonly list: HTMLElement;
@@ -80,8 +81,14 @@ export class PassengerList {
   }
 
   private row(passenger: Passenger): HTMLElement {
+    const edit = el('button', {
+      class: 'list__action',
+      text: tr.admin.list.edit,
+      attrs: { type: 'button', 'aria-label': `${tr.admin.list.edit}: ${passenger.fullName}` },
+    });
+    edit.addEventListener('click', () => this.handlers.edit(passenger));
     const remove = el('button', {
-      class: 'list__remove',
+      class: 'list__action list__action--remove',
       text: tr.admin.list.remove,
       attrs: { type: 'button', 'aria-label': `${tr.admin.list.remove}: ${passenger.fullName}` },
     });
@@ -103,7 +110,7 @@ export class PassengerList {
           ? []
           : [el('span', { class: 'list__note', text: passenger.note })]),
       ]),
-      remove,
+      el('div', { class: 'list__actions' }, [edit, remove]),
     ]);
   }
 

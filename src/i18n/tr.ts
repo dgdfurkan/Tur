@@ -133,6 +133,10 @@ export const tr = {
       noteHint: 'İsteğe bağlıdır.',
       submit: 'Yolcuyu Kaydet',
       saved: 'Yolcu kaydedildi.',
+      editTitle: 'Yolcu Bilgilerini Düzenle',
+      update: 'Değişiklikleri Kaydet',
+      cancelEdit: 'Vazgeç',
+      updated: 'Yolcu bilgileri güncellendi.',
       fixErrors: 'Kayıt yapılamadı. İşaretli alanları düzeltiniz.',
     },
     paymentMethods: { nakit: 'Nakit', havale: 'Havale', kart: 'Kart' },
@@ -160,6 +164,7 @@ export const tr = {
     list: {
       empty: 'Bu kalkış için panelden eklenmiş yolcu yok.',
       seat: 'Koltuk',
+      edit: 'Düzenle',
       remove: 'Kaydı Sil',
       removed: 'Kayıt silindi.',
       undo: 'Geri Al',

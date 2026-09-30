@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
-import { openPanelPage } from './support';
+import { openPanelPage, waitForStillness } from './support';
 
 const PAGES: Record<string, string> = {
   'home page': './',
@@ -34,6 +34,7 @@ for (const map of ['3b', 'duz']) {
   test(`route preview has no accessibility violations (harita=${map})`, async ({ page }) => {
     await page.goto(`./turlar/kapadokya/rota/?harita=${map}`);
     await expect(page.locator('[data-route-app]')).toHaveAttribute('data-ready', 'true');
+    await waitForStillness(page);
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toEqual([]);
   });
@@ -46,6 +47,7 @@ test('the home page map has no accessibility violations once it is interactive',
   const map = page.locator('[data-tour-map]');
   await map.scrollIntoViewIfNeeded();
   await expect(map).toHaveAttribute('data-ready', 'true', { timeout: 15_000 });
+  await waitForStillness(page);
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
 });

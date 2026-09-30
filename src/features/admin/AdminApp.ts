@@ -20,7 +20,8 @@ const isViewName = (value: string | undefined): value is ViewName =>
 /**
  * The operations panel. It owns navigation between the three tabs and
  * re-renders every view from the booking service after each change, so the
- * views never hold state of their own.
+ * views hold no records of their own; the form only remembers which record
+ * it is editing.
  */
 export class AdminApp {
   private readonly summary: SummaryView;
@@ -36,8 +37,12 @@ export class AdminApp {
     private readonly today: string,
   ) {
     this.summary = new SummaryView(required(root, '[data-panel="ozet"]'));
-    this.form = new PassengerForm(required(root, '[data-form]'), (draft) => this.add(draft));
+    this.form = new PassengerForm(required(root, '[data-panel="ekle"]'), {
+      save: (draft, editing) => this.save(draft, editing),
+      cancel: () => this.show('liste', true),
+    });
     this.list = new PassengerList(required(root, '[data-panel="liste"]'), {
+      edit: (passenger) => this.edit(passenger),
       remove: (passenger) => this.remove(passenger),
       exportList: (table, fileName) => this.download(table, fileName),
       exportEmpty: () => this.toast.show(tr.admin.list.exportEmpty),
@@ -85,16 +90,25 @@ export class AdminApp {
     this.list.render(bookings);
   }
 
-  private add(draft: PassengerDraft): DraftErrors | null {
-    const result = this.bookings.addPassenger(draft);
+  private save(draft: PassengerDraft, editing: Passenger | null): DraftErrors | null {
+    const result = editing
+      ? this.bookings.updatePassenger(editing, draft)
+      : this.bookings.addPassenger(draft);
     if (!result.ok) {
       this.toast.show(tr.admin.form.fixErrors);
       return result.errors;
     }
     this.refresh();
     this.list.select(result.passenger.departureId);
-    this.toast.show(tr.admin.form.saved);
+    // A changed record is shown where it now stands; after adding, the next passenger usually follows.
+    if (editing) this.show('liste', true);
+    this.toast.show(editing ? tr.admin.form.updated : tr.admin.form.saved);
     return null;
+  }
+
+  private edit(passenger: Passenger): void {
+    this.form.edit(passenger);
+    this.show('ekle', true);
   }
 
   private remove(passenger: Passenger): void {

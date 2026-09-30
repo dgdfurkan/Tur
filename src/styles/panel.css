@@ -196,6 +196,11 @@
   min-height: 3.5rem;
 }
 
+.form__actions {
+  display: grid;
+  gap: var(--space-3);
+}
+
 .form {
   display: grid;
   gap: var(--space-5);

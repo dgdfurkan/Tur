@@ -162,9 +162,19 @@ const deposits = [500, 1000, 2000];
           </p>
         </div>
 
-        <button class="button button--primary button--block" type="submit">
-          {admin.form.submit}
-        </button>
+        <div class="form__actions">
+          <button class="button button--primary button--block" type="submit">
+            <span data-submit-label>{admin.form.submit}</span>
+          </button>
+          <button
+            class="button button--secondary button--block"
+            type="button"
+            data-action="cancel-edit"
+            hidden
+          >
+            {admin.form.cancelEdit}
+          </button>
+        </div>
       </form>
     </section>
 
