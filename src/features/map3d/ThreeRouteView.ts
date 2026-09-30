@@ -2,7 +2,7 @@ import { MathUtils, Vector3 } from 'three';
 import type { RoutePlan } from '@/domain/tour/RoutePlan';
 import type { StopKind } from '@/domain/tour/Tour';
 import { easeLeg } from '@/features/route-simulation/RouteSimulation';
-import type { RouteView } from '@/features/route-simulation/RouteView';
+import type { RouteView, TimeOfDay } from '@/features/route-simulation/RouteView';
 import type { ViewPadding } from '@/shared/lifecycle';
 import { BusModel } from './BusModel';
 import type { MapSurface } from './MapSurface';
@@ -189,6 +189,10 @@ export class ThreeRouteView implements RouteView {
       if (id === this.activeLabel) continue;
       this.world.labels.setState(id, visited.has(id) ? 'visited' : 'idle');
     }
+  }
+
+  setTimeOfDay(time: TimeOfDay): void {
+    this.world.setTimeOfDay(time);
   }
 
   setPadding(padding: ViewPadding): void {

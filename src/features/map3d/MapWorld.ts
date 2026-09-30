@@ -1,8 +1,10 @@
-import { Color, DirectionalLight, HemisphereLight, Vector3, type Scene } from 'three';
+import { Vector3, type Scene } from 'three';
 import { TURKEY_PROJECTION } from '@/domain/geo/MapProjection';
 import type { Disposable, ViewPadding } from '@/shared/lifecycle';
 import { yieldToMain } from '@/shared/scheduling';
+import type { TimeOfDay } from '@/features/route-simulation/RouteView';
 import { CameraRig } from './CameraRig';
+import { Daylight } from './Daylight';
 import { LabelLayer } from './LabelLayer';
 import { LandmarkFactory } from './LandmarkFactory';
 import { LandTexture } from './LandTexture';
@@ -17,7 +19,6 @@ import { ToonKit } from './ToonKit';
 import { TurkeyBoard } from './TurkeyBoard';
 import { KM_PER_UNIT, LAND_TOP, toWorld } from './world';
 
-const SKY = new Color('#dcedf8');
 const NO_PADDING: ViewPadding = { left: 0, right: 0, top: 0, bottom: 0 };
 const CITY_PRIORITY = { 1: 40, 2: 20 } as const;
 const SEA_PRIORITY = 10;
@@ -50,6 +51,7 @@ export class MapWorld implements Disposable {
   private readonly landmarks: LandmarkFactory;
   private readonly board: TurkeyBoard;
   private readonly scenery: Scenery;
+  private readonly daylight: Daylight;
   private readonly frameCallbacks = new Set<FrameCallback>();
   private padding: ViewPadding = NO_PADDING;
   private viewportKey = '';
@@ -99,13 +101,17 @@ export class MapWorld implements Disposable {
     this.landmarks = parts.landmarks;
     this.board = parts.board;
     this.scenery = parts.scenery;
-    this.manager.setBackdrop(SKY);
+    this.daylight = new Daylight(
+      {
+        setSky: (color) => this.manager.setBackdrop(color),
+        setTint: (color) => this.board.setTint(color),
+        setBalloonLift: (lift) => this.scenery.setBalloonLift(lift),
+      },
+      reducedMotion,
+    );
 
     const { scene, camera } = this.manager;
-    scene.add(new HemisphereLight('#ffffff', '#c4d2dc', 1.5));
-    const sun = new DirectionalLight('#fff3dc', 2.1);
-    sun.position.set(-70, 130, 90);
-    scene.add(sun, this.board.group, this.scenery.group);
+    scene.add(...this.daylight.lamps, this.board.group, this.scenery.group);
 
     this.rig = new CameraRig(camera, reducedMotion);
     this.labels = new LabelLayer(labelContainer);
@@ -122,6 +128,7 @@ export class MapWorld implements Disposable {
       update: (delta, elapsed) => {
         this.syncViewport();
         for (const callback of this.frameCallbacks) callback(delta, elapsed);
+        this.daylight.update(delta);
         this.scenery.update(delta, elapsed);
         this.rig.update(delta);
         this.manager.setHaze(this.rig.distance * HAZE_NEAR, this.rig.distance * HAZE_FAR);
@@ -154,6 +161,10 @@ export class MapWorld implements Disposable {
       ),
       pitch,
     };
+  }
+
+  setTimeOfDay(time: TimeOfDay): void {
+    this.daylight.set(time);
   }
 
   /** Clears trees and landmarks away from a path, or restores them all with an empty path. */

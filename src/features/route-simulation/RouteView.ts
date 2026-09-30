@@ -1,6 +1,9 @@
 import type { RoutePlan } from '@/domain/tour/RoutePlan';
 import type { Disposable, ViewPadding } from '@/shared/lifecycle';
 
+/** Daylight on the map: evening falls where the coach stays the night. */
+export type TimeOfDay = 'day' | 'dusk';
+
 /**
  * What the simulation needs from a map, whatever draws it. The 3D scene and the
  * flat SVG fallback both implement this, so the controller never knows which
@@ -21,6 +24,8 @@ export interface RouteView extends Disposable {
   setActiveStop(stopIndex: number | null): void;
   /** Marks every stop up to and including the index as already visited. */
   setVisitedThrough(stopIndex: number): void;
+  /** Changes the light on the map to a time of day. */
+  setTimeOfDay(time: TimeOfDay): void;
   /** Tells the view which part of its area is covered by panels. */
   setPadding(padding: ViewPadding): void;
   /** Registers a callback that runs once per rendered frame. */

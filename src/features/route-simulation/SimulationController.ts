@@ -122,6 +122,7 @@ export class SimulationController implements Disposable {
     this.view.setActiveStop(null);
     this.view.setVisitedThrough(-1);
     this.view.setPosition(0, 0);
+    this.view.setTimeOfDay('day');
     this.view.showOverview();
     this.panel.setState('intro');
     this.panel.showIntro(this.options.duration, this.options.summary);
@@ -176,6 +177,8 @@ export class SimulationController implements Disposable {
     const next = this.plan.stops[fromIndex + 1];
     this.view.setActiveStop(null);
     this.view.setVisitedThrough(fromIndex);
+    // Every departure is a morning or a daytime one; evening only falls at a hotel.
+    this.view.setTimeOfDay('day');
     this.view.followCoach(fromIndex);
     this.sound.setEngine(ENGINE_DRIVING);
     this.panel.setStops(null, fromIndex);
@@ -193,6 +196,7 @@ export class SimulationController implements Disposable {
     if (!stop) return;
     this.view.setVisitedThrough(stopIndex - 1);
     this.view.setActiveStop(stopIndex);
+    this.view.setTimeOfDay(stop.stop.kind === 'lodging' ? 'dusk' : 'day');
     this.view.focusStop(stopIndex);
     this.sound.setEngine(ENGINE_IDLE);
     this.sound.chime();
@@ -203,6 +207,7 @@ export class SimulationController implements Disposable {
 
   private onFinished(): void {
     this.sound.setEngine(0);
+    this.view.setTimeOfDay('day');
     this.view.showOverview();
     this.panel.setState('finished');
     this.panel.showFinished(this.options.duration, this.options.summary);

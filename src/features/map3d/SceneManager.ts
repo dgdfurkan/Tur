@@ -1,4 +1,4 @@
-import { Fog, PerspectiveCamera, Scene, WebGLRenderer, type Color, type Texture } from 'three';
+import { Color, Fog, PerspectiveCamera, Scene, WebGLRenderer, type Texture } from 'three';
 import type { MapSurface } from './MapSurface';
 import { lowerQuality, type QualityProfile } from './QualityProfile';
 import type { Disposable, Updatable } from '@/shared/lifecycle';
@@ -19,7 +19,8 @@ export class SceneManager implements Disposable {
   private readonly updatables = new Set<Updatable>();
   private readonly resizeObserver: ResizeObserver;
   private readonly visibilityObserver: IntersectionObserver;
-  private fog: Fog | undefined;
+  private readonly backdrop = new Color();
+  private readonly fog = new Fog(this.backdrop, 1, 2);
   private frameHandle = 0;
   private lastTime = 0;
   private elapsed = 0;
@@ -35,6 +36,8 @@ export class SceneManager implements Disposable {
     private profile: QualityProfile,
   ) {
     this.canvas = surface.canvas;
+    this.scene.background = this.backdrop;
+    this.scene.fog = this.fog;
     const { canvas } = this;
     // The context is already open: whoever chose the 3D map had to look at it first.
     this.renderer = new WebGLRenderer({ canvas, context: surface.context });
@@ -59,15 +62,14 @@ export class SceneManager implements Disposable {
     return { width: this.canvas.clientWidth, height: this.canvas.clientHeight };
   }
 
+  /** The sky behind the map; distant land fades into the same colour. */
   setBackdrop(color: Color): void {
-    this.fog = new Fog(color, 1, 2);
-    this.scene.background = color;
-    this.scene.fog = this.fog;
+    this.backdrop.copy(color);
+    this.fog.color.copy(color);
   }
 
   /** Haze begins behind the subject and thickens towards the horizon. */
   setHaze(near: number, far: number): void {
-    if (!this.fog) return;
     this.fog.near = near;
     this.fog.far = far;
   }

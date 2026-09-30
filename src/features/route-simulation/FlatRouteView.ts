@@ -4,7 +4,7 @@ import type { StopKind } from '@/domain/tour/Tour';
 import { mapData, ringsToSvgPath } from '@/features/map3d/MapData';
 import type { ViewPadding } from '@/shared/lifecycle';
 import { easeLeg } from './RouteSimulation';
-import type { RouteView } from './RouteView';
+import type { RouteView, TimeOfDay } from './RouteView';
 
 interface Box {
   x: number;
@@ -41,6 +41,8 @@ export class FlatRouteView implements RouteView {
   private readonly root = svg('svg', { class: 'flat-map', 'aria-hidden': 'true' });
   private readonly routeLayer = svg('g');
   private readonly coach = svg('circle', { class: 'flat-map__coach' });
+  /** A warm wash over the map that fades in at dusk. */
+  private readonly dusk = document.createElement('div');
   private readonly callbacks = new Set<(deltaSeconds: number) => void>();
   private readonly box: Box = { x: 0, y: 0, width: 1, height: 1 };
   private readonly wanted: Box = { x: 0, y: 0, width: 1, height: 1 };
@@ -66,7 +68,8 @@ export class FlatRouteView implements RouteView {
       svg('path', { class: 'flat-map__lake', d: ringsToSvgPath(Object.values(mapData.lakes)) }),
       this.routeLayer,
     );
-    host.append(this.root);
+    this.dusk.className = 'flat-map__dusk';
+    host.append(this.root, this.dusk);
   }
 
   showRoute(plan: RoutePlan): void {
@@ -177,6 +180,10 @@ export class FlatRouteView implements RouteView {
     });
   }
 
+  setTimeOfDay(time: TimeOfDay): void {
+    this.dusk.dataset['on'] = String(time === 'dusk');
+  }
+
   setPadding(padding: ViewPadding): void {
     this.padding = padding;
   }
@@ -196,6 +203,7 @@ export class FlatRouteView implements RouteView {
     this.frameHandle = 0;
     this.callbacks.clear();
     this.root.remove();
+    this.dusk.remove();
   }
 
   /** The map's size in pixels and the part of it that no panel covers. */

@@ -111,6 +111,21 @@
   background: #cfe4f2;
 }
 
+/* Evening on the flat map: a warm wash laid over it, faded with opacity alone. */
+.flat-map__dusk {
+  position: absolute;
+  inset: 0;
+  background: #e9a97d;
+  mix-blend-mode: multiply;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1200ms ease;
+}
+
+.flat-map__dusk[data-on='true'] {
+  opacity: 0.38;
+}
+
 .flat-map__neighbour {
   fill: #e9ece4;
 }

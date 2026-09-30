@@ -5,7 +5,7 @@ import { mapData, ringsContain } from './MapData';
 import { PEAKS } from './places';
 import { createRandom } from './random';
 import type { ToonKit } from './ToonKit';
-import { KM_PER_UNIT, toWorld } from './world';
+import { KM_PER_UNIT, LAND_TOP, toWorld } from './world';
 import type { Disposable, Updatable } from '@/shared/lifecycle';
 
 interface Placement {
@@ -73,6 +73,8 @@ const FOOTPRINT: Readonly<Record<Exclude<LandmarkKind, 'balloon'>, number>> = {
 const BALLOON_HOME: GeoCoordinates = { lat: 38.65, lon: 34.85 };
 const BALLOON_TINTS = ['#e4572e', '#f2b705', '#2a9d8f', '#0b5a8f', '#c0161c', '#f4a261', '#8e5ea2'];
 const KM_PER_DEGREE = 111;
+/** Height at which a landed balloon's basket touches the land. */
+const BALLOON_GROUND = LAND_TOP + 0.03;
 
 /** One kind of landmark, planted as instances of a single mesh. */
 interface Planting {
@@ -99,6 +101,7 @@ export class Scenery implements Disposable, Updatable {
   private readonly balloonMesh: InstancedMesh;
   private readonly dummy = new Object3D();
   private readonly random = createRandom(2026);
+  private balloonLift = 1;
 
   constructor(factory: LandmarkFactory, kit: ToonKit, density: number) {
     const material = kit.vertexColors();
@@ -165,14 +168,21 @@ export class Scenery implements Disposable, Updatable {
     this.update(0, 0);
   }
 
+  /** How high the balloons fly: 0 rests them on the ground, 1 is full height. */
+  setBalloonLift(lift: number): void {
+    this.balloonLift = lift;
+  }
+
   /** Balloons bob and sway slowly; everything else is static. */
   update(_deltaSeconds: number, elapsedSeconds: number): void {
+    const lift = this.balloonLift;
     this.balloons.forEach((balloon, index) => {
       const t = elapsedSeconds * 0.5 + balloon.phase;
+      // Near the ground the swaying dies down, so a landed balloon sits still.
       this.dummy.position.set(
-        balloon.x + Math.sin(t * 0.6) * 0.12,
-        bob(balloon.altitude, t),
-        balloon.z + Math.cos(t * 0.5) * 0.12,
+        balloon.x + Math.sin(t * 0.6) * 0.12 * lift,
+        BALLOON_GROUND + (bob(balloon.altitude, t) - BALLOON_GROUND) * lift,
+        balloon.z + Math.cos(t * 0.5) * 0.12 * lift,
       );
       this.dummy.rotation.set(0, t * 0.2, 0);
       this.dummy.scale.setScalar(balloon.scale);
