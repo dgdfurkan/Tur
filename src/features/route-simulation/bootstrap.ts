@@ -33,8 +33,11 @@ async function createView(root: HTMLElement, reducedMotion: boolean): Promise<Ro
       : openGraphics(canvas, { antialias: quality.antialias, allowSoftware: choice === '3d' });
   if (context) {
     try {
-      const { ThreeRouteView } = await import('@/features/map3d/ThreeRouteView');
-      const labels = required<HTMLElement>(stage, '[data-map-labels]');
+      const [{ ThreeRouteView }, { DomLabels }] = await Promise.all([
+        import('@/features/map3d/ThreeRouteView'),
+        import('@/features/map3d/DomLabels'),
+      ]);
+      const labels = new DomLabels(required<HTMLElement>(stage, '[data-map-labels]'));
       const view = await ThreeRouteView.create({ canvas, context, labels }, quality, reducedMotion);
       root.dataset['map'] = '3d';
       return view;

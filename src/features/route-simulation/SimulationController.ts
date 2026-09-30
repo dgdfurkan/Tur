@@ -66,7 +66,7 @@ export class SimulationController implements Disposable {
 
     view.showRoute(plan);
     view.setPadding(panel.padding());
-    view.showOverview(true);
+    view.showOverview({ immediate: true });
     view.onFrame((delta) => this.tick(delta));
     view.start();
 

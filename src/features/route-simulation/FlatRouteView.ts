@@ -3,8 +3,9 @@ import type { RoutePlan } from '@/domain/tour/RoutePlan';
 import type { StopKind } from '@/domain/tour/Tour';
 import { mapData, ringsToSvgPath } from '@/features/map3d/MapData';
 import type { ViewPadding } from '@/shared/lifecycle';
+import type { TimeOfDay } from '@/shared/timeOfDay';
 import { easeLeg } from './RouteSimulation';
-import type { RouteView, TimeOfDay } from './RouteView';
+import type { OverviewOptions, RouteView } from './RouteView';
 
 interface Box {
   x: number;
@@ -130,10 +131,10 @@ export class FlatRouteView implements RouteView {
     if (this.following) this.frame(point.x, point.y, this.followSpan);
   }
 
-  showOverview(immediate = false): void {
+  showOverview({ immediate = false, road = 'whole' }: OverviewOptions = {}): void {
     if (!this.plan) return;
     this.following = false;
-    this.wholeRoad = true;
+    this.wholeRoad = road === 'whole';
     const { minX, maxX, minY, maxY } = this.plan.bounds;
     const { freeWidth, freeHeight } = this.area;
     const span = Math.max(maxX - minX, (maxY - minY) * (freeWidth / freeHeight)) * 1.35 + 80;

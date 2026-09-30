@@ -2,8 +2,9 @@ import { MathUtils, Vector3 } from 'three';
 import type { RoutePlan } from '@/domain/tour/RoutePlan';
 import type { StopKind } from '@/domain/tour/Tour';
 import { easeLeg } from '@/features/route-simulation/RouteSimulation';
-import type { RouteView, TimeOfDay } from '@/features/route-simulation/RouteView';
+import type { OverviewOptions, RouteView } from '@/features/route-simulation/RouteView';
 import type { ViewPadding } from '@/shared/lifecycle';
+import type { TimeOfDay } from '@/shared/timeOfDay';
 import { BusModel } from './BusModel';
 import { DustTrail } from './DustTrail';
 import type { MapSurface } from './MapSurface';
@@ -134,10 +135,10 @@ export class ThreeRouteView implements RouteView {
     else this.dust.settle();
   }
 
-  showOverview(immediate = false): void {
+  showOverview({ immediate = false, road = 'whole' }: OverviewOptions = {}): void {
     if (!this.plan) return;
     this.following = false;
-    this.wholeRoad = true;
+    this.wholeRoad = road === 'whole';
     const { minX, maxX, minY, maxY } = this.plan.bounds;
     const halfWidth = (maxX - minX) / 2 / KM_PER_UNIT + OVERVIEW_MARGIN;
     const halfDepth = (maxY - minY) / 2 / KM_PER_UNIT + OVERVIEW_MARGIN;
@@ -213,6 +214,21 @@ export class ThreeRouteView implements RouteView {
 
   start(): void {
     this.world.start();
+  }
+
+  /** Gets the map ready to be drawn frame by frame, without starting a loop. */
+  async prepare(): Promise<void> {
+    await this.world.prepare();
+  }
+
+  /** Moves the map on by `deltaSeconds` and draws one frame. */
+  step(deltaSeconds: number): void {
+    this.world.step(deltaSeconds);
+  }
+
+  /** The canvas the map is drawn on. */
+  get canvas(): HTMLCanvasElement {
+    return this.world.canvas;
   }
 
   dispose(): void {

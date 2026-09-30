@@ -1,8 +1,13 @@
 import type { RoutePlan } from '@/domain/tour/RoutePlan';
 import type { Disposable, ViewPadding } from '@/shared/lifecycle';
+import type { TimeOfDay } from '@/shared/timeOfDay';
 
-/** Daylight on the map: evening falls where the coach stays the night. */
-export type TimeOfDay = 'day' | 'dusk';
+export interface OverviewOptions {
+  /** Jump straight to the view instead of gliding there. */
+  readonly immediate?: boolean;
+  /** How much of the road is drawn: all of it (the default), or only as far as the coach has come. */
+  readonly road?: 'whole' | 'travelled';
+}
 
 /**
  * What the simulation needs from a map, whatever draws it. The 3D scene and the
@@ -14,8 +19,8 @@ export interface RouteView extends Disposable {
   showRoute(plan: RoutePlan): void;
   /** Places the coach part-way along the leg that starts at `legIndex`. */
   setPosition(legIndex: number, legProgress: number): void;
-  /** Frames the whole route and draws all of its road, as on a printed map. */
-  showOverview(immediate?: boolean): void;
+  /** Frames the whole route; by default all of its road is drawn, as on a printed map. */
+  showOverview(options?: OverviewOptions): void;
   /** Keeps the coach in view while it travels along a leg; only the road behind it stays drawn. */
   followCoach(legIndex: number): void;
   /** Moves in on one stop; the road is drawn as far as the coach has come. */
