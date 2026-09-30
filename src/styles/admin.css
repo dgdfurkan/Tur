@@ -1,0 +1,179 @@
+/*
+ * Styles for the parts of the operations panel that are built at runtime
+ * (departure rows, passenger rows, seat options, meters).
+ */
+
+.panel-meter {
+  --level: var(--c-green);
+  display: grid;
+  gap: var(--space-2);
+}
+
+.panel-meter[data-level='limited'] {
+  --level: var(--c-yellow);
+}
+
+.panel-meter[data-level='full'] {
+  --level: var(--c-red);
+}
+
+.panel-meter__labels {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: var(--text-small);
+  font-variant-numeric: tabular-nums;
+}
+
+.panel-meter__labels span {
+  color: var(--c-muted);
+}
+
+.panel-meter__bar {
+  height: 0.375rem;
+  border-radius: 0.1875rem;
+  background: var(--c-line);
+  overflow: hidden;
+}
+
+.panel-meter__fill {
+  display: block;
+  height: 100%;
+  background: var(--level);
+  transform-origin: left;
+}
+
+.departure {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  background: var(--c-white);
+}
+
+.departure__head {
+  display: grid;
+  gap: 0.125rem;
+}
+
+.departure__head strong {
+  font-stretch: var(--wdth-sign);
+  font-size: 1.125rem;
+}
+
+.departure__head span,
+.departure__own {
+  color: var(--c-muted);
+  font-size: var(--text-small);
+}
+
+.seat-option {
+  cursor: pointer;
+}
+
+.seat-option span:not(.visually-hidden) {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 0.09375rem solid var(--c-green);
+  border-radius: 0.5rem;
+  background: var(--c-green-tint);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  transition:
+    transform var(--dur-press) var(--ease-out),
+    background-color var(--dur-ui) ease;
+}
+
+.seat-option:active span:not(.visually-hidden) {
+  transform: scale(0.94);
+}
+
+.seat-option input:checked + span {
+  border-color: var(--c-blue);
+  background: var(--c-blue);
+  color: var(--c-white);
+}
+
+.seat-option input:disabled + span {
+  border-color: var(--c-asphalt);
+  background: var(--c-asphalt);
+  color: rgb(255 255 255 / 0.6);
+  cursor: not-allowed;
+}
+
+.seat-option input:focus-visible + span {
+  outline: 3px solid var(--c-blue);
+  outline-offset: 2px;
+}
+
+.list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.list__row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-lg);
+  background: var(--c-white);
+}
+
+.list__seat {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.5rem;
+  background: var(--c-asphalt);
+  color: var(--c-white);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.list__person {
+  display: grid;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.list__person span {
+  color: var(--c-muted);
+  font-size: var(--text-small);
+  overflow-wrap: anywhere;
+}
+
+.list__remove {
+  min-height: 2.75rem;
+  padding: 0 var(--space-3);
+  border: 0.09375rem solid var(--c-line);
+  border-radius: var(--radius-md);
+  background: var(--c-white);
+  color: var(--c-red);
+  font-weight: 600;
+  font-size: var(--text-small);
+  cursor: pointer;
+}
+
+.list__remove:active {
+  background: var(--c-red-tint);
+}
+
+.list__empty {
+  padding: var(--space-5);
+  border: 0.09375rem dashed var(--c-line);
+  border-radius: var(--radius-lg);
+  color: var(--c-muted);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .list__remove:hover {
+    background: var(--c-red-tint);
+  }
+}

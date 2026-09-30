@@ -9,6 +9,10 @@ const links = [
   { href: pageUrl('turlar'), label: tr.nav.tours },
   { href: pageUrl('kurumsal'), label: tr.nav.corporate },
   { href: pageUrl('iletisim'), label: tr.nav.contact },
+  // The panel is linked only while the site is a prototype; the real panel sits behind a login.
+  ...(siteConfig.isPrototype
+    ? [{ href: pageUrl('yonetim'), label: `${tr.admin.title} (${tr.admin.demoBadge})` }]
+    : []),
 ];
 ---
 

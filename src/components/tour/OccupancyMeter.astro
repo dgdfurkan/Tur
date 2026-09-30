@@ -1,7 +1,6 @@
 ---
 import type { Occupancy } from '@/domain/tour/Occupancy';
-import { formatPercent } from '@/shared/format';
-import { tr } from '@/i18n/tr';
+import { occupancyText } from '@/shared/occupancyText';
 
 interface Props {
   occupancy: Occupancy;
@@ -10,13 +9,7 @@ interface Props {
 }
 
 const { occupancy, departureId } = Astro.props;
-
-const status =
-  occupancy.level === 'full'
-    ? tr.tour.soldOut
-    : occupancy.level === 'limited'
-      ? `Son ${occupancy.remaining} Koltuk`
-      : `${tr.tour.remainingSeats}: ${occupancy.remaining}`;
+const text = occupancyText(occupancy);
 ---
 
 <div
@@ -29,10 +22,10 @@ const status =
 >
   <div class="meter__labels">
     <span class="meter__percent tabular" data-occupancy-percent>
-      {`${tr.tour.occupancy} ${formatPercent(occupancy.ratio)}`}
+      {text.percent}
     </span>
     <span class="meter__status tabular" data-occupancy-status>
-      {status}
+      {text.status}
     </span>
   </div>
   <svg class="meter__bar" viewBox="0 0 100 4" preserveAspectRatio="none" aria-hidden="true">
@@ -103,3 +96,11 @@ const status =
     transition: width var(--dur-panel) var(--ease-out);
   }
 </style>
+
+<script>
+  import { syncOccupancy } from '@/features/occupancy-sync/syncOccupancy';
+  import { LocalPassengerRepository } from '@/infrastructure/storage/LocalPassengerRepository';
+  import { SafeStorage } from '@/infrastructure/storage/SafeStorage';
+
+  syncOccupancy(document, new LocalPassengerRepository(new SafeStorage()));
+</script>

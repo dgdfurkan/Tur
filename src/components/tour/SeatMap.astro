@@ -1,6 +1,7 @@
 ---
 import type { Departure } from '@/domain/tour/Departure';
 import { tr } from '@/i18n/tr';
+import { seatPlanLabel } from '@/shared/occupancyText';
 
 /** Top-down seating plan of the coach, front at the top. */
 interface Props {
@@ -21,7 +22,6 @@ const height = CAB + PAD + layout.rowCount * STEP;
 const seatX = (column: number): number => PAD + column * STEP;
 const seatY = (row: number): number => CAB + (row - 1) * STEP;
 const doorY = seatY(layout.doorRow);
-const label = `${tr.tour.seatStatus}: ${occupancy.capacity} koltuktan ${occupancy.booked} koltuk dolu, ${occupancy.remaining} koltuk boş.`;
 ---
 
 <figure class="seat-map">
@@ -29,9 +29,11 @@ const label = `${tr.tour.seatStatus}: ${occupancy.capacity} koltuktan ${occupanc
     class="seat-map__svg"
     viewBox={`0 0 ${width} ${height}`}
     role="img"
-    aria-label={label}
+    aria-label={seatPlanLabel(occupancy)}
     data-seat-map
     data-departure-id={departure.id}
+    data-capacity={occupancy.capacity}
+    data-booked={occupancy.booked}
   >
     <rect class="body" x="1" y="1" width={width - 2} height={height - 2} rx="22"></rect>
     <path class="windscreen" d={`M${PAD} 22 Q${width / 2} 6 ${width - PAD} 22`}></path>

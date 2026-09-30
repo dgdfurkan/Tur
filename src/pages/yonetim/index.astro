@@ -1,0 +1,599 @@
+---
+import BrandMark from '@/components/ui/BrandMark.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { loadTourSnapshots } from '@/composition/catalog';
+import { assetUrl, pageUrl } from '@/config/paths';
+import { PAYMENT_METHODS } from '@/domain/booking/Passenger';
+import { tr } from '@/i18n/tr';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import '@/styles/admin.css';
+
+// "<" is escaped so the JSON can never close its own script element.
+const toursJson = JSON.stringify(await loadTourSnapshots()).replaceAll('<', '\\u003c');
+const { admin } = tr;
+const deposits = [500, 1000, 2000];
+---
+
+<BaseLayout
+  title={admin.title}
+  description="Yolcu ve kapora kaydı, doluluk takibi ve sigorta listesi için demo panel."
+  chrome={false}
+>
+  <link slot="head" rel="manifest" href={assetUrl('manifest.webmanifest')} />
+
+  <div class="admin" data-admin data-view="ozet">
+    <script is:inline type="application/json" data-tours set:html={toursJson} />
+    <header class="admin__bar">
+      <a class="admin__brand" href={pageUrl()} aria-label={admin.backToSite}>
+        <BrandMark size={32} />
+      </a>
+      <span class="admin__title">{admin.title}</span>
+      <span class="admin__badge">{admin.demoBadge}</span>
+    </header>
+
+    <p class="admin__notice">{admin.notice}</p>
+
+    <div class="admin__body">
+      <section class="panel" data-panel="ozet" aria-labelledby="ozet-baslik">
+        <h1 id="ozet-baslik" tabindex="-1">
+          {admin.tabs.summary}
+        </h1>
+        <dl class="stats">
+          <div class="stat">
+            <dt>{admin.stats.departures}</dt>
+            <dd data-stat="departures">0</dd>
+          </div>
+          <div class="stat">
+            <dt>{admin.stats.passengers}</dt>
+            <dd data-stat="passengers">0</dd>
+          </div>
+          <div class="stat">
+            <dt>{admin.stats.deposits}</dt>
+            <dd data-stat="deposits">₺0</dd>
+          </div>
+          <div class="stat">
+            <dt>{admin.stats.freeSeats}</dt>
+            <dd data-stat="free-seats">0</dd>
+          </div>
+        </dl>
+
+        <h2>{admin.upcoming}</h2>
+        <ul class="departures" data-departures></ul>
+
+        <div class="tools">
+          <button class="button button--secondary" type="button" data-action="samples">
+            {admin.loadSamples}
+          </button>
+          <button class="button button--quiet" type="button" data-action="reset">
+            {admin.reset}
+          </button>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="ekle" aria-labelledby="ekle-baslik">
+        <h1 id="ekle-baslik" tabindex="-1">
+          {admin.tabs.add}
+        </h1>
+        <form class="form" data-form novalidate>
+          <div class="field">
+            <label for="f-departure">{admin.form.departure}</label>
+            <select id="f-departure" name="departureId" aria-describedby="e-departure"></select>
+            <p class="field__error" id="e-departure" data-error-for="departureId"></p>
+          </div>
+
+          <div class="field">
+            <label for="f-name">{admin.form.fullName}</label>
+            <input
+              id="f-name"
+              name="fullName"
+              type="text"
+              autocomplete="off"
+              autocapitalize="words"
+              enterkeyhint="next"
+              aria-describedby="e-name"
+            />
+            <p class="field__error" id="e-name" data-error-for="fullName"></p>
+          </div>
+
+          <div class="field">
+            <label for="f-phone">{admin.form.phone}</label>
+            <input
+              id="f-phone"
+              name="phone"
+              type="tel"
+              inputmode="tel"
+              autocomplete="off"
+              enterkeyhint="next"
+              aria-describedby="h-phone e-phone"
+            />
+            <p class="field__hint" id="h-phone">
+              {admin.form.phoneHint}
+            </p>
+            <p class="field__error" id="e-phone" data-error-for="phone"></p>
+          </div>
+
+          <fieldset class="field">
+            <legend>{admin.form.seat}</legend>
+            <p class="field__hint">{admin.form.seatHint}</p>
+            <div class="seat-picker">
+              <p class="seat-picker__front">{tr.tour.front}</p>
+              <div class="seat-picker__grid" data-seat-picker></div>
+            </div>
+            <p class="field__error" data-error-for="seatNumber"></p>
+          </fieldset>
+
+          <div class="field">
+            <label for="f-deposit">{admin.form.deposit}</label>
+            <input
+              id="f-deposit"
+              name="depositLira"
+              type="text"
+              inputmode="decimal"
+              autocomplete="off"
+              enterkeyhint="done"
+              aria-describedby="e-deposit"
+            />
+            <div class="quick">
+              {deposits.map((amount) => (
+                <button class="quick__chip" type="button" data-deposit={amount}>
+                  {amount.toLocaleString('tr-TR')}
+                </button>
+              ))}
+            </div>
+            <p class="field__error" id="e-deposit" data-error-for="depositLira"></p>
+          </div>
+
+          <fieldset class="field">
+            <legend>{admin.form.paymentMethod}</legend>
+            <div class="choices">
+              {PAYMENT_METHODS.map((method, index) => (
+                <label class="choice">
+                  <input
+                    class="visually-hidden"
+                    type="radio"
+                    name="paymentMethod"
+                    value={method}
+                    checked={index === 0}
+                  />
+                  <span>{admin.paymentMethods[method]}</span>
+                </label>
+              ))}
+            </div>
+            <p class="field__error" data-error-for="paymentMethod"></p>
+          </fieldset>
+
+          <div class="field">
+            <label for="f-note">{admin.form.note}</label>
+            <textarea
+              id="f-note"
+              name="note"
+              rows="2"
+              maxlength="200"
+              aria-describedby="h-note"
+            ></textarea>
+            <p class="field__hint" id="h-note">
+              {admin.form.noteHint}
+            </p>
+          </div>
+
+          <button class="button button--primary button--block" type="submit">
+            {admin.form.submit}
+          </button>
+        </form>
+      </section>
+
+      <section class="panel" data-panel="liste" aria-labelledby="liste-baslik">
+        <h1 id="liste-baslik" tabindex="-1">
+          {admin.tabs.list}
+        </h1>
+        <div class="field">
+          <label for="l-departure">{admin.form.departure}</label>
+          <select id="l-departure" data-list-select></select>
+        </div>
+        <div data-list></div>
+        <div class="tools">
+          <button class="button button--primary" type="button" data-action="export">
+            <Icon name="download" />
+            <span>{admin.list.export}</span>
+          </button>
+        </div>
+        <p class="field__hint">{admin.list.exportNote}</p>
+      </section>
+    </div>
+
+    <nav class="tabs" aria-label="Panel Bölümleri">
+      <button class="tab" type="button" data-tab="ozet" aria-current="page">
+        <Icon name="chart" size={22} />
+        <span>{admin.tabs.summary}</span>
+      </button>
+      <button class="tab" type="button" data-tab="ekle">
+        <Icon name="plus" size={22} />
+        <span>{admin.tabs.add}</span>
+      </button>
+      <button class="tab" type="button" data-tab="liste">
+        <Icon name="list" size={22} />
+        <span>{admin.tabs.list}</span>
+      </button>
+    </nav>
+
+    <div class="toast" data-toast data-visible="false" role="status" aria-live="polite">
+      <span data-toast-text></span>
+      <button class="toast__action" type="button" data-toast-action hidden></button>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .admin {
+    --tabs-height: 4.25rem;
+    min-height: 100dvh;
+    padding-bottom: calc(var(--tabs-height) + env(safe-area-inset-bottom, 0px));
+    background: var(--c-mist);
+  }
+
+  .admin__bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: calc(var(--space-3) + env(safe-area-inset-top, 0px)) var(--gutter) var(--space-3);
+    background: var(--c-white);
+  }
+
+  .admin__brand {
+    display: inline-flex;
+    border-radius: var(--radius-md);
+  }
+
+  .admin__title {
+    font-stretch: var(--wdth-heading);
+    font-size: 1.25rem;
+    font-weight: 750;
+  }
+
+  .admin__badge {
+    margin-left: auto;
+    padding: 0.125rem var(--space-3);
+    border-radius: var(--radius-sm);
+    background: var(--c-yellow);
+    font-size: var(--text-small);
+    font-weight: 700;
+  }
+
+  .admin__notice {
+    padding: var(--space-3) var(--gutter);
+    background: var(--c-yellow-tint);
+    font-size: var(--text-small);
+  }
+
+  .admin__body {
+    width: 100%;
+    max-width: 44rem;
+    margin-inline: auto;
+    padding: var(--space-5) var(--gutter) var(--space-7);
+  }
+
+  .panel {
+    display: none;
+    gap: var(--space-5);
+  }
+
+  .admin[data-view='ozet'] [data-panel='ozet'],
+  .admin[data-view='ekle'] [data-panel='ekle'],
+  .admin[data-view='liste'] [data-panel='liste'] {
+    display: grid;
+  }
+
+  .panel h1 {
+    font-size: var(--text-h2);
+    font-stretch: var(--wdth-display);
+  }
+
+  .panel h1:focus {
+    outline: none;
+  }
+
+  .panel h2 {
+    font-size: var(--text-h3);
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+    margin: 0;
+  }
+
+  .stat {
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    background: var(--c-white);
+  }
+
+  .stat dt {
+    color: var(--c-muted);
+    font-size: var(--text-small);
+  }
+
+  .stat dd {
+    margin: var(--space-1) 0 0;
+    font-stretch: var(--wdth-heading);
+    font-size: 1.75rem;
+    font-weight: 750;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+
+  .departures {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: 3rem;
+    padding: 0 var(--space-5);
+    border: 0.09375rem solid transparent;
+    border-radius: var(--radius-md);
+    font-stretch: var(--wdth-sign);
+    font-weight: 650;
+    cursor: pointer;
+    transition:
+      transform var(--dur-press) var(--ease-out),
+      background-color var(--dur-ui) ease;
+  }
+
+  .button:active {
+    transform: scale(0.97);
+  }
+
+  .button--primary {
+    background: var(--c-blue);
+    color: var(--c-white);
+  }
+
+  .button--secondary {
+    border-color: var(--c-asphalt);
+    background: var(--c-white);
+  }
+
+  .button--quiet {
+    border-color: var(--c-line);
+    background: transparent;
+    color: var(--c-red);
+  }
+
+  .button--block {
+    width: 100%;
+    min-height: 3.5rem;
+  }
+
+  .form {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .field {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .field label,
+  .field legend {
+    padding: 0;
+    font-weight: 650;
+  }
+
+  .field input[type='text'],
+  .field input[type='tel'],
+  .field select,
+  .field textarea {
+    width: 100%;
+    min-height: 3rem;
+    padding: var(--space-3) var(--space-4);
+    border: 0.09375rem solid var(--c-line);
+    border-radius: var(--radius-md);
+    background: var(--c-white);
+  }
+
+  .field [aria-invalid='true'] {
+    border-color: var(--c-red);
+  }
+
+  .field__hint {
+    color: var(--c-muted);
+    font-size: var(--text-small);
+  }
+
+  .field__error {
+    color: var(--c-red);
+    font-size: var(--text-small);
+    font-weight: 600;
+  }
+
+  .field__error:empty {
+    display: none;
+  }
+
+  .seat-picker {
+    justify-self: start;
+    padding: var(--space-3) var(--space-4) var(--space-4);
+    border: 0.125rem solid var(--c-asphalt);
+    border-radius: 1.5rem 1.5rem 1rem 1rem;
+    background: var(--c-white);
+  }
+
+  .seat-picker__front {
+    margin-bottom: var(--space-3);
+    color: var(--c-muted);
+    font-size: var(--text-caption);
+    text-align: center;
+  }
+
+  .seat-picker__grid {
+    display: grid;
+    grid-auto-columns: 2.75rem;
+    grid-auto-rows: 2.75rem;
+    gap: 0.375rem;
+  }
+
+  .quick,
+  .choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .quick__chip,
+  .choice span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 var(--space-4);
+    border: 0.09375rem solid var(--c-line);
+    border-radius: var(--radius-md);
+    background: var(--c-white);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: transform var(--dur-press) var(--ease-out);
+  }
+
+  .quick__chip:active,
+  .choice span:active {
+    transform: scale(0.97);
+  }
+
+  .choice input:checked + span {
+    border-color: var(--c-blue);
+    background: var(--c-blue);
+    color: var(--c-white);
+  }
+
+  .choice input:focus-visible + span {
+    outline: 3px solid var(--c-blue);
+    outline-offset: 3px;
+  }
+
+  .tabs {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--z-sticky);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    border-top: 1px solid var(--c-line);
+    background: var(--c-white);
+  }
+
+  .tab {
+    display: grid;
+    justify-items: center;
+    gap: 0.125rem;
+    min-height: var(--tabs-height);
+    padding: var(--space-2);
+    border: 0;
+    background: transparent;
+    color: var(--c-muted);
+    font-size: var(--text-caption);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .tab[aria-current='page'] {
+    color: var(--c-blue);
+    box-shadow: inset 0 0.1875rem 0 var(--c-blue);
+  }
+
+  .tab:focus-visible {
+    outline-offset: -3px;
+  }
+
+  .toast {
+    position: fixed;
+    left: var(--gutter);
+    right: var(--gutter);
+    bottom: calc(var(--tabs-height) + env(safe-area-inset-bottom, 0px) + var(--space-3));
+    z-index: var(--z-toast);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    max-width: 28rem;
+    margin-inline: auto;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--c-asphalt);
+    box-shadow: var(--shadow-2);
+    color: var(--c-white);
+    opacity: 0;
+    transform: translateY(100%);
+    pointer-events: none;
+    transition:
+      opacity var(--dur-ui) ease,
+      transform var(--dur-panel) var(--ease-drawer);
+  }
+
+  .toast[data-visible='true'] {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+
+  .toast__action {
+    flex: none;
+    min-height: 2.75rem;
+    padding: 0 var(--space-3);
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--c-yellow);
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .toast :focus-visible {
+    outline-color: var(--c-white);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .button--primary:hover {
+      background: var(--c-blue-deep);
+    }
+
+    .button--secondary:hover,
+    .quick__chip:hover {
+      background: var(--c-mist);
+    }
+
+    .tab:hover {
+      color: var(--c-asphalt);
+    }
+  }
+
+  @media (min-width: 40rem) {
+    .stats {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+</style>
+
+<script>
+  import { mountAdmin } from '@/features/admin/bootstrap';
+
+  const root = document.querySelector<HTMLElement>('[data-admin]');
+  if (root) mountAdmin(root);
+</script>
