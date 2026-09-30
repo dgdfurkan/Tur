@@ -4,12 +4,13 @@ Bu depodaki özgün kod ve içerik `LICENSE` dosyasındaki koşullara tabidir. A
 
 ## Çalışma Zamanı Kütüphaneleri
 
-| Bileşen                         | Lisans                                                     | Not                                                         |
-| ------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------- |
-| [Astro](https://astro.build)    | MIT                                                        | Statik site üretimi                                         |
-| [three.js](https://threejs.org) | MIT                                                        | 3D harita ve simülasyon                                     |
-| [GSAP](https://gsap.com)        | [GSAP Standard License](https://gsap.com/standard-license) | Ücretsizdir; açık kaynak lisansı değildir                   |
-| Yazı tipleri                    | SIL Open Font License 1.1                                  | Fontsource paketlerinden alınır, kendi sunucumuzdan sunulur |
+| Bileşen                              | Lisans                                                     | Not                                                                                                          |
+| ------------------------------------ | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| [Astro](https://astro.build)         | MIT                                                        | Statik site üretimi                                                                                          |
+| [three.js](https://threejs.org)      | MIT                                                        | 3D harita ve simülasyon                                                                                      |
+| [GSAP](https://gsap.com)             | [GSAP Standard License](https://gsap.com/standard-license) | Ücretsizdir; açık kaynak lisansı değildir                                                                    |
+| [Mediabunny](https://mediabunny.dev) | MPL-2.0                                                    | Video stüdyosunda MP4 dosyasını oluşturur; yalnızca panelde yüklenir. Kaynak kodu değiştirilmeden kullanılır |
+| Yazı tipleri                         | SIL Open Font License 1.1                                  | Fontsource paketlerinden alınır, kendi sunucumuzdan sunulur                                                  |
 
 ## Harita Verisi
 

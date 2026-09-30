@@ -4,13 +4,14 @@ Ankara çıkışlı turlar için tanıtım sitesi, 3D rota simülasyonu ve demo 
 
 ## Komutlar
 
-| Komut               | İş                                                                             |
-| ------------------- | ------------------------------------------------------------------------------ |
-| `npm run dev`       | Geliştirme sunucusu (`http://localhost:4321/Tur/`)                             |
-| `npm run verify`    | `check` + `lint` + `test` + `build`; her teslimden önce çalıştırılır           |
-| `npm run test:e2e`  | Playwright; derlenmiş siteyi 4329 portunda sunar, önce `npm run build` gerekir |
-| `npm run format`    | Prettier                                                                       |
-| `npm run map:build` | Harita verisini `world-atlas` kaynağından yeniden üretir                       |
+| Komut                | İş                                                                                  |
+| -------------------- | ----------------------------------------------------------------------------------- |
+| `npm run dev`        | Geliştirme sunucusu (`http://localhost:4321/Tur/`)                                  |
+| `npm run verify`     | `check` + `lint` + `test` + `build`; her teslimden önce çalıştırılır                |
+| `npm run test:e2e`   | Test sürümünü `dist-e2e/` klasörüne derler ve Playwright'ı 4329 portunda çalıştırır |
+| `npm run format`     | Prettier                                                                            |
+| `npm run map:build`  | Harita verisini `world-atlas` kaynağından yeniden üretir                            |
+| `npm run panel:code` | Operasyon panelinin erişim kodunu değiştirir                                        |
 
 Astro 7, bir yapay zekâ ajanı algıladığında `dev` ve `preview` sunucusunu arka plana alır. Ön planda tutmak için `--ignore-lock` kullanılır (`.claude/launch.json` ve `playwright.config.ts` böyle ayarlıdır). Arka planda kalan sunucu `npx astro dev stop` veya `npx astro preview stop` ile durdurulur.
 
@@ -45,6 +46,8 @@ Kullanıcıya görünen her Türkçe metin `.claude/skills/turkce-icerik-standar
 - three.js yalnızca gereken sayfada ve lazy yüklenir; tuval görünmezken veya sekme gizliyken çizim döngüsü durur.
 - 3D harita yalnızca grafik işlemcisiyle çizim yapan cihazlarda açılır; diğerlerinde düz SVG harita kullanılır (`src/shared/webgl.ts`). `?harita=3b` ve `?harita=duz` haritayı elle seçer. Başsız tarayıcı yazılımla çizer; 3D yolunu görmek için parametre veya `--use-angle=metal` gerekir.
 - Haritaya eklenen her davranış `RouteView` arayüzünden geçer ve iki uygulamada da (`ThreeRouteView`, `FlatRouteView`) karşılanır.
+- Kaydırmaya bağlı CSS animasyonları `animation` kısaltmasıyla yazılmaz; `animation-name`, `animation-timeline` gibi uzun adlar kullanılır. Küçültücü zaman çizelgesini kısaltmaya katar ve tarayıcı kuralı yok sayar (`tests/e2e/motion.spec.ts`).
+- Kaydırıldıkça gelen içerik `data-reveal` özniteliğiyle işaretlenir; başlangıç hâli yalnızca ekranda, betik çalışırken ve hareket tercih edilirken uygulanır.
 - Bütçe: ilk JS (3D hariç) ≤ 30 KB gz, CSS ≤ 30 KB gz, 3D parçası ≤ 250 KB gz; LCP < 2 sn, CLS < 0,05, INP < 150 ms.
 
 ## Güvenlik ve Veri Kuralları
@@ -53,6 +56,8 @@ Kullanıcıya görünen her Türkçe metin `.claude/skills/turkce-icerik-standar
 - Dinamik veri DOM'a `textContent` ile yazılır; `innerHTML` kullanılmaz. CSP, Trusted Types'ı politikasız olarak zorunlu kılar; `innerHTML`, `eval` ve benzerleri çalışma anında hata verir.
 - Üçüncü taraf istek, analitik ve CDN yoktur; yazı tipleri kendi sunucumuzdan gelir.
 - Repo herkese açıktır. Gerçek kişisel veri, parola, anahtar veya iş ortaklarına dair iç bilgi commit'lenmez. Panel yalnızca demo verisi tutar; localStorage anahtarları `tur-demo:v1:` önekiyle başlar.
+- Panelin erişim kodu depoya yazılmaz; `npm run panel:code` yalnızca parmak izini (`src/config/panel-lock.json`) günceller. Üretilen kodun yazıldığı `erisim-kodu.txt` depoya eklenmez. Testler yalnızca `--mode e2e` derlemesinin tanıdığı herkese açık test kodunu kullanır.
+- Panele ve video stüdyosuna sitenin hiçbir sayfasından bağlantı verilmez.
 - Tüm sayfalar `noindex` taşır; site gerçek içerikle yayına alınırken kaldırılır.
 
 ## Skill Kullanımı
