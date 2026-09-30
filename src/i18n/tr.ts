@@ -6,6 +6,7 @@
 export const tr = {
   nav: {
     label: 'Ana Menü',
+    footerLabel: 'Alt Bilgi Menüsü',
     tours: 'Turlar',
     corporate: 'Kurumsal',
     contact: 'İletişim',

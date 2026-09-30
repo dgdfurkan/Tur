@@ -1,6 +1,7 @@
 ---
 import DistanceSign from '@/components/home/DistanceSign.astro';
 import ServiceSign from '@/components/home/ServiceSign.astro';
+import Skyline from '@/components/home/Skyline.astro';
 import TourMap from '@/components/home/TourMap.astro';
 import TourTicket from '@/components/tour/TourTicket.astro';
 import Button from '@/components/ui/Button.astro';
@@ -65,6 +66,7 @@ const services = [
         <p class="hero__caption">Mesafeler Ankara'dan itibaren kilometre cinsindendir.</p>
       </div>
     </div>
+    <Skyline />
   </section>
 
   <section class="section section--mist" aria-labelledby="yaklasan-turlar">
@@ -129,7 +131,14 @@ const services = [
 
 <style>
   .hero {
-    padding-block: clamp(2.5rem, 1rem + 6vw, 6rem) clamp(1rem, 4vw, 3rem);
+    padding-top: clamp(2.5rem, 1rem + 6vw, 6rem);
+    overflow: hidden;
+  }
+
+  /* The skyline stands on the section below, so nothing may separate them. */
+  .hero :global(.skyline) {
+    margin-top: var(--space-5);
+    margin-bottom: -1px;
   }
 
   .hero__inner {
@@ -243,9 +252,12 @@ const services = [
       justify-items: end;
     }
 
+    /* The posts pass on either side of the caption. */
     .hero__caption {
       width: 100%;
       max-width: 32rem;
+      margin-top: var(--space-4);
+      padding-inline: 22%;
     }
 
     .corporate__inner {

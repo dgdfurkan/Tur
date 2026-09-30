@@ -127,7 +127,7 @@ const facts = [
                 <div>
                   <h3>{hotel.name}</h3>
                   <p>{`${hotel.location}, ${hotel.nights} ${tr.tour.nightsUnit}, ${hotel.board}`}</p>
-                  <p class="hotel__stars" aria-label={`${hotel.stars} yıldızlı`}>
+                  <p class="hotel__stars" role="img" aria-label={`${hotel.stars} yıldızlı`}>
                     {Array.from({ length: hotel.stars }, () => (
                       <Icon name="star" size={16} />
                     ))}
@@ -230,7 +230,6 @@ const facts = [
       inset 0 0 0 0.46875rem var(--c-white),
       var(--shadow-sign);
     color: var(--c-white);
-    view-transition-name: tour-plate;
   }
 
   .tour-head h1 {

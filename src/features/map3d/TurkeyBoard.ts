@@ -9,9 +9,8 @@ import {
   SRGBColorSpace,
   type BufferGeometry,
 } from 'three';
-import { LandTexture } from './LandTexture';
+import type { LandTexture } from './LandTexture';
 import type { MapData, Ring } from './MapData';
-import { SeaTexture } from './SeaTexture';
 import type { ToonKit } from './ToonKit';
 import { KM_PER_UNIT, LAND_TOP } from './world';
 import type { Disposable } from '@/shared/lifecycle';
@@ -41,8 +40,10 @@ function layFlat<T extends BufferGeometry>(geometry: T): T {
   return geometry;
 }
 
-export interface BoardOptions {
-  readonly texturePixels: number;
+/** The two paintings the board wears; they are made beforehand so the work can be spread out. */
+export interface BoardTextures {
+  readonly surroundings: HTMLCanvasElement;
+  readonly land: LandTexture;
   readonly anisotropy: number;
 }
 
@@ -58,7 +59,7 @@ export class TurkeyBoard implements Disposable {
   private readonly seaMaterial: MeshBasicMaterial;
   private readonly surroundingsMaterial: MeshBasicMaterial;
 
-  constructor(data: MapData, kit: ToonKit, options: BoardOptions) {
+  constructor(data: MapData, kit: ToonKit, textures: BoardTextures) {
     this.seaMaterial = new MeshBasicMaterial({ color: SEA_COLOR });
     const sea = new Mesh(this.track(new PlaneGeometry(SEA_SIZE, SEA_SIZE)), this.seaMaterial);
     sea.rotation.x = -Math.PI / 2;
@@ -66,10 +67,7 @@ export class TurkeyBoard implements Disposable {
 
     // Neighbouring land and the coastal shallows are a painting laid on the sea.
     const { bounds } = data;
-    const surroundings = this.texture(
-      new SeaTexture(data, bounds, options.texturePixels).canvas,
-      options.anisotropy,
-    );
+    const surroundings = this.texture(textures.surroundings, textures.anisotropy);
     this.surroundingsMaterial = new MeshBasicMaterial({ map: surroundings });
     const frame = new Mesh(
       this.track(
@@ -88,8 +86,8 @@ export class TurkeyBoard implements Disposable {
     );
     this.group.add(frame);
 
-    const land = new LandTexture(data, options.texturePixels);
-    const landTexture = this.texture(land.canvas, options.anisotropy);
+    const { land } = textures;
+    const landTexture = this.texture(land.canvas, textures.anisotropy);
     // ExtrudeGeometry writes the cap's UVs in shape units; map them onto the painting.
     const width = land.extent.width / KM_PER_UNIT;
     const height = land.extent.height / KM_PER_UNIT;
@@ -133,6 +131,11 @@ export class TurkeyBoard implements Disposable {
     texture.anisotropy = anisotropy;
     this.textures.push(texture);
     return texture;
+  }
+
+  /** The textures, for uploading to the GPU ahead of the first frame. */
+  get paintings(): readonly CanvasTexture[] {
+    return this.textures;
   }
 
   private track<T extends BufferGeometry>(geometry: T): T {

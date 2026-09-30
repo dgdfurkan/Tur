@@ -166,4 +166,19 @@ const { tours } = Astro.props;
       background: rgb(255 255 255 / 0.12);
     }
   }
+
+  /*
+   * Beside the headline the sign has room to stand: the posts run down to the
+   * skyline at the foot of the hero, which clips whatever extends past it.
+   */
+  @media (min-width: 60rem) {
+    .posts {
+      position: absolute;
+      top: calc(100% - 0.5rem);
+      left: 18%;
+      right: 18%;
+      height: 100vh;
+      margin: 0;
+    }
+  }
 </style>

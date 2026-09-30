@@ -1,4 +1,4 @@
-import { Fog, PerspectiveCamera, Scene, WebGLRenderer, type Color } from 'three';
+import { Fog, PerspectiveCamera, Scene, WebGLRenderer, type Color, type Texture } from 'three';
 import { lowerQuality, type QualityProfile } from './QualityProfile';
 import type { Disposable, Updatable } from '@/shared/lifecycle';
 
@@ -68,6 +68,16 @@ export class SceneManager implements Disposable {
     if (!this.fog) return;
     this.fog.near = near;
     this.fog.far = far;
+  }
+
+  /** Sends a texture to the GPU now rather than in the middle of the first frame. */
+  upload(texture: Texture): void {
+    this.renderer.initTexture(texture);
+  }
+
+  /** Compiles every shader the scene needs without blocking, so the first frame is cheap. */
+  async compile(): Promise<void> {
+    await this.renderer.compileAsync(this.scene, this.camera);
   }
 
   add(updatable: Updatable): void {

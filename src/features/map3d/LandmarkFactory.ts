@@ -61,7 +61,8 @@ function buildPeak(): BufferGeometry {
     position.setX(i, position.getX(i) + offset[0]);
     position.setZ(i, position.getZ(i) + offset[1]);
   }
-  return facet(cone, (_x, y) => (y > 0.72 ? '#ffffff' : y > 0.34 ? '#a3987f' : '#8fa371'));
+  // The foot is the colour of dry earth so the mountain grows out of the land it stands on.
+  return facet(cone, (_x, y) => (y > 0.72 ? '#ffffff' : y > 0.34 ? '#a3987f' : '#c6b68c'));
 }
 
 function buildPine(): BufferGeometry {

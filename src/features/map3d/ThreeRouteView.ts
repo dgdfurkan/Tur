@@ -30,7 +30,6 @@ const HEADING_RESPONSE = 7;
 
 /** The 3D map as a route view: draws one tour's road, stops and coach on the shared world. */
 export class ThreeRouteView implements RouteView {
-  private readonly world: MapWorld;
   private readonly bus: BusModel;
   private readonly position = new Vector3();
   private readonly direction = new Vector3();
@@ -47,13 +46,19 @@ export class ThreeRouteView implements RouteView {
   private followDistance = MIN_FOLLOW_DISTANCE;
   private activeLabel: string | undefined;
 
-  constructor(
+  /** Builds the map in stages; resolves when the first frame can be drawn cheaply. */
+  static async create(
     canvas: HTMLCanvasElement,
     labelContainer: HTMLElement,
     quality: QualityProfile,
     reducedMotion = false,
-  ) {
-    this.world = new MapWorld(canvas, labelContainer, quality, reducedMotion);
+  ): Promise<ThreeRouteView> {
+    return new ThreeRouteView(
+      await MapWorld.create(canvas, labelContainer, quality, reducedMotion),
+    );
+  }
+
+  private constructor(private readonly world: MapWorld) {
     this.bus = new BusModel(this.world.kit);
     this.bus.group.visible = false;
     this.world.scene.add(this.bus.group);

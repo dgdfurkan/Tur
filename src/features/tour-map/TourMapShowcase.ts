@@ -29,20 +29,29 @@ const PARKED_FRACTION = 0.3;
  * each. Selecting a tour brings its road forward and frames it.
  */
 export class TourMapShowcase implements Disposable {
-  private readonly world: MapWorld;
   private readonly routes = new Map<string, ShowcaseRoute>();
   private readonly position = new Vector3();
   private readonly direction = new Vector3();
   private markers: StopMarkers | undefined;
   private selected: string | null = null;
 
-  constructor(
+  /** Builds the map in stages; resolves when the first frame can be drawn cheaply. */
+  static async create(
     canvas: HTMLCanvasElement,
     labelContainer: HTMLElement,
     quality: QualityProfile,
+    reducedMotion: boolean,
+  ): Promise<TourMapShowcase> {
+    return new TourMapShowcase(
+      await MapWorld.create(canvas, labelContainer, quality, reducedMotion),
+      reducedMotion,
+    );
+  }
+
+  private constructor(
+    private readonly world: MapWorld,
     private readonly reducedMotion: boolean,
   ) {
-    this.world = new MapWorld(canvas, labelContainer, quality, reducedMotion);
     this.world.rig.moveTo(this.world.overviewPose(), true);
     this.world.onFrame((_delta, elapsed) => this.animate(elapsed));
   }

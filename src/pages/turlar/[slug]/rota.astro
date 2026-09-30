@@ -5,6 +5,7 @@ import Icon from '@/components/ui/Icon.astro';
 import { loadTourSnapshots, tourCatalog } from '@/composition/catalog';
 import { pageUrl } from '@/config/paths';
 import type { Tour } from '@/domain/tour/Tour';
+import { routeSummary } from '@/features/route-simulation/routeSummary';
 import { tr } from '@/i18n/tr';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { formatDuration, todayIso } from '@/shared/format';
@@ -79,7 +80,9 @@ const days = tour.days.map((day) => ({
         <h1 class="card__title" data-card-title>
           {tr.route.heading}
         </h1>
-        <p class="card__text" data-card-text></p>
+        <p class="card__text" data-card-text>
+          {routeSummary(tour)}
+        </p>
         <p class="card__duration" data-card-duration hidden>
           <Icon name="clock" size={16} />
           <span data-card-duration-text></span>
@@ -168,6 +171,11 @@ const days = tour.days.map((day) => ({
   .route__static {
     position: absolute;
     inset: 0;
+  }
+
+  /* Shares its name with the map on the tour page, so one grows into the other. */
+  .route__stage {
+    view-transition-name: route-map;
   }
 
   .route__canvas {

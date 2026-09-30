@@ -5,12 +5,26 @@ export interface QualityProfile {
   readonly antialias: boolean;
   /** Share of decorative scenery (trees, hills) to place, 0 to 1. */
   readonly sceneryDensity: number;
+  /** Width in pixels of the painted map textures. */
+  readonly texturePixels: number;
 }
 
 const PROFILES = {
-  high: { name: 'high', pixelRatioCap: 2, antialias: true, sceneryDensity: 1 },
-  medium: { name: 'medium', pixelRatioCap: 1.5, antialias: true, sceneryDensity: 0.6 },
-  low: { name: 'low', pixelRatioCap: 1, antialias: false, sceneryDensity: 0.3 },
+  high: { name: 'high', pixelRatioCap: 2, antialias: true, sceneryDensity: 1, texturePixels: 2048 },
+  medium: {
+    name: 'medium',
+    pixelRatioCap: 1.5,
+    antialias: true,
+    sceneryDensity: 0.6,
+    texturePixels: 1536,
+  },
+  low: {
+    name: 'low',
+    pixelRatioCap: 1,
+    antialias: false,
+    sceneryDensity: 0.3,
+    texturePixels: 1024,
+  },
 } as const satisfies Record<string, QualityProfile>;
 
 interface DeviceHints {

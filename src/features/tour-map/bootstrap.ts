@@ -23,7 +23,7 @@ async function start(root: HTMLElement): Promise<void> {
   if (!response.ok) throw new Error(`Route outlines failed to load: ${response.status}`);
   const outlines = (await response.json()) as RouteOutline[];
 
-  const showcase = new TourMapShowcase(
+  const showcase = await TourMapShowcase.create(
     canvas,
     labels,
     detectQuality(),

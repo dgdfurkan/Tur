@@ -1,11 +1,11 @@
 import type { TourSnapshot } from '@/application/dto/TourData';
 import { toTour } from '@/application/tourMapper';
 import { RoutePlan } from '@/domain/tour/RoutePlan';
-import { tr } from '@/i18n/tr';
 import { SafeStorage } from '@/infrastructure/storage/SafeStorage';
-import { formatDuration, formatKm } from '@/shared/format';
+import { formatDuration } from '@/shared/format';
 import { supportsWebGL } from '@/shared/webgl';
 import { RouteSimulation } from './RouteSimulation';
+import { routeSummary } from './routeSummary';
 import type { RouteView } from './RouteView';
 import { SimulationController, type BoardingRitual } from './SimulationController';
 import { SimulationPanel } from './SimulationPanel';
@@ -26,7 +26,7 @@ async function createView(root: HTMLElement, reducedMotion: boolean): Promise<Ro
         import('@/features/map3d/ThreeRouteView'),
         import('@/features/map3d/QualityProfile'),
       ]);
-      return new ThreeRouteView(
+      return await ThreeRouteView.create(
         required<HTMLCanvasElement>(stage, '[data-map-canvas]'),
         required<HTMLElement>(stage, '[data-map-labels]'),
         detectQuality(),
@@ -68,7 +68,6 @@ export async function mountRouteSimulation(root: HTMLElement): Promise<void> {
   const tour = toTour(snapshot);
   const plan = RoutePlan.fromTour(tour);
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const summary = `${tour.sightCount} gezi noktası, ${tr.tour.approximately} ${formatKm(tour.routeDistanceKm)} yol.`;
 
   const view = await createView(root, reducedMotion);
   const sound = new SoundManager(new SafeStorage());
@@ -79,7 +78,11 @@ export async function mountRouteSimulation(root: HTMLElement): Promise<void> {
     new SimulationPanel(root),
     lazyBoardingPass(required<HTMLElement>(root, '[data-boarding-pass]'), sound, reducedMotion),
     sound,
-    { duration: formatDuration(tour.nights, tour.dayCount), summary, stepMode: reducedMotion },
+    {
+      duration: formatDuration(tour.nights, tour.dayCount),
+      summary: routeSummary(tour),
+      stepMode: reducedMotion,
+    },
   );
   root.dataset['ready'] = 'true';
   if (reducedMotion) root.dataset['step'] = 'true';
