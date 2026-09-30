@@ -32,6 +32,7 @@ const deposits = [500, 1000, 2000];
     </header>
 
     <p class="admin__notice">{admin.notice}</p>
+    <p class="admin__framed">{admin.framed}</p>
 
     <div class="admin__body">
       <section class="panel" data-panel="ozet" aria-labelledby="ozet-baslik">
@@ -263,6 +264,21 @@ const deposits = [500, 1000, 2000];
     padding: var(--space-3) var(--gutter);
     background: var(--c-yellow-tint);
     font-size: var(--text-small);
+  }
+
+  /* Shown instead of the panel when another page has put it in a frame. */
+  .admin__framed {
+    display: none;
+    padding: var(--space-6) var(--gutter);
+    font-weight: 600;
+  }
+
+  .admin[data-framed] .admin__framed {
+    display: block;
+  }
+
+  .admin[data-framed] :is(.admin__body, .tabs) {
+    display: none;
   }
 
   .admin__body {
@@ -593,7 +609,10 @@ const deposits = [500, 1000, 2000];
 
 <script>
   import { mountAdmin } from '@/features/admin/bootstrap';
+  import { isFramed } from '@/shared/framing';
 
   const root = document.querySelector<HTMLElement>('[data-admin]');
-  if (root) mountAdmin(root);
+  // Inside someone else's frame a visitor could be tricked into pressing the panel's buttons.
+  if (root && isFramed()) root.dataset['framed'] = 'true';
+  else if (root) mountAdmin(root);
 </script>

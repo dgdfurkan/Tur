@@ -25,3 +25,31 @@ test('unknown addresses show the not-found page', async ({ page }) => {
   expect(response?.status()).toBe(404);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Aradığınız Sayfa Bulunamadı');
 });
+
+/**
+ * The Content Security Policy forbids inline script, and Trusted Types forbid
+ * turning text into markup. A breach of either shows up as a console error.
+ */
+const EVERY_PAGE = [
+  './',
+  './turlar/',
+  './turlar/kapadokya/',
+  './turlar/beypazari-gunubirlik/',
+  './turlar/kapadokya/rota/?harita=3b',
+  './turlar/kapadokya/rota/?harita=duz',
+  './kurumsal/',
+  './iletisim/',
+  './yonetim/',
+];
+
+for (const path of EVERY_PAGE) {
+  test(`${path} loads without console errors or policy violations`, async ({ page }) => {
+    const errors = trackErrors(page);
+    await page.goto(path);
+    await page.waitForLoadState('networkidle');
+    // Lazy parts announce themselves; where there is one, wait for it to finish starting.
+    const lazy = page.locator('[data-route-app], [data-admin]');
+    if ((await lazy.count()) > 0) await expect(lazy).toHaveAttribute('data-ready', 'true');
+    expectNoErrors(errors);
+  });
+}

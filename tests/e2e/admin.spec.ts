@@ -105,3 +105,22 @@ test('sample data loads and the demo can be reset', async ({ page }) => {
   await page.getByRole('button', { name: 'Demo Verilerini Sıfırla' }).click();
   await expect(page.locator('[data-stat="passengers"]')).toHaveText('0');
 });
+
+test('the panel refuses to run inside another page', async ({ page, baseURL }) => {
+  const panelUrl = new URL(PANEL, baseURL).href;
+  // A page that does not belong to the site and puts the panel in a frame.
+  const hostUrl = new URL('/cerceveleyen-sayfa', baseURL).href;
+  await page.route(hostUrl, (route) =>
+    route.fulfill({
+      contentType: 'text/html',
+      body: `<!doctype html><iframe src="${panelUrl}" width="400" height="700"></iframe>`,
+    }),
+  );
+  await page.goto(hostUrl);
+
+  const panel = page.frameLocator('iframe').locator('[data-admin]');
+  await expect(panel).toHaveAttribute('data-framed', 'true');
+  await expect(panel).not.toHaveAttribute('data-ready', 'true');
+  await expect(panel.getByText('başka bir sayfanın içinde')).toBeVisible();
+  await expect(panel.getByRole('button', { name: 'Demo Verilerini Sıfırla' })).toBeHidden();
+});

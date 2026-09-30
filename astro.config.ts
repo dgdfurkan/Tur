@@ -92,6 +92,9 @@ export default defineConfig({
         "frame-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
+        // Trusted Types with no policy allowed: text can never be turned into markup or script.
+        "require-trusted-types-for 'script'",
+        "trusted-types 'none'",
       ],
     },
   },
