@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const port = 4321;
+// Not the development port: the tests must run against the built site, never a dev server.
+const port = 4329;
 const basePath = process.env.BASE_PATH ?? '/Tur';
 
 export default defineConfig({
