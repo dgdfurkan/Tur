@@ -28,21 +28,21 @@
       "location": "Karahayıt",
       "stars": 4,
       "nights": 1,
-      "board": "Yarım Pansiyon"
+      "board": "yarım pansiyon"
     },
     {
       "name": "Deniz Manzaralı Otel",
       "location": "Kuşadası",
       "stars": 4,
       "nights": 1,
-      "board": "Yarım Pansiyon"
+      "board": "yarım pansiyon"
     },
     {
       "name": "Termal Otel",
       "location": "Afyonkarahisar",
       "stars": 5,
       "nights": 1,
-      "board": "Yarım Pansiyon"
+      "board": "yarım pansiyon"
     }
   ],
   "days": [
@@ -155,7 +155,7 @@
           "kind": "sight",
           "lat": 38.488,
           "lon": 28.04,
-          "summary": "Lidya başkentindeki gymnasium ve sinagog kalıntıları gezilir.",
+          "summary": "Lidya başkentindeki hamam yapısı ve sinagog kalıntıları gezilir.",
           "durationMinutes": 75
         },
         {

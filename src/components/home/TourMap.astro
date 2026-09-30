@@ -5,7 +5,8 @@ import Icon from '@/components/ui/Icon.astro';
 import { assetUrl, pageUrl } from '@/config/paths';
 import type { Tour } from '@/domain/tour/Tour';
 import { tr } from '@/i18n/tr';
-import { formatDuration, formatKm } from '@/shared/format';
+import { formatDuration } from '@/shared/format';
+import { routeSummary } from '@/shared/routeSummary';
 import '@/styles/route-map.css';
 
 /**
@@ -49,10 +50,9 @@ const { tours } = Astro.props;
     </div>
     {tours.map((tour) => (
       <div class="detail">
+        <p class="detail__duration">{formatDuration(tour.nights, tour.dayCount)}</p>
         <h3>{tour.title}</h3>
-        <p>
-          {`${formatDuration(tour.nights, tour.dayCount)}, ${tour.sightCount} gezi noktası, ${tr.tour.approximately} ${formatKm(tour.routeDistanceKm)} yol`}
-        </p>
+        <p>{routeSummary(tour)}</p>
         <div class="detail__actions">
           <Button href={pageUrl(`turlar/${tour.id}`)}>{tr.actions.viewTour}</Button>
           <Button href={pageUrl(`turlar/${tour.id}/rota`)} variant="secondary">
@@ -166,6 +166,17 @@ const { tours } = Astro.props;
 
   .detail p {
     color: var(--c-muted);
+  }
+
+  .detail .detail__duration {
+    justify-self: start;
+    padding: 0.0625rem var(--space-2);
+    border-radius: var(--radius-sm);
+    background: var(--c-asphalt);
+    color: var(--c-white);
+    font-stretch: var(--wdth-sign);
+    font-size: var(--text-caption);
+    font-weight: 650;
   }
 
   .detail__actions {

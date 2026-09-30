@@ -5,10 +5,10 @@ import Icon from '@/components/ui/Icon.astro';
 import { loadTourSnapshots, tourCatalog } from '@/composition/catalog';
 import { pageUrl } from '@/config/paths';
 import type { Tour } from '@/domain/tour/Tour';
-import { routeSummary } from '@/features/route-simulation/routeSummary';
 import { tr } from '@/i18n/tr';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { formatDuration, todayIso } from '@/shared/format';
+import { routeSummary } from '@/shared/routeSummary';
 import '@/styles/route-map.css';
 
 export async function getStaticPaths() {

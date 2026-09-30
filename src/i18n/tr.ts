@@ -42,8 +42,6 @@ export const tr = {
     occupancy: 'Doluluk',
     remainingSeats: 'Kalan Koltuk',
     soldOut: 'Kontenjan Doldu',
-    lastSeats: 'Son Koltuklar',
-    seatsAvailable: 'Yer Var',
     noDepartures: 'Yeni kalkış tarihleri yakında açıklanacaktır.',
     day: 'Gün',
     samplePrice: 'Örnek fiyattır.',
@@ -52,11 +50,11 @@ export const tr = {
     seatFree: 'Boş',
     seatTaken: 'Dolu',
     front: 'Ön',
-    door: 'Kapı',
   },
   route: {
     heading: 'Rota Ön İzlemesi',
     onTheRoad: 'Yolda',
+    roadAhead: (distance: string) => `Sonraki durağa yaklaşık ${distance} yol var.`,
     nextStop: 'Sonraki Durak',
     finished: 'Tur Tamamlandı',
     watchAgain: 'Yeniden İzle',
@@ -76,8 +74,6 @@ export const tr = {
     stampTop: 'BİNİŞ',
     stampBottom: 'ONAYLANDI',
     boarded: 'Biniş kartı onaylandı, yolculuk başlıyor.',
-    flatMapNotice:
-      'Bu cihazda üç boyutlu harita açılamadığı için rota düz harita üzerinde gösterilir.',
     kinds: {
       departure: 'Kalkış',
       rest: 'Mola',
@@ -91,6 +87,8 @@ export const tr = {
     demoBadge: 'Demo',
     notice:
       'Demo: Kayıtlar yalnızca bu cihazda saklanır ve hiçbir sunucuya gönderilmez. Gerçek kişi bilgisi girmeyiniz.',
+    framed:
+      'Panel, başka bir sayfanın içinde açıldığında çalışmaz. Lütfen paneli kendi adresinden açınız.',
     backToSite: 'Siteye Dön',
     tabs: { summary: 'Özet', add: 'Yolcu Ekle', list: 'Yolcu Listesi' },
     stats: {

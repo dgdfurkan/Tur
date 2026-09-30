@@ -29,28 +29,28 @@
       "location": "Ordu",
       "stars": 4,
       "nights": 1,
-      "board": "Yarım Pansiyon"
+      "board": "yarım pansiyon"
     },
     {
       "name": "Şehir Oteli",
       "location": "Trabzon",
       "stars": 4,
       "nights": 1,
-      "board": "Yarım Pansiyon"
+      "board": "yarım pansiyon"
     },
     {
       "name": "Göl Manzaralı Dağ Oteli",
       "location": "Uzungöl",
       "stars": 3,
       "nights": 1,
-      "board": "Yarım Pansiyon"
+      "board": "yarım pansiyon"
     },
     {
       "name": "Ahşap Yayla Oteli",
       "location": "Ayder",
       "stars": 3,
       "nights": 1,
-      "board": "Yarım Pansiyon"
+      "board": "yarım pansiyon"
     }
   ],
   "days": [

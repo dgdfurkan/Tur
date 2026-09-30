@@ -126,7 +126,7 @@ export class SimulationPanel {
     this.day.textContent = `${next.day}. ${tr.tour.day}`;
     this.kind.textContent = tr.route.onTheRoad;
     this.title.textContent = next.stop.name;
-    this.text.textContent = `Sonraki durağa ${tr.tour.approximately} ${distance} yol var.`;
+    this.text.textContent = tr.route.roadAhead(distance);
     this.setDuration(undefined);
   }
 

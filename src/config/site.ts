@@ -27,7 +27,7 @@ export const siteConfig: SiteConfig = {
     name: 'Ajans Adı',
     city: 'Ankara',
     description:
-      'Ankara çıkışlı kültür turları: günlük program, konaklama, doluluk durumu ve 3D rota ön izlemesi.',
+      'Ankara çıkışlı kültür turları: günlük program, konaklama, doluluk durumu ve üç boyutlu rota ön izlemesi.',
   },
   contact: {
     phone: null,
