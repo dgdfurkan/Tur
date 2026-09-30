@@ -1,0 +1,24 @@
+Copyright (c) 2026 Furkan Gündüz (dgdfurkan). Tüm hakları saklıdır.
+
+Bu depodaki kaynak kod, tasarım, metin ve görseller telif hakkı sahibine aittir.
+Telif hakkı sahibinin yazılı izni olmadan kopyalanamaz, değiştirilemez,
+dağıtılamaz ve ticari veya ticari olmayan herhangi bir amaçla kullanılamaz.
+Depoyu GitHub üzerinde görüntülemek ve GitHub Hizmet Koşullarının zorunlu kıldığı
+ölçüde çatallamak dışında hiçbir kullanım hakkı verilmez.
+
+Üçüncü taraf bileşenler (kütüphaneler, yazı tipleri, harita verisi ve
+.claude/skills altındaki skill paketleri) kendi lisanslarına tabidir.
+Ayrıntılar docs/ucuncu-taraf.md dosyasında yer alır.
+
+--------------------------------------------------------------------------------
+
+Copyright (c) 2026 Furkan Gündüz (dgdfurkan). All rights reserved.
+
+The source code, design, text and artwork in this repository are the property of
+the copyright holder. They may not be copied, modified, distributed or used for
+any purpose without prior written permission. No rights are granted other than
+viewing the repository on GitHub and forking it to the extent required by the
+GitHub Terms of Service.
+
+Third-party components remain under their own licenses; see
+docs/ucuncu-taraf.md.
