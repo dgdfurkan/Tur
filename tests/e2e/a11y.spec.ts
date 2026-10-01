@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { openPanelPage, waitForStillness } from './support';
 
 const PAGES: Record<string, string> = {
   'home page': './',
@@ -11,19 +12,29 @@ const PAGES: Record<string, string> = {
   'not-found page': './boyle-bir-sayfa-yok/',
 };
 
-for (const [name, path] of Object.entries(PAGES)) {
-  test(`${name} has no accessibility violations`, async ({ page }) => {
-    await page.goto(path);
-    const results = await new AxeBuilder({ page }).analyze();
-    expect(results.violations).toEqual([]);
-  });
-}
+/**
+ * Axe judges what is painted at the instant it runs. With motion, content that
+ * arrives on scroll is still hidden or half-transparent then, so it would be
+ * skipped or misjudged. Reduced motion shows each page whole and at rest.
+ */
+test.describe('pages at rest', () => {
+  test.use({ contextOptions: { reducedMotion: 'reduce' } });
+
+  for (const [name, path] of Object.entries(PAGES)) {
+    test(`${name} has no accessibility violations`, async ({ page }) => {
+      await page.goto(path);
+      const results = await new AxeBuilder({ page }).analyze();
+      expect(results.violations).toEqual([]);
+    });
+  }
+});
 
 // The route preview draws either map depending on the device; both have to pass.
 for (const map of ['3b', 'duz']) {
   test(`route preview has no accessibility violations (harita=${map})`, async ({ page }) => {
     await page.goto(`./turlar/kapadokya/rota/?harita=${map}`);
     await expect(page.locator('[data-route-app]')).toHaveAttribute('data-ready', 'true');
+    await waitForStillness(page);
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toEqual([]);
   });
@@ -36,12 +47,20 @@ test('the home page map has no accessibility violations once it is interactive',
   const map = page.locator('[data-tour-map]');
   await map.scrollIntoViewIfNeeded();
   await expect(map).toHaveAttribute('data-ready', 'true', { timeout: 15_000 });
+  await waitForStillness(page);
+  const results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations).toEqual([]);
+});
+
+test('the locked panel has no accessibility violations', async ({ page }) => {
+  await page.goto('./yonetim/');
+  await expect(page.locator('[data-admin]')).toHaveAttribute('data-access', 'locked');
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
 });
 
 test('operations panel has no accessibility violations on any tab', async ({ page }) => {
-  await page.goto('./yonetim/');
+  await openPanelPage(page, './yonetim/');
   await expect(page.locator('[data-admin]')).toHaveAttribute('data-ready', 'true');
   await page.getByRole('button', { name: 'Örnek Verileri Yükle' }).click();
   for (const tab of ['Özet', 'Yolcu Ekle', 'Yolcu Listesi']) {

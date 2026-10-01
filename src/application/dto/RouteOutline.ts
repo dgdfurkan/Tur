@@ -1,5 +1,5 @@
 import { GeoPoint } from '@/domain/geo/GeoPoint';
-import { RoutePlan } from '@/domain/tour/RoutePlan';
+import { RoutePlan, type RoutePlace } from '@/domain/tour/RoutePlan';
 import type { StopKind, Tour } from '@/domain/tour/Tour';
 
 /**
@@ -25,17 +25,11 @@ export function toRouteOutline(tour: Tour): RouteOutline {
   };
 }
 
-export function toRoutePlan(outline: RouteOutline): RoutePlan {
+export function toRoutePlan(outline: RouteOutline): RoutePlan<RoutePlace> {
   return RoutePlan.fromStops(
-    outline.stops.map((stop, index) => ({
+    outline.stops.map((stop) => ({
       day: 1,
-      stop: {
-        id: `${outline.id}-${index}`,
-        name: stop.name,
-        kind: stop.kind,
-        location: new GeoPoint(stop.lat, stop.lon),
-        summary: '',
-      },
+      stop: { name: stop.name, kind: stop.kind, location: new GeoPoint(stop.lat, stop.lon) },
     })),
   );
 }

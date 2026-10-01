@@ -1,0 +1,75 @@
+---
+import { ink } from '../palette';
+import Cloud from '../parts/Cloud.astro';
+import Tree from '../parts/Tree.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyDay}></rect>
+<Cloud x={244} y={30} scale={1.2} />
+<path d="M0 90q100-50 320-20v130H0z" fill={ink.farGreen}></path>
+<path d="M0 130q120-70 320-40v110H0z" fill={ink.grass}></path>
+<!-- Houses stacked up the hillside -->
+<g>
+  <g fill={ink.wall}>
+    <rect x="150" y="66" width="30" height="20"></rect>
+    <rect x="196" y="72" width="34" height="20"></rect>
+    <rect x="104" y="84" width="34" height="22"></rect>
+    <rect x="150" y="96" width="36" height="22"></rect>
+    <rect x="202" y="102" width="36" height="22"></rect>
+    <rect x="250" y="92" width="32" height="22"></rect>
+    <rect x="62" y="108" width="36" height="24"></rect>
+    <rect x="112" y="122" width="38" height="24"></rect>
+    <rect x="166" y="130" width="38" height="24"></rect>
+    <rect x="222" y="136" width="38" height="24"></rect>
+  </g>
+  <g fill={ink.roof}>
+    <path d="M146 67l19-10 19 10z"></path>
+    <path d="M192 73l21-10 21 10z"></path>
+    <path d="M100 85l21-10 21 10z"></path>
+    <path d="M146 97l22-10 22 10z"></path>
+    <path d="M198 103l22-10 22 10z"></path>
+    <path d="M246 93l20-10 20 10z"></path>
+    <path d="M58 109l22-10 22 10z"></path>
+    <path d="M108 123l23-10 23 10z"></path>
+    <path d="M162 131l23-10 23 10z"></path>
+    <path d="M218 137l23-10 23 10z"></path>
+  </g>
+  <g fill={ink.blue}>
+    <rect x="158" y="72" width="5" height="8"></rect>
+    <rect x="168" y="72" width="5" height="8"></rect>
+    <rect x="204" y="78" width="5" height="8"></rect>
+    <rect x="218" y="78" width="5" height="8"></rect>
+    <rect x="112" y="90" width="5" height="9"></rect>
+    <rect x="124" y="90" width="5" height="9"></rect>
+    <rect x="158" y="102" width="5" height="9"></rect>
+    <rect x="172" y="102" width="5" height="9"></rect>
+    <rect x="210" y="108" width="5" height="9"></rect>
+    <rect x="224" y="108" width="5" height="9"></rect>
+    <rect x="258" y="98" width="5" height="9"></rect>
+    <rect x="70" y="114" width="5" height="10"></rect>
+    <rect x="84" y="114" width="5" height="10"></rect>
+    <rect x="120" y="128" width="5" height="10"></rect>
+    <rect x="136" y="128" width="5" height="10"></rect>
+    <rect x="174" y="136" width="5" height="10"></rect>
+    <rect x="190" y="136" width="5" height="10"></rect>
+    <rect x="230" y="142" width="5" height="10"></rect>
+    <rect x="246" y="142" width="5" height="10"></rect>
+  </g>
+</g>
+<Tree x={44} y={140} size={11} fill={ink.grassDeep} />
+<Tree x={292} y={128} size={12} fill={ink.grassDeep} />
+<Tree x={94} y={150} size={9} fill={ink.forest} />
+<!-- Vineyard rows in front -->
+<path d="M0 160q160-20 320 0v40H0z" fill={ink.steppe}></path>
+<g fill={ink.forest}>
+  <ellipse cx="30" cy="176" rx="12" ry="4"></ellipse>
+  <ellipse cx="74" cy="172" rx="12" ry="4"></ellipse>
+  <ellipse cx="120" cy="178" rx="12" ry="4"></ellipse>
+  <ellipse cx="166" cy="172" rx="12" ry="4"></ellipse>
+  <ellipse cx="212" cy="178" rx="12" ry="4"></ellipse>
+  <ellipse cx="258" cy="172" rx="12" ry="4"></ellipse>
+  <ellipse cx="298" cy="180" rx="12" ry="4"></ellipse>
+  <ellipse cx="52" cy="190" rx="12" ry="4"></ellipse>
+  <ellipse cx="144" cy="192" rx="12" ry="4"></ellipse>
+  <ellipse cx="236" cy="192" rx="12" ry="4"></ellipse>
+</g>

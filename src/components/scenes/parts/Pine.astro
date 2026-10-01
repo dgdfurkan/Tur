@@ -1,0 +1,25 @@
+---
+/** A conifer standing on the point (`x`, `y`). */
+interface Props {
+  x: number;
+  y: number;
+  height?: number;
+  fill?: string;
+  trunk?: string;
+}
+
+const { x, y, height = 30, fill = '#3f7d4a', trunk = '#553c28' } = Astro.props;
+const half = height * 0.26;
+---
+
+<g>
+  <rect x={x - 1.2} y={y - height * 0.2} width="2.4" height={height * 0.2} fill={trunk}></rect>
+  <polygon
+    fill={fill}
+    points={`${x},${y - height} ${x + half},${y - height * 0.45} ${x - half},${y - height * 0.45}`}
+  ></polygon>
+  <polygon
+    fill={fill}
+    points={`${x},${y - height * 0.72} ${x + half * 1.35},${y - height * 0.16} ${x - half * 1.35},${y - height * 0.16}`}
+  ></polygon>
+</g>

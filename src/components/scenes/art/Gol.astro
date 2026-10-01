@@ -1,0 +1,51 @@
+---
+import { ink } from '../palette';
+import Cloud from '../parts/Cloud.astro';
+import Pine from '../parts/Pine.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyPale}></rect>
+<Cloud x={160} y={26} scale={1.2} />
+<!-- Peaks closing the valley -->
+<path d="M70 110l50-66 40 40 36-52 60 78z" fill={ink.farBlue}></path>
+<path d="M120 44l12 16-10-4-8 10zM196 32l14 20-12-5-10 12z" fill={ink.foam}></path>
+<!-- Forested slopes -->
+<path d="M0 50q60 10 110 66H0z" fill={ink.forest}></path>
+<path d="M320 44q-70 14-110 72h110z" fill={ink.forestDeep}></path>
+<Pine x={24} y={112} height={44} fill={ink.forestDeep} />
+<Pine x={56} y={114} height={36} fill={ink.forestDeep} />
+<Pine x={264} y={112} height={40} fill={ink.forest} />
+<Pine x={296} y={112} height={48} fill={ink.forest} />
+<!-- The village and its mosque on the far shore -->
+<rect x="0" y="108" width="320" height="8" fill={ink.grass}></rect>
+<g>
+  <rect x="144" y="92" width="30" height="18" fill={ink.wall}></rect>
+  <path d="M146 92q13-16 26 0z" fill={ink.blue}></path>
+  <rect x="136" y="72" width="4" height="38" fill={ink.wall}></rect>
+  <rect x="178" y="72" width="4" height="38" fill={ink.wall}></rect>
+  <path d="M134 72l4-10 4 10zM176 72l4-10 4 10z" fill={ink.blue}></path>
+  <g fill={ink.wood}>
+    <rect x="100" y="98" width="18" height="12"></rect>
+    <rect x="198" y="96" width="20" height="14"></rect>
+    <rect x="228" y="100" width="16" height="10"></rect>
+    <rect x="78" y="100" width="14" height="10"></rect>
+  </g>
+  <g fill={ink.roof}>
+    <path d="M97 99l12-7 12 7z"></path>
+    <path d="M195 97l13-7 13 7z"></path>
+    <path d="M225 101l11-6 11 6z"></path>
+    <path d="M75 101l10-6 10 6z"></path>
+  </g>
+</g>
+<!-- The lake with its reflections -->
+<rect x="0" y="114" width="320" height="86" fill={ink.waterDeep}></rect>
+<path d="M0 114q50 8 110 0v40q-60 10-110 0z" fill={ink.forest} opacity="0.35"></path>
+<path d="M320 114q-50 8-110 0v40q60 10 110 0z" fill={ink.forestDeep} opacity="0.35"></path>
+<path d="M144 114h30v18q-15 8-30 0z" fill={ink.wall} opacity="0.45"></path>
+<g fill={ink.foam} opacity="0.6">
+  <rect x="30" y="164" width="40" height="2.4" rx="1.2"></rect>
+  <rect x="120" y="176" width="50" height="2.4" rx="1.2"></rect>
+  <rect x="220" y="166" width="44" height="2.4" rx="1.2"></rect>
+  <rect x="70" y="188" width="30" height="2.4" rx="1.2"></rect>
+  <rect x="250" y="188" width="36" height="2.4" rx="1.2"></rect>
+</g>

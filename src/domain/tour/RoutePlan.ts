@@ -1,9 +1,12 @@
 import { TURKEY_PROJECTION, type MapProjection, type PlanePoint } from '../geo/MapProjection';
 import type { Stop, Tour } from './Tour';
 
-export interface RouteStop {
+/** The least a route needs to know about a place in order to be drawn on a map. */
+export type RoutePlace = Pick<Stop, 'name' | 'kind' | 'location'>;
+
+export interface RouteStop<P extends RoutePlace = Stop> {
   readonly index: number;
-  readonly stop: Stop;
+  readonly stop: P;
   /** Day of the tour on which the stop is visited, starting at 1. */
   readonly day: number;
   /** Position on the map plane, in kilometres. */
@@ -22,9 +25,13 @@ export interface RouteBounds {
 /** Stops closer together than this are treated as one place. */
 const SAME_PLACE_KM = 0.5;
 
-/** The geometry of a tour: its stops in travel order, laid out on the map plane. */
-export class RoutePlan {
-  private constructor(readonly stops: readonly RouteStop[]) {}
+/**
+ * The geometry of a tour: its stops in travel order, laid out on the map plane.
+ * A plan made from full stops can tell a visitor about each place; one made from
+ * bare places is enough to draw the road.
+ */
+export class RoutePlan<P extends RoutePlace = Stop> {
+  private constructor(readonly stops: readonly RouteStop<P>[]) {}
 
   static fromTour(tour: Tour, projection: MapProjection = TURKEY_PROJECTION): RoutePlan {
     return RoutePlan.fromStops(
@@ -33,12 +40,31 @@ export class RoutePlan {
     );
   }
 
-  /** Builds a plan from stops in travel order, each tagged with its day. */
-  static fromStops(
-    visits: readonly { stop: Stop; day: number }[],
+  /**
+   * One day of a tour on its own. It starts where the day before ended, so the
+   * first leg of the morning has somewhere to set off from.
+   */
+  static forDay(
+    tour: Tour,
+    dayNumber: number,
     projection: MapProjection = TURKEY_PROJECTION,
   ): RoutePlan {
-    const stops: RouteStop[] = [];
+    const day = tour.days.find((candidate) => candidate.number === dayNumber);
+    if (!day) throw new RangeError(`Tour ${tour.id} has no day ${dayNumber}`);
+    const eve = tour.days.find((candidate) => candidate.number === dayNumber - 1)?.stops.at(-1);
+    const visits = day.stops.map((stop) => ({ stop, day: day.number }));
+    return RoutePlan.fromStops(
+      eve ? [{ stop: eve, day: day.number }, ...visits] : visits,
+      projection,
+    );
+  }
+
+  /** Builds a plan from stops in travel order, each tagged with its day. */
+  static fromStops<P extends RoutePlace>(
+    visits: readonly { stop: P; day: number }[],
+    projection: MapProjection = TURKEY_PROJECTION,
+  ): RoutePlan<P> {
+    const stops: RouteStop<P>[] = [];
     let travelled = 0;
     for (const { stop, day } of visits) {
       const previous = stops.at(-1);

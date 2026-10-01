@@ -1,0 +1,66 @@
+---
+import { ink } from '../palette';
+import Tree from '../parts/Tree.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyWarm}></rect>
+<circle cx="52" cy="22" r="11" fill={ink.sunPale}></circle>
+<!-- Surface -->
+<g>
+  <rect x="58" y="24" width="30" height="20" fill={ink.stone}></rect>
+  <path d="M54 25l19-10 19 10z" fill={ink.roof}></path>
+  <rect x="236" y="28" width="26" height="16" fill={ink.stone}></rect>
+  <path d="M232 29l17-9 17 9z" fill={ink.roof}></path>
+</g>
+<Tree x={120} y={44} size={9} />
+<Tree x={286} y={44} size={8} fill={ink.grassDeep} />
+<!-- Earth -->
+<rect x="0" y="44" width="320" height="156" fill={ink.rockShade}></rect>
+<rect x="0" y="44" width="320" height="6" fill={ink.grassDeep}></rect>
+<!-- Air shaft -->
+<rect x="200" y="44" width="9" height="150" fill={ink.tuffShade}></rect>
+<!-- Rooms and passages, three levels down -->
+<g fill={ink.tuff}>
+  <rect x="26" y="64" width="54" height="24" rx="10"></rect>
+  <rect x="104" y="62" width="76" height="26" rx="11"></rect>
+  <rect x="226" y="64" width="64" height="24" rx="10"></rect>
+  <rect x="78" y="72" width="28" height="8"></rect>
+  <rect x="178" y="72" width="50" height="8"></rect>
+  <path d="M60 86h10l32 26H92z"></path>
+  <rect x="56" y="108" width="84" height="24" rx="10"></rect>
+  <rect x="162" y="106" width="50" height="26" rx="10"></rect>
+  <rect x="234" y="110" width="58" height="22" rx="9"></rect>
+  <rect x="138" y="116" width="26" height="8"></rect>
+  <rect x="210" y="116" width="26" height="8"></rect>
+  <path d="M252 130h10l-26 24h-10z"></path>
+  <rect x="30" y="152" width="70" height="26" rx="11"></rect>
+  <rect x="122" y="150" width="66" height="28" rx="11"></rect>
+  <rect x="214" y="152" width="78" height="26" rx="11"></rect>
+  <rect x="98" y="160" width="26" height="8"></rect>
+  <rect x="186" y="160" width="30" height="8"></rect>
+</g>
+<!-- Millstone door, jars and lamps -->
+<circle cx="92" cy="76" r="8" fill={ink.rockDeep}></circle>
+<circle cx="92" cy="76" r="2.4" fill={ink.tuff}></circle>
+<g fill={ink.clay}>
+  <path d="M120 86c-3-5-3-10 0-13h6c3 3 3 8 0 13z"></path>
+  <path d="M132 86c-3-5-3-10 0-13h6c3 3 3 8 0 13z"></path>
+  <path d="M252 130c-3-5-3-9 0-12h6c3 3 3 7 0 12z"></path>
+  <path d="M46 176c-3-5-3-10 0-13h6c3 3 3 8 0 13z"></path>
+</g>
+<g fill={ink.lit}>
+  <circle cx="160" cy="70" r="2.6"></circle>
+  <circle cx="258" cy="72" r="2.6"></circle>
+  <circle cx="110" cy="116" r="2.6"></circle>
+  <circle cx="186" cy="114" r="2.6"></circle>
+  <circle cx="76" cy="160" r="2.6"></circle>
+  <circle cx="156" cy="158" r="2.6"></circle>
+  <circle cx="262" cy="160" r="2.6"></circle>
+</g>
+<!-- Visitors -->
+<g fill={ink.dark}>
+  <circle cx="146" cy="74" r="2.6"></circle>
+  <rect x="143.8" y="77" width="4.4" height="9" rx="2"></rect>
+  <circle cx="232" cy="164" r="2.6"></circle>
+  <rect x="229.8" y="167" width="4.4" height="9" rx="2"></rect>
+</g>

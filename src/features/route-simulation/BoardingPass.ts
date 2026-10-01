@@ -5,7 +5,7 @@ interface PassSounds {
   punch(): void;
 }
 
-const STATIC_HOLD_MS = 1600;
+const STATIC_HOLD_MS = 1300;
 
 /**
  * The boarding pass that opens the simulation: it slides in, is stamped and
@@ -72,7 +72,7 @@ export class BoardingPass {
         .fromTo(
           this.pass,
           { y: 56, rotation: -5, scale: 0.94 },
-          { y: 0, rotation: -1.5, scale: 1, duration: 0.65 },
+          { y: 0, rotation: -1.5, scale: 1, duration: 0.55 },
           '<',
         )
         // The stamp accelerates into the paper, so it eases in rather than out.
@@ -80,7 +80,7 @@ export class BoardingPass {
           this.stamp,
           { scale: 2.6, rotation: -26, autoAlpha: 0 },
           { scale: 1, rotation: -12, autoAlpha: 0.88, duration: 0.17, ease: 'power4.in' },
-          '+=0.4',
+          '+=0.22',
         )
         .call(() => this.sounds.stamp())
         .to(this.pass, { scale: 0.982, duration: 0.05, ease: 'power1.out' })
@@ -89,13 +89,13 @@ export class BoardingPass {
           this.punch,
           { scale: 0.3, autoAlpha: 0 },
           { scale: 1, autoAlpha: 1, duration: 0.1, ease: 'power2.out' },
-          '+=0.3',
+          '+=0.16',
         )
         .call(() => this.sounds.punch())
         .to(
           this.stub,
-          { x: 30, y: 12, rotation: 8, autoAlpha: 0, duration: 0.45, ease: 'power2.in' },
-          '+=0.6',
+          { x: 30, y: 12, rotation: 8, autoAlpha: 0, duration: 0.4, ease: 'power2.in' },
+          '+=0.38',
         )
         .to(this.main, { y: -28, autoAlpha: 0, duration: 0.4, ease: 'power2.in' }, '<0.08')
         .to(this.root, { autoAlpha: 0, duration: 0.25 }, '-=0.12');

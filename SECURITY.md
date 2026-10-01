@@ -16,6 +16,8 @@ Bildirimler yedi gün içinde yanıtlanır. Doğrulanan açıklar için düzeltm
 - Trusted Types zorunludur ve hiçbir politikaya izin verilmez; destekleyen tarayıcılarda metin HTML'e veya koda dönüştürülemez.
 - Değişken veri sayfaya yalnızca `textContent` ile yazılır; tarayıcı deposundan okunan kayıtlar doğrulanır.
 - Operasyon paneli, başka bir sayfanın çerçevesi içinde açıldığında çalışmaz.
+- Operasyon paneli erişim koduyla açılır ve siteden bağlantı verilmez. Kod depoda tutulmaz; yalnızca PBKDF2 (SHA-256, 310.000 tur) ile türetilmiş anahtarın özeti saklanır. Art arda yapılan hatalı denemelerden sonra panel bir süre yeni deneme kabul etmez.
+- Video stüdyosu videoyu ve yüklenen logoyu cihazda işler; hiçbir dosya sunucuya gönderilmez.
 - Üçüncü taraf betik, analitik, yazı tipi sunucusu ve CDN kullanılmaz.
 - Bağımlılıklar Dependabot ile haftalık olarak denetlenir.
 - Depoya gerçek kişisel veri, parola veya erişim anahtarı eklenmez.
@@ -24,5 +26,6 @@ Bildirimler yedi gün içinde yanıtlanır. Doğrulanan açıklar için düzeltm
 
 - GitHub Pages özel HTTP başlığı tanımlamaya izin vermez. Bu nedenle `frame-ancestors`, HSTS ve `Permissions-Policy` gibi başlıklar, site Cloudflare üzerine taşındığında etkinleştirilecektir.
 - Site, `dgdfurkan.github.io` adresindeki diğer projelerle aynı tarayıcı deposunu paylaşır. Bu nedenle panel yalnızca demo verisiyle kullanılmalıdır.
+- Panel kilidi, statik bir sitede gerçek erişim denetimi sağlamaz. Kilit ziyaretçinin paneli açmasını önler; ancak panelin yazılımı yayınlanan dosyaların içindedir ve kayıtlar yalnızca girildiği cihazda durur. Gerçek erişim denetimi, paylaşımlı panelle birlikte Cloudflare Access üzerinden kurulur.
 
 Ayrıntılar `docs/yol-haritasi.md` dosyasındadır.

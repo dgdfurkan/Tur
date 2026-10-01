@@ -1,0 +1,37 @@
+---
+import { ink } from '../palette';
+import Pine from '../parts/Pine.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyPale}></rect>
+<path d="M0 40q80 20 130 90H0z" fill={ink.forestDeep}></path>
+<path d="M320 30q-90 24-140 100h140z" fill={ink.forest}></path>
+<path d="M110 130q50-50 100 0z" fill={ink.farGreen}></path>
+<Pine x={30} y={128} height={60} fill={ink.forest} />
+<Pine x={64} y={132} height={48} fill={ink.forest} />
+<Pine x={258} y={130} height={56} fill={ink.forestDeep} />
+<Pine x={292} y={130} height={68} fill={ink.forestDeep} />
+<!-- Banks -->
+<path d="M0 120q60-6 96 22t24 58H0z" fill={ink.grassDeep}></path>
+<path d="M320 120q-60-6-96 22t-24 58h120z" fill={ink.grassDeep}></path>
+<!-- Stream -->
+<path d="M96 142q64-22 128 0l-10 58H106z" fill={ink.water}></path>
+<g fill={ink.foam} opacity="0.85">
+  <path d="M120 164q14-8 28 0t28 0 28 0v5q-14 6-28 0t-28 0-28 0z"></path>
+  <path d="M116 184q16-8 32 0t32 0 28 0v5q-14 6-28 0t-32 0-32 0z"></path>
+</g>
+<g fill={ink.cliff}>
+  <ellipse cx="134" cy="176" rx="9" ry="5"></ellipse>
+  <ellipse cx="190" cy="196" rx="11" ry="6"></ellipse>
+  <ellipse cx="200" cy="158" rx="7" ry="4"></ellipse>
+</g>
+<!-- The humpback bridge -->
+<path d="M52 126q108-86 216 0v18q-108-70-216 0z" fill={ink.stone}></path>
+<path d="M52 126q108-86 216 0v5q-108-80-216 0z" fill={ink.marble}></path>
+<path d="M82 138q78-54 156 0q-78-40-156 0z" fill={ink.stoneDeep}></path>
+<path d="M52 126v18l30-6q-14-4-30-12zM268 126v18l-30-6q14-4 30-12z" fill={ink.stoneShade}></path>
+<!-- Someone crossing -->
+<g fill={ink.dark}>
+  <circle cx="162" cy="72" r="2.6"></circle>
+  <rect x="159.8" y="75" width="4.4" height="9" rx="2"></rect>
+</g>

@@ -1,10 +1,14 @@
 ---
+import Scene from '@/components/scenes/Scene.astro';
 import Icon from '@/components/ui/Icon.astro';
 import type { Tour } from '@/domain/tour/Tour';
 import { tr } from '@/i18n/tr';
 import { formatMinutes } from '@/shared/format';
 
-/** Day-by-day programme drawn as a road with its stops. */
+/**
+ * Day-by-day programme drawn as a road with its stops, each with a picture of
+ * the place. The page must include the pictures themselves with <SceneSprite>.
+ */
 interface Props {
   tour: Tour;
 }
@@ -24,20 +28,37 @@ const { tour } = Astro.props;
       </div>
       <ol class="stops">
         {day.stops.map((stop) => (
-          <li class="stop" data-kind={stop.kind}>
+          <li class="stop" data-kind={stop.kind} data-reveal>
             <span class="stop__marker" aria-hidden="true">
               {stop.kind === 'lodging' && <Icon name="bed" size={16} />}
             </span>
             <div class="stop__body">
               <h4>{stop.name}</h4>
               <p>{stop.summary}</p>
-              {stop.durationMinutes !== undefined && (
-                <p class="stop__duration">
-                  <Icon name="clock" size={16} />
-                  {formatMinutes(stop.durationMinutes)}
-                </p>
-              )}
             </div>
+            <div class="stop__art">
+              <Scene scene={stop.scene} />
+            </div>
+            {(stop.facts.length > 0 || stop.durationMinutes !== undefined) && (
+              <div class="stop__more">
+                {stop.facts.length > 0 && (
+                  <dl class="stop__facts">
+                    {stop.facts.map((fact) => (
+                      <div>
+                        <dt>{fact.label}</dt>
+                        <dd>{fact.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )}
+                {stop.durationMinutes !== undefined && (
+                  <p class="stop__duration">
+                    <Icon name="clock" size={16} />
+                    {formatMinutes(stop.durationMinutes)}
+                  </p>
+                )}
+              </div>
+            )}
           </li>
         ))}
       </ol>
@@ -94,13 +115,75 @@ const { tour } = Astro.props;
     width: 0.25rem;
     border-radius: 0.125rem;
     background: var(--c-line);
+    transform-origin: top;
+  }
+
+  /* The road is laid as the day scrolls into view. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .stops::before {
+        /* Longhands on purpose: the minifier folds a timeline into the shorthand, which browsers reject. */
+        animation-name: road-laid;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: view();
+        animation-range: entry 5% cover 55%;
+      }
+
+      @keyframes road-laid {
+        from {
+          transform: scaleY(0);
+        }
+      }
+    }
   }
 
   .stop {
     position: relative;
     display: grid;
-    grid-template-columns: var(--marker) 1fr;
-    gap: var(--space-4);
+    grid-template-columns: var(--marker) minmax(0, 1fr) 5.75rem;
+    gap: var(--space-2) var(--space-4);
+    /* Stops arrive as they are scrolled to, not in turn like a row of cards. */
+    transition-delay: 0ms;
+  }
+
+  .stop__art {
+    align-self: start;
+    aspect-ratio: 16 / 10;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-1);
+    overflow: hidden;
+  }
+
+  /* What there is to know about the place; on a phone it runs under the picture too. */
+  .stop__more {
+    display: grid;
+    gap: var(--space-2);
+    grid-column: 2 / -1;
+    color: var(--c-muted);
+    font-size: var(--text-small);
+  }
+
+  .stop__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1) var(--space-4);
+    margin: 0;
+  }
+
+  .stop__facts div {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .stop__facts dt {
+    white-space: nowrap;
+  }
+
+  .stop__facts dd {
+    margin: 0;
+    color: var(--c-asphalt);
+    font-weight: 650;
   }
 
   .stop__marker {
@@ -146,7 +229,20 @@ const { tour } = Astro.props;
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    font-size: var(--text-small);
+  }
+
+  @media (min-width: 40rem) {
+    .stop {
+      grid-template-columns: var(--marker) minmax(0, 1fr) 9rem;
+    }
+
+    .stop__art {
+      grid-row: span 2;
+    }
+
+    .stop__more {
+      grid-column: 2;
+    }
   }
 
   @media (min-width: 56rem) {

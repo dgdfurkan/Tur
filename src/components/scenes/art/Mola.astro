@@ -1,0 +1,54 @@
+---
+import { ink } from '../palette';
+import Cloud from '../parts/Cloud.astro';
+import Poplar from '../parts/Poplar.astro';
+import Tree from '../parts/Tree.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyWarm}></rect>
+<circle cx="64" cy="46" r="18" fill={ink.sunPale}></circle>
+<Cloud x={220} y={40} scale={1.1} />
+<path d="M0 118q60-26 130-10t190-16v60H0z" fill={ink.farSand}></path>
+<path d="M0 134q90-18 180-6t140-8v40H0z" fill={ink.steppe}></path>
+<Poplar x={26} y={140} height={46} />
+<Poplar x={40} y={142} height={38} fill={ink.grassDeep} />
+<!-- Tea house -->
+<g>
+  <rect x="62" y="102" width="104" height="46" fill={ink.wall}></rect>
+  <path d="M54 104l60-26 60 26z" fill={ink.roof}></path>
+  <path d="M114 78l60 26h-12l-48-21z" fill={ink.roofShade}></path>
+  <rect x="78" y="116" width="20" height="32" fill={ink.wood}></rect>
+  <rect x="110" y="114" width="42" height="18" fill={ink.glass}></rect>
+  <rect x="130" y="114" width="2" height="18" fill={ink.wall}></rect>
+  <!-- Awning -->
+  <path d="M104 108h54l8 12h-70z" fill={ink.red}></path>
+  <g fill={ink.wall}>
+    <path d="M114 108h9l2 12h-10z"></path>
+    <path d="M132 108h9l3 12h-10z"></path>
+    <path d="M150 108h8l5 12h-9z"></path>
+  </g>
+</g>
+<Tree x={196} y={148} size={20} />
+<!-- Table with two tulip glasses -->
+<g>
+  <ellipse cx="248" cy="146" rx="34" ry="7" fill={ink.wood}></ellipse>
+  <rect x="245" y="148" width="6" height="26" fill={ink.woodDeep}></rect>
+  <ellipse cx="248" cy="175" rx="14" ry="3" fill={ink.woodDeep}></ellipse>
+  <g>
+    <ellipse cx="234" cy="144" rx="9" ry="2.6" fill={ink.wall}></ellipse>
+    <path d="M228 124c0 7 3 8 3 11s-2 5-2 8h10c0-3-2-5-2-8s3-4 3-11z" fill="#b5421e"></path>
+    <path d="M228 124h12v3h-12z" fill={ink.wall} opacity="0.75"></path>
+    <ellipse cx="262" cy="144" rx="9" ry="2.6" fill={ink.wall}></ellipse>
+    <path d="M256 124c0 7 3 8 3 11s-2 5-2 8h10c0-3-2-5-2-8s3-4 3-11z" fill="#b5421e"></path>
+    <path d="M256 124h12v3h-12z" fill={ink.wall} opacity="0.75"></path>
+  </g>
+</g>
+<!-- Road -->
+<rect x="0" y="176" width="320" height="24" fill={ink.asphalt}></rect>
+<g fill={ink.line}>
+  <rect x="10" y="186" width="28" height="3"></rect>
+  <rect x="74" y="186" width="28" height="3"></rect>
+  <rect x="138" y="186" width="28" height="3"></rect>
+  <rect x="202" y="186" width="28" height="3"></rect>
+  <rect x="266" y="186" width="28" height="3"></rect>
+</g>

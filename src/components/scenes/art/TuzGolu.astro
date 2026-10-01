@@ -1,0 +1,60 @@
+---
+import { ink } from '../palette';
+import Cloud from '../parts/Cloud.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyPale}></rect>
+<rect y="0" width="320" height="70" fill={ink.skyDay}></rect>
+<circle cx="230" cy="92" r="22" fill={ink.sunPale}></circle>
+<Cloud x={80} y={42} scale={1.3} />
+<Cloud x={270} y={30} scale={0.8} />
+<path d="M0 118q40-14 84-8t70-6 90 4 76-2v18H0z" fill={ink.farBlue} opacity="0.75"></path>
+<!-- Salt flat and the sun's reflection -->
+<rect x="0" y="120" width="320" height="80" fill={ink.salt}></rect>
+<path d="M208 120h44l14 80h-72z" fill={ink.sunPale} opacity="0.55"></path>
+<g fill="none" stroke={ink.saltShade} stroke-width="1.4" stroke-linejoin="round">
+  <path d="M20 150l26-8 30 6 18 12-22 12-34-4z"></path>
+  <path d="M94 160l30-10 34 4 12 14-30 12-32-6z"></path>
+  <path d="M170 168l34-8 36 8 8 14-40 8-30-8z"></path>
+  <path d="M40 182l34-6 28 8-10 16H44z"></path>
+  <path d="M248 182l30-10 36 6v22h-58z"></path>
+  <path d="M124 134l28-4 24 6-8 10-30 2z"></path>
+</g>
+<!-- Flamingos -->
+<g>
+  <g>
+    <ellipse cx="92" cy="128" rx="11" ry="6.5" fill={ink.pink}></ellipse>
+    <path
+      d="M100 126c6-2 3-12 7-16s7-1 6 3"
+      fill="none"
+      stroke={ink.pink}
+      stroke-width="2.6"
+      stroke-linecap="round"
+    ></path>
+    <path d="M113 112l5 2-5 1z" fill={ink.dark}></path>
+    <path d="M90 134v22M95 134v14l-5 8" fill="none" stroke="#d97f95" stroke-width="1.4"></path>
+  </g>
+  <g>
+    <ellipse cx="132" cy="134" rx="9" ry="5.5" fill={ink.pink}></ellipse>
+    <path
+      d="M125 132c-5-2-2-10-5-13s-6-1-5 2"
+      fill="none"
+      stroke={ink.pink}
+      stroke-width="2.2"
+      stroke-linecap="round"
+    ></path>
+    <path d="M115 120l-4 2 4 1z" fill={ink.dark}></path>
+    <path d="M131 139v19M135 139v19" fill="none" stroke="#d97f95" stroke-width="1.3"></path>
+  </g>
+  <g opacity="0.85">
+    <ellipse cx="40" cy="124" rx="7" ry="4" fill={ink.pink}></ellipse>
+    <path
+      d="M45 123c4-1 2-8 5-10"
+      fill="none"
+      stroke={ink.pink}
+      stroke-width="1.8"
+      stroke-linecap="round"
+    ></path>
+    <path d="M39 128v14M42 128v14" fill="none" stroke="#d97f95" stroke-width="1.1"></path>
+  </g>
+</g>

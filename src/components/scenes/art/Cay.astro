@@ -1,0 +1,37 @@
+---
+import { ink } from '../palette';
+import Cloud from '../parts/Cloud.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyDay}></rect>
+<Cloud x={70} y={30} scale={1.1} />
+<!-- Sea far below -->
+<rect x="0" y="62" width="320" height="30" fill={ink.sea}></rect>
+<rect x="0" y="62" width="320" height="5" fill={ink.seaDeep} opacity="0.5"></rect>
+<Cloud x={250} y={72} scale={1.4} opacity={0.85} />
+<!-- Terraced slopes: each band is a row of tea bushes following the contour -->
+<path d="M0 84q120-40 320-6v122H0z" fill={ink.forest}></path>
+<g fill="none" stroke-linecap="round">
+  <path d="M0 96q120-38 320-6" stroke={ink.grass} stroke-width="7"></path>
+  <path d="M0 112q120-36 320-4" stroke={ink.grassDeep} stroke-width="8"></path>
+  <path d="M0 130q120-34 320-2" stroke={ink.grass} stroke-width="9"></path>
+  <path d="M0 150q120-32 320 0" stroke={ink.grassDeep} stroke-width="10"></path>
+  <path d="M0 172q120-30 320 2" stroke={ink.grass} stroke-width="11"></path>
+  <path d="M0 196q120-28 320 4" stroke={ink.grassDeep} stroke-width="12"></path>
+</g>
+<!-- Farmhouse -->
+<g>
+  <rect x="216" y="58" width="42" height="24" fill={ink.wall}></rect>
+  <path d="M210 60l27-16 27 16z" fill={ink.roof}></path>
+  <rect x="224" y="66" width="8" height="9" fill={ink.glass}></rect>
+  <rect x="240" y="66" width="8" height="16" fill={ink.woodDeep}></rect>
+</g>
+<!-- Pickers with their baskets -->
+<g>
+  <circle cx="92" cy="116" r="4" fill={ink.yellow}></circle>
+  <path d="M88 138v-12q4-6 8 0v12z" fill={ink.red}></path>
+  <path d="M96 126h8l-1 10h-6z" fill={ink.wood}></path>
+  <circle cx="176" cy="148" r="4.5" fill={ink.wall}></circle>
+  <path d="M171 174v-14q5-7 10 0v14z" fill={ink.blue}></path>
+  <path d="M160 160h9l-1 12h-7z" fill={ink.wood}></path>
+</g>

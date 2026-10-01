@@ -2,14 +2,17 @@ import { Vector3, type Scene } from 'three';
 import { TURKEY_PROJECTION } from '@/domain/geo/MapProjection';
 import type { Disposable, ViewPadding } from '@/shared/lifecycle';
 import { yieldToMain } from '@/shared/scheduling';
-import type { TimeOfDay } from '@/features/route-simulation/RouteView';
+import type { TimeOfDay } from '@/shared/timeOfDay';
 import { CameraRig } from './CameraRig';
 import { Daylight } from './Daylight';
+import { FrameLoop } from './FrameLoop';
+import { GroundDetail } from './GroundDetail';
 import { LabelLayer } from './LabelLayer';
+import type { LabelSurface } from './LabelSurface';
 import { LandmarkFactory } from './LandmarkFactory';
 import { LandTexture } from './LandTexture';
 import { mapData, ringsExtent } from './MapData';
-import type { MapSurface } from './MapSurface';
+import type { FixedFrame, MapSurface } from './MapSurface';
 import { CITIES, SEAS } from './places';
 import type { QualityProfile } from './QualityProfile';
 import { SceneManager } from './SceneManager';
@@ -33,6 +36,8 @@ type FrameCallback = (deltaSeconds: number, elapsedSeconds: number) => void;
 
 interface WorldParts {
   readonly manager: SceneManager;
+  /** Absent when the map is drawn frame by frame for a film. */
+  readonly loop: FrameLoop | undefined;
   readonly kit: ToonKit;
   readonly landmarks: LandmarkFactory;
   readonly board: TurkeyBoard;
@@ -48,6 +53,7 @@ export class MapWorld implements Disposable {
   readonly rig: CameraRig;
   readonly labels: LabelLayer;
   private readonly manager: SceneManager;
+  private readonly loop: FrameLoop | undefined;
   private readonly landmarks: LandmarkFactory;
   private readonly board: TurkeyBoard;
   private readonly scenery: Scenery;
@@ -74,15 +80,21 @@ export class MapWorld implements Disposable {
     await yieldToMain();
     const land = new LandTexture(mapData, quality.texturePixels);
     await yieldToMain();
-    const board = new TurkeyBoard(mapData, kit, { surroundings, land, anisotropy: ANISOTROPY });
+    const board = new TurkeyBoard(mapData, kit, {
+      surroundings,
+      land,
+      detail: new GroundDetail().canvas,
+      anisotropy: ANISOTROPY,
+    });
     await yieldToMain();
 
     const landmarks = new LandmarkFactory();
     const scenery = new Scenery(landmarks, kit, quality.sceneryDensity);
     await yieldToMain();
 
+    const loop = surface.frame ? undefined : new FrameLoop(manager);
     const world = new MapWorld(
-      { manager, kit, landmarks, board, scenery },
+      { manager, loop, kit, landmarks, board, scenery },
       surface.labels,
       reducedMotion,
     );
@@ -95,8 +107,9 @@ export class MapWorld implements Disposable {
     return world;
   }
 
-  private constructor(parts: WorldParts, labelContainer: HTMLElement, reducedMotion: boolean) {
+  private constructor(parts: WorldParts, labels: LabelSurface, reducedMotion: boolean) {
     this.manager = parts.manager;
+    this.loop = parts.loop;
     this.kit = parts.kit;
     this.landmarks = parts.landmarks;
     this.board = parts.board;
@@ -114,7 +127,7 @@ export class MapWorld implements Disposable {
     scene.add(...this.daylight.lamps, this.board.group, this.scenery.group);
 
     this.rig = new CameraRig(camera, reducedMotion);
-    this.labels = new LabelLayer(labelContainer);
+    this.labels = new LabelLayer(labels);
     for (const city of CITIES) {
       const position = toWorld(TURKEY_PROJECTION.project(city), LAND_TOP + 0.05);
       this.labels.add(`city:${city.name}`, city.name, position, 'city', CITY_PRIORITY[city.tier]);
@@ -183,17 +196,40 @@ export class MapWorld implements Disposable {
   }
 
   /**
-   * Starts drawing. Whatever was added since the map was built gets its shaders
-   * compiled first, off the main thread, so the first frame does not stall.
+   * Compiles the shaders of whatever was added since the map was built, off
+   * the main thread, so the next frame does not stall on them.
    */
+  async prepare(): Promise<void> {
+    await this.manager.compile();
+  }
+
+  /** Starts drawing with the display's refresh. */
   start(): void {
-    void this.manager.compile().finally(() => {
-      if (!this.disposed) this.manager.start();
+    void this.prepare().finally(() => {
+      if (!this.disposed) this.loop?.start();
     });
+  }
+
+  /** Moves the map on by `deltaSeconds` and draws one frame; for film, where no loop runs. */
+  step(deltaSeconds: number): void {
+    this.manager.step(deltaSeconds);
+  }
+
+  /** The canvas the map is drawn on. */
+  get canvas(): HTMLCanvasElement {
+    return this.manager.canvas;
+  }
+
+  /** Gives a map that is drawn frame by frame another size or sharpness. */
+  reframe(frame: FixedFrame): void {
+    this.manager.reframe(frame);
+    this.viewportKey = '';
+    this.syncViewport();
   }
 
   dispose(): void {
     this.disposed = true;
+    this.loop?.dispose();
     this.manager.dispose();
     this.frameCallbacks.clear();
     this.labels.dispose();

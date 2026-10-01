@@ -1,0 +1,50 @@
+---
+import RoadScene from '@/components/home/RoadScene.astro';
+
+/**
+ * The head of an inner page: its title under an open sky, with the landscape
+ * along the road at its foot. It ties the inner pages to the home page.
+ */
+interface Props {
+  title: string;
+  lead?: string;
+}
+
+const { title, lead } = Astro.props;
+---
+
+<header class="page-head">
+  <div class="container page-head__inner">
+    <h1>{title}</h1>
+    {lead && <p class="lead">{lead}</p>}
+    <slot />
+  </div>
+  <RoadScene sky={false} />
+</header>
+
+<style>
+  .page-head {
+    /* A strip of the landscape, not the whole view as on the home page. */
+    --scene-height: clamp(6.5rem, 13vw, 10.5rem);
+    position: relative;
+    padding-top: var(--space-7);
+    /* The text ends above the landscape. */
+    padding-bottom: calc(var(--scene-height) + var(--space-3));
+    background: linear-gradient(180deg, #fff 0%, #eef6fb 22%, #d3e8f6 72%, #f6e8d1 100%);
+    overflow: hidden;
+  }
+
+  .page-head__inner {
+    position: relative;
+    z-index: 1;
+  }
+
+  .page-head h1 {
+    font-stretch: var(--wdth-display);
+    font-weight: 780;
+  }
+
+  .page-head .lead {
+    margin-top: var(--space-4);
+  }
+</style>

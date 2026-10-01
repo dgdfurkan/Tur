@@ -8,7 +8,7 @@ import {
   MeshBasicMaterial,
   Vector3,
 } from 'three';
-import type { RoutePlan } from '@/domain/tour/RoutePlan';
+import type { RoutePlace, RoutePlan } from '@/domain/tour/RoutePlan';
 import { LAND_TOP, ROAD_WIDTH, toWorld } from './world';
 import type { Disposable } from '@/shared/lifecycle';
 
@@ -52,7 +52,7 @@ export class RouteTrack implements Disposable {
   /** Shared by every ribbon of this road. */
   private readonly widthScale = { value: 1 };
 
-  constructor(plan: RoutePlan) {
+  constructor(plan: RoutePlan<RoutePlace>) {
     // Consecutive stops in the same spot (a sight and the hotel next to it)
     // would give the spline a zero-length segment, so they share one point.
     const points: Vector3[] = [];

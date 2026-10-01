@@ -24,15 +24,16 @@ async function start(root: HTMLElement): Promise<void> {
   });
   if (!context) return;
 
-  const [{ TourMapShowcase }, response] = await Promise.all([
+  const [{ TourMapShowcase }, { DomLabels }, response] = await Promise.all([
     import('./TourMapShowcase'),
+    import('@/features/map3d/DomLabels'),
     fetch(routesUrl),
   ]);
   if (!response.ok) throw new Error(`Route outlines failed to load: ${response.status}`);
   const outlines = (await response.json()) as RouteOutline[];
 
   const showcase = await TourMapShowcase.create(
-    { canvas, context, labels },
+    { canvas, context, labels: new DomLabels(labels) },
     quality,
     matchMedia('(prefers-reduced-motion: reduce)').matches,
   );

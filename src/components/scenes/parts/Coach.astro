@@ -1,0 +1,65 @@
+---
+import { ink } from '../palette';
+
+/**
+ * The tour coach seen from the side, facing right. The body and each wheel are
+ * elements of their own, so whoever places the coach can move it and turn its
+ * wheels without anything being repainted. Its width comes from its container.
+ */
+---
+
+<div class="coach">
+  <svg class="coach__body" viewBox="0 0 124 50" focusable="false">
+    <ellipse cx="62" cy="46" rx="56" ry="3.5" fill={ink.dark} opacity="0.25"></ellipse>
+    <rect x="2" y="4" width="118" height="36" rx="8" fill="#f6f5f0"></rect>
+    <path d="M104 4h8a8 8 0 0 1 8 8v12h-16Z" fill={ink.glass}></path>
+    <rect x="12" y="10" width="86" height="13" rx="2.5" fill={ink.glass}></rect>
+    <g fill="#f6f5f0">
+      <rect x="32" y="10" width="2.5" height="13"></rect>
+      <rect x="54" y="10" width="2.5" height="13"></rect>
+      <rect x="76" y="10" width="2.5" height="13"></rect>
+    </g>
+    <rect x="2" y="27" width="118" height="6" fill={ink.blue}></rect>
+    <rect x="86" y="25" width="12" height="15" rx="1.5" fill="#e6e5df"></rect>
+    <rect x="116" y="30" width="5" height="5" rx="1.5" fill={ink.lit}></rect>
+    <rect x="1" y="30" width="3" height="5" rx="1" fill={ink.red}></rect>
+  </svg>
+  <svg class="coach__wheel coach__wheel--rear" viewBox="-8 -8 16 16" focusable="false">
+    <circle r="7.5" fill={ink.dark}></circle>
+    <circle r="3.4" fill="#aeb4ba"></circle>
+    <rect x="-6" y="-1" width="12" height="2" fill="#aeb4ba"></rect>
+  </svg>
+  <svg class="coach__wheel coach__wheel--front" viewBox="-8 -8 16 16" focusable="false">
+    <circle r="7.5" fill={ink.dark}></circle>
+    <circle r="3.4" fill="#aeb4ba"></circle>
+    <rect x="-6" y="-1" width="12" height="2" fill="#aeb4ba"></rect>
+  </svg>
+</div>
+
+<style>
+  .coach {
+    position: relative;
+    width: 100%;
+  }
+
+  .coach__body {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .coach__wheel {
+    position: absolute;
+    bottom: 1%;
+    width: 13%;
+    height: auto;
+  }
+
+  .coach__wheel--rear {
+    left: 13%;
+  }
+
+  .coach__wheel--front {
+    left: 72%;
+  }
+</style>

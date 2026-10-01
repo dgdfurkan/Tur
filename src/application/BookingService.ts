@@ -24,7 +24,7 @@ export type DraftProblem = 'required' | 'invalid' | 'taken';
 
 export type DraftErrors = Partial<Record<DraftField, DraftProblem>>;
 
-export type AddPassengerResult =
+export type SavePassengerResult =
   | { readonly ok: true; readonly passenger: Passenger }
   | { readonly ok: false; readonly errors: DraftErrors };
 
@@ -65,11 +65,7 @@ export class BookingService {
   }
 
   booking(departureId: string): DepartureBooking | undefined {
-    for (const tour of this.tours) {
-      const departure = tour.findDeparture(departureId);
-      if (departure) return this.merge(tour, departure, this.repository.findAll());
-    }
-    return undefined;
+    return this.bookingWith(departureId, this.repository.findAll());
   }
 
   summary(today: string): BookingSummary {
@@ -84,9 +80,41 @@ export class BookingService {
     };
   }
 
-  addPassenger(draft: PassengerDraft): AddPassengerResult {
+  addPassenger(draft: PassengerDraft): SavePassengerResult {
+    return this.save(draft);
+  }
+
+  /**
+   * Changes a record, which keeps its identity and the time it was made. Its
+   * own seat counts as free, so the passenger can keep it or move to another.
+   */
+  updatePassenger(original: Passenger, draft: PassengerDraft): SavePassengerResult {
+    return this.save(draft, original);
+  }
+
+  /** Removes a record and returns it, so the caller can offer to undo. */
+  removePassenger(passengerId: string): Passenger | undefined {
+    const passenger = this.repository.findAll().find((item) => item.id === passengerId);
+    if (passenger) this.repository.remove(passengerId);
+    return passenger;
+  }
+
+  /** Puts a removed record back, unless its seat has been given away meanwhile. */
+  restorePassenger(passenger: Passenger): boolean {
+    const booking = this.booking(passenger.departureId);
+    if (!booking || booking.departure.isBooked(passenger.seatNumber)) return false;
+    this.repository.save(passenger);
+    return true;
+  }
+
+  clear(): void {
+    this.repository.replaceAll([]);
+  }
+
+  private save(draft: PassengerDraft, original?: Passenger): SavePassengerResult {
     const errors: DraftErrors = {};
-    const booking = this.booking(draft.departureId);
+    const others = this.repository.findAll().filter((item) => item.id !== original?.id);
+    const booking = this.bookingWith(draft.departureId, others);
     if (!booking) errors.departureId = 'required';
 
     const fullName = draft.fullName.trim();
@@ -121,7 +149,7 @@ export class BookingService {
     }
 
     const passenger = new Passenger({
-      id: this.newId(),
+      id: original?.id ?? this.newId(),
       departureId: booking.departure.id,
       fullName,
       phone,
@@ -129,29 +157,21 @@ export class BookingService {
       deposit: Money.fromLira(draft.depositLira),
       paymentMethod: draft.paymentMethod,
       note: draft.note,
-      createdAt: this.now().toISOString(),
+      createdAt: original?.createdAt ?? this.now().toISOString(),
     });
     this.repository.save(passenger);
     return { ok: true, passenger };
   }
 
-  /** Removes a record and returns it, so the caller can offer to undo. */
-  removePassenger(passengerId: string): Passenger | undefined {
-    const passenger = this.repository.findAll().find((item) => item.id === passengerId);
-    if (passenger) this.repository.remove(passengerId);
-    return passenger;
-  }
-
-  /** Puts a removed record back, unless its seat has been given away meanwhile. */
-  restorePassenger(passenger: Passenger): boolean {
-    const booking = this.booking(passenger.departureId);
-    if (!booking || booking.departure.isBooked(passenger.seatNumber)) return false;
-    this.repository.save(passenger);
-    return true;
-  }
-
-  clear(): void {
-    this.repository.replaceAll([]);
+  private bookingWith(
+    departureId: string,
+    passengers: readonly Passenger[],
+  ): DepartureBooking | undefined {
+    for (const tour of this.tours) {
+      const departure = tour.findDeparture(departureId);
+      if (departure) return this.merge(tour, departure, passengers);
+    }
+    return undefined;
   }
 
   private merge(

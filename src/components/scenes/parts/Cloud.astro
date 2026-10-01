@@ -1,0 +1,19 @@
+---
+/** A flat cloud; `x` and `y` are its centre. */
+interface Props {
+  x: number;
+  y: number;
+  scale?: number;
+  fill?: string;
+  opacity?: number;
+}
+
+const { x, y, scale = 1, fill = '#ffffff', opacity = 0.92 } = Astro.props;
+---
+
+<g transform={`translate(${x} ${y}) scale(${scale})`} fill={fill} opacity={opacity}>
+  <ellipse cx="0" cy="0" rx="17" ry="7"></ellipse>
+  <ellipse cx="-10" cy="3" rx="11" ry="5"></ellipse>
+  <ellipse cx="11" cy="3" rx="12" ry="5"></ellipse>
+  <ellipse cx="3" cy="-5" rx="9" ry="6"></ellipse>
+</g>

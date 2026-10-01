@@ -1,14 +1,14 @@
 import type { RoutePlan } from '@/domain/tour/RoutePlan';
-import { ROAD_WINDING_FACTOR } from '@/domain/tour/Tour';
+import { roadKm } from '@/domain/tour/Tour';
 import { tr } from '@/i18n/tr';
 import { formatKm } from '@/shared/format';
 import type { Disposable } from '@/shared/lifecycle';
 import { easeLeg, type RouteSimulation, type SimulationSnapshot } from './RouteSimulation';
 import type { RouteView } from './RouteView';
-import type { SimulationPanel } from './SimulationPanel';
+import type { PanelState, SimulationPanel } from './SimulationPanel';
 import type { SoundManager } from './SoundManager';
 
-const SPEEDS = [1, 2] as const;
+const SPEEDS = [1, 2, 3] as const;
 const ENGINE_IDLE = 0.4;
 const ENGINE_DRIVING = 1;
 
@@ -66,7 +66,7 @@ export class SimulationController implements Disposable {
 
     view.showRoute(plan);
     view.setPadding(panel.padding());
-    view.showOverview(true);
+    view.showOverview({ immediate: true });
     view.onFrame((delta) => this.tick(delta));
     view.start();
 
@@ -123,8 +123,8 @@ export class SimulationController implements Disposable {
     this.view.setVisitedThrough(-1);
     this.view.setPosition(0, 0);
     this.view.setTimeOfDay('day');
+    this.enter('intro');
     this.view.showOverview();
-    this.panel.setState('intro');
     this.panel.showIntro(this.options.duration, this.options.summary);
     this.panel.setStops(null, -1);
     this.panel.setProgress(0);
@@ -141,7 +141,7 @@ export class SimulationController implements Disposable {
     if (this.boarding) return;
     this.sound.unlock();
     this.started = true;
-    this.panel.setState('running');
+    this.enter('running');
     this.simulation.seekToStop(stopIndex);
   }
 
@@ -157,9 +157,15 @@ export class SimulationController implements Disposable {
     this.view.dispose();
   }
 
+  /** Changes the panel's state; the room it leaves for the map changes with it. */
+  private enter(state: PanelState): void {
+    this.panel.setState(state);
+    this.view.setPadding(this.panel.padding());
+  }
+
   private begin(): void {
     this.started = true;
-    this.panel.setState('running');
+    this.enter('running');
     if (this.options.stepMode) this.simulation.seekToStop(0);
     else this.simulation.play();
   }
@@ -185,10 +191,8 @@ export class SimulationController implements Disposable {
     if (next) this.panel.showTravelling(next, this.legDistance(fromIndex));
   }
 
-  /** Road distance of a leg, rounded to a figure that reads naturally. */
   private legDistance(legIndex: number): string {
-    const km = this.plan.legKm(legIndex) * ROAD_WINDING_FACTOR;
-    return formatKm(km < 10 ? Math.max(1, Math.round(km)) : Math.round(km / 5) * 5);
+    return formatKm(roadKm(this.plan.legKm(legIndex)));
   }
 
   private onStopReached(stopIndex: number): void {
@@ -202,14 +206,15 @@ export class SimulationController implements Disposable {
     this.sound.chime();
     this.panel.showStop(stop);
     this.panel.setStops(stopIndex, stopIndex - 1);
-    this.panel.announce(`${stop.stop.name}. ${stop.stop.summary}`);
+    const facts = stop.stop.facts.map((fact) => ` ${fact.label}: ${fact.value}.`).join('');
+    this.panel.announce(`${stop.stop.name}. ${stop.stop.summary}${facts}`);
   }
 
   private onFinished(): void {
     this.sound.setEngine(0);
     this.view.setTimeOfDay('day');
+    this.enter('finished');
     this.view.showOverview();
-    this.panel.setState('finished');
     this.panel.showFinished(this.options.duration, this.options.summary);
     this.panel.announce(`${tr.route.finished}. ${this.options.summary}`);
   }

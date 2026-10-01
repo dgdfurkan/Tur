@@ -3,6 +3,7 @@
   "category": "doga",
   "summary": "Samsun'dan Ayder'e uzanan beş günlük programda Sümela Manastırı, Uzungöl ve Kaçkar yaylaları gezilir.",
   "emblem": "yayla",
+  "scene": "yayla",
   "destination": "Ayder Yaylası",
   "nights": 4,
   "distanceFromAnkaraKm": 970,
@@ -64,7 +65,8 @@
           "kind": "departure",
           "lat": 39.9208,
           "lon": 32.8541,
-          "summary": "Saat 06.00'da Kızılay'daki buluşma noktasından hareket edilir."
+          "summary": "Saat 06.00'da Kızılay'daki buluşma noktasından hareket edilir.",
+          "scene": "sehir"
         },
         {
           "id": "corum",
@@ -73,6 +75,7 @@
           "lat": 40.5506,
           "lon": 34.9556,
           "summary": "Kahvaltı molası verilir.",
+          "scene": "mola",
           "durationMinutes": 45
         },
         {
@@ -82,6 +85,13 @@
           "lat": 41.283,
           "lon": 36.356,
           "summary": "Mustafa Kemal'in 19 Mayıs 1919'da Samsun'a çıktığı vapurun birebir örneği gezilir.",
+          "scene": "vapur",
+          "facts": [
+            {
+              "label": "Tarih",
+              "value": "19 Mayıs 1919"
+            }
+          ],
           "durationMinutes": 60
         },
         {
@@ -91,6 +101,13 @@
           "lat": 40.993,
           "lon": 37.864,
           "summary": "Teleferikle çıkılan tepeden şehir ve Karadeniz izlenir.",
+          "scene": "teleferik",
+          "facts": [
+            {
+              "label": "Ulaşım",
+              "value": "Teleferik"
+            }
+          ],
           "durationMinutes": 75
         },
         {
@@ -99,7 +116,8 @@
           "kind": "lodging",
           "lat": 40.984,
           "lon": 37.879,
-          "summary": "Otele yerleşilir; akşam yemeği otelde alınır."
+          "summary": "Otele yerleşilir; akşam yemeği otelde alınır.",
+          "scene": "otel"
         }
       ]
     },
@@ -114,6 +132,13 @@
           "lat": 40.919,
           "lon": 38.392,
           "summary": "Kaleden Giresun Adası ve şehir manzarası izlenir.",
+          "scene": "sahil-kalesi",
+          "facts": [
+            {
+              "label": "Manzara",
+              "value": "Giresun Adası"
+            }
+          ],
           "durationMinutes": 45
         },
         {
@@ -123,6 +148,13 @@
           "lat": 41.0033,
           "lon": 39.6961,
           "summary": "13. yüzyıldan kalan yapının freskleri görülür.",
+          "scene": "ayasofya",
+          "facts": [
+            {
+              "label": "Yapım",
+              "value": "13. yüzyıl"
+            }
+          ],
           "durationMinutes": 60
         },
         {
@@ -132,6 +164,13 @@
           "lat": 40.987,
           "lon": 39.679,
           "summary": "Soğuksu'daki köşk ve bahçesi gezilir.",
+          "scene": "kosk",
+          "facts": [
+            {
+              "label": "Yapım Başlangıcı",
+              "value": "1890"
+            }
+          ],
           "durationMinutes": 45
         },
         {
@@ -140,7 +179,8 @@
           "kind": "lodging",
           "lat": 41.005,
           "lon": 39.726,
-          "summary": "Otele yerleşilir; akşam yemeği otelde alınır."
+          "summary": "Otele yerleşilir; akşam yemeği otelde alınır.",
+          "scene": "otel"
         }
       ]
     },
@@ -155,6 +195,17 @@
           "lat": 40.69,
           "lon": 39.658,
           "summary": "Altındere Vadisi'nde sarp kayalığa kurulu manastıra orman içinden yürünür.",
+          "scene": "manastir",
+          "facts": [
+            {
+              "label": "Rakım",
+              "value": "1.150 m"
+            },
+            {
+              "label": "Kuruluş",
+              "value": "4. yüzyıl"
+            }
+          ],
           "durationMinutes": 150
         },
         {
@@ -164,6 +215,13 @@
           "lat": 40.619,
           "lon": 40.296,
           "summary": "Göl çevresinde yürüyüş yapılır; seyir terasından vadi izlenir.",
+          "scene": "gol",
+          "facts": [
+            {
+              "label": "Rakım",
+              "value": "1.090 m"
+            }
+          ],
           "durationMinutes": 120
         },
         {
@@ -172,7 +230,8 @@
           "kind": "lodging",
           "lat": 40.617,
           "lon": 40.29,
-          "summary": "Göl kıyısındaki otele yerleşilir."
+          "summary": "Göl kıyısındaki otele yerleşilir.",
+          "scene": "otel"
         }
       ]
     },
@@ -187,6 +246,13 @@
           "lat": 41.019,
           "lon": 40.516,
           "summary": "Şehre bakan çay bahçesinde demleme çay ikram edilir.",
+          "scene": "cay",
+          "facts": [
+            {
+              "label": "Ürün",
+              "value": "Siyah çay"
+            }
+          ],
           "durationMinutes": 45
         },
         {
@@ -196,6 +262,13 @@
           "lat": 41.048,
           "lon": 41.005,
           "summary": "Fırtına Deresi üzerindeki taş kemer köprüler görülür.",
+          "scene": "tas-kopru",
+          "facts": [
+            {
+              "label": "Öne Çıkan",
+              "value": "Taş kemer köprüler"
+            }
+          ],
           "durationMinutes": 45
         },
         {
@@ -205,6 +278,17 @@
           "lat": 40.929,
           "lon": 40.962,
           "summary": "Vadiye hâkim Orta Çağ kalesi gezilir.",
+          "scene": "orman-kalesi",
+          "facts": [
+            {
+              "label": "Rakım",
+              "value": "750 m"
+            },
+            {
+              "label": "Dönem",
+              "value": "14. yüzyıl"
+            }
+          ],
           "durationMinutes": 45
         },
         {
@@ -213,7 +297,14 @@
           "kind": "lodging",
           "lat": 40.953,
           "lon": 41.106,
-          "summary": "Yaylada serbest zaman verilir; ahşap otele yerleşilir."
+          "summary": "Yaylada serbest zaman verilir; ahşap otele yerleşilir.",
+          "scene": "yayla",
+          "facts": [
+            {
+              "label": "Rakım",
+              "value": "1.350 m"
+            }
+          ]
         }
       ]
     },
@@ -228,6 +319,7 @@
           "lat": 40.951,
           "lon": 41.113,
           "summary": "Yayla merkezindeki şelaleye kısa bir yürüyüş yapılır.",
+          "scene": "selale",
           "durationMinutes": 30
         },
         {
@@ -237,6 +329,7 @@
           "lat": 41.2867,
           "lon": 36.33,
           "summary": "Öğle yemeği molası verilir.",
+          "scene": "mola",
           "durationMinutes": 60
         },
         {
@@ -245,7 +338,8 @@
           "kind": "arrival",
           "lat": 39.9208,
           "lon": 32.8541,
-          "summary": "Saat 23.30 civarında Kızılay'a varılır."
+          "summary": "Saat 23.30 civarında Kızılay'a varılır.",
+          "scene": "sehir"
         }
       ]
     }

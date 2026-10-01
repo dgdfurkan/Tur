@@ -1,5 +1,5 @@
 import { Color, DirectionalLight, HemisphereLight, MathUtils, type Object3D } from 'three';
-import type { TimeOfDay } from '@/features/route-simulation/RouteView';
+import type { TimeOfDay } from '@/shared/timeOfDay';
 import type { Updatable } from '@/shared/lifecycle';
 
 interface Mood {

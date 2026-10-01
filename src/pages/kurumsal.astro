@@ -1,4 +1,5 @@
 ---
+import PageHead from '@/components/layout/PageHead.astro';
 import Button from '@/components/ui/Button.astro';
 import Icon, { type IconName } from '@/components/ui/Icon.astro';
 import { pageUrl } from '@/config/paths';
@@ -71,19 +72,16 @@ const steps = [
   title="Kurumsal ve Okul Turları"
   description="Okullar, kamu kurumları ve şirketler için tarih, program ve bütçeye göre düzenlenen özel turlar."
 >
-  <div class="container page-head">
-    <h1>Kurumsal ve Okul Turları</h1>
-    <p class="lead">
-      Okullar, kamu kurumları ve şirketler için tarih, program ve bütçeye göre özel turlar
-      düzenlenir.
-    </p>
-  </div>
+  <PageHead
+    title="Kurumsal ve Okul Turları"
+    lead="Okullar, kamu kurumları ve şirketler için tarih, program ve bütçeye göre özel turlar düzenlenir."
+  />
 
   <section class="section container" aria-labelledby="okul-gezileri">
     <h2 id="okul-gezileri">Okul Gezileri</h2>
     <ul class="features">
       {school.map((feature) => (
-        <li class="feature">
+        <li class="feature" data-reveal>
           <Icon name={feature.icon} size={28} />
           <div>
             <h3>{feature.title}</h3>
@@ -99,7 +97,7 @@ const steps = [
       <h2 id="kurumlar">Kamu Kurumları ve Şirketler</h2>
       <ul class="features">
         {institutions.map((feature) => (
-          <li class="feature">
+          <li class="feature" data-reveal>
             <Icon name={feature.icon} size={28} />
             <div>
               <h3>{feature.title}</h3>
@@ -115,7 +113,7 @@ const steps = [
     <h2 id="teklif-sureci">Teklif Süreci</h2>
     <ol class="steps">
       {steps.map((step, index) => (
-        <li class="step">
+        <li class="step" data-reveal>
           <span class="step__number tabular" aria-hidden="true">
             {index + 1}
           </span>
@@ -135,19 +133,6 @@ const steps = [
 </BaseLayout>
 
 <style>
-  .page-head {
-    padding-block: var(--space-7) var(--space-5);
-  }
-
-  .page-head h1 {
-    font-stretch: var(--wdth-display);
-    font-weight: 780;
-  }
-
-  .page-head .lead {
-    margin-top: var(--space-4);
-  }
-
   .features,
   .steps {
     display: grid;
@@ -208,6 +193,26 @@ const steps = [
 
     .steps {
       grid-template-columns: repeat(3, 1fr);
+    }
+
+    .step {
+      position: relative;
+      grid-template-columns: 1fr;
+    }
+
+    /* A stretch of road leads from each step to the next. */
+    .step:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      top: 1.25rem;
+      left: calc(2.75rem + var(--space-3));
+      right: calc(var(--space-3) - var(--space-6));
+      height: 0.25rem;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--c-line) 0 1.25rem,
+        transparent 1.25rem 2rem
+      );
     }
   }
 </style>

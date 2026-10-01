@@ -4,16 +4,18 @@ Bu sürüm, tasarımı ve fikri göstermek için hazırlanmış bir prototiptir.
 
 ## Yayın Öncesi Yapılacaklar
 
-| İş                    | Açıklama                                                                                |
-| --------------------- | --------------------------------------------------------------------------------------- |
-| Marka                 | Ad, logo ve iletişim bilgileri `src/config/site.ts` dosyasına yazılır                   |
-| Belge Bilgisi         | TÜRSAB belge numarası ve işletme unvanı alt bilgiye eklenir                             |
-| Gerçek İçerik         | Tur programları, fiyatlar ve konaklama bilgileri örnek içeriğin yerini alır             |
-| Fotoğraf              | Kullanım hakkı acenteye ait olan tur fotoğrafları eklenir                               |
-| Yasal Metinler        | KVKK aydınlatma metni ile paket tur sözleşmesi ve ön bilgilendirme metinleri hazırlanır |
-| Arama Motorları       | `noindex` etiketi kaldırılır; site haritası ve yapılandırılmış veri eklenir             |
-| Gerçek Cihaz Denemesi | Simülasyon, orta seviye Android telefonlarda ve iPhone'da kare süresi ölçülerek denenir |
-| Alan Adı              | Site kendi alan adına taşınır; `SITE_URL` ve `BASE_PATH` değişkenleri ayarlanır         |
+| İş                    | Açıklama                                                                                          |
+| --------------------- | ------------------------------------------------------------------------------------------------- |
+| Marka                 | Ad, logo ve iletişim bilgileri `src/config/site.ts` dosyasına yazılır                             |
+| Belge Bilgisi         | TÜRSAB belge numarası ve işletme unvanı alt bilgiye eklenir                                       |
+| Gerçek İçerik         | Tur programları, fiyatlar ve konaklama bilgileri örnek içeriğin yerini alır                       |
+| Fotoğraf              | Kullanım hakkı acenteye ait olan tur fotoğrafları eklenir                                         |
+| Yasal Metinler        | KVKK aydınlatma metni ile paket tur sözleşmesi ve ön bilgilendirme metinleri hazırlanır           |
+| Arama Motorları       | `noindex` etiketi kaldırılır; site haritası ve yapılandırılmış veri eklenir                       |
+| Gerçek Cihaz Denemesi | Simülasyon, orta seviye Android telefonlarda ve iPhone'da kare süresi ölçülerek denenir           |
+| Panel Erişim Kodu     | `npm run panel:code` ile yeni bir kod belirlenir ve yalnızca yetkili kişilerle paylaşılır         |
+| Video Stüdyosu        | Videolar Safari ve Firefox'ta da denenir; WebCodecs desteklemeyen tarayıcıda stüdyo bunu bildirir |
+| Alan Adı              | Site kendi alan adına taşınır; `SITE_URL` ve `BASE_PATH` değişkenleri ayarlanır                   |
 
 ## Aşama 1: Cloudflare'e Geçiş
 
@@ -29,7 +31,8 @@ Kendi alan adı, tarayıcı deposunu da ayırır: bugün `dgdfurkan.github.io` a
 Demo paneli kayıtları yalnızca girildiği cihazda tutar. Gerçek kullanım için kayıtların ofisteki ve sahadaki herkes tarafından aynı anda görülmesi gerekir.
 
 - Veri, Cloudflare Workers ve D1 üzerinde tutulur.
-- Giriş Cloudflare Access ile yapılır; ofis, satış ve rehber rolleri ayrılır.
+- Giriş Cloudflare Access ile yapılır; ofis, satış ve rehber rolleri ayrılır. Bugünkü erişim kodu kilidi bu girişle değiştirilir.
+- Video stüdyosunda kullanılan logo ve iletişim bilgisi, ayarlarla birlikte ofisin tüm cihazlarında ortak tutulur.
 - Her ekleme, değişiklik ve silme işlemi, yapan kişi ve zamanla birlikte kaydedilir.
 - Panel kodu değişmez: `PassengerRepository` arayüzü için HTTP üzerinden çalışan yeni bir uygulama yazılır.
 - Bağlantının zayıf olduğu yerlerde kayıt cihazda bekletilir ve bağlantı geldiğinde gönderilir.
@@ -71,5 +74,5 @@ Kişisel veri işlenmeye başlandığı için bu aşamada KVKK yükümlülükler
 
 - Lighthouse bütçesinin CI adımı olarak çalıştırılması.
 - Uçtan uca testlere WebKit (iOS Safari) projesinin eklenmesi.
-- Harita ve biniş kartı için görsel karşılaştırma testleri.
+- Harita, biniş kartı ve video kareleri için görsel karşılaştırma testleri.
 - Gerçek fotoğraflar eklendiğinde görsellerin boyut ve biçim olarak optimize edilmesi.

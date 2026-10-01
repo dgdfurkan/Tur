@@ -43,3 +43,11 @@ const pageTitle = title ? `${title} | ${siteConfig.brand.name}` : siteConfig.bra
     {chrome && <Footer />}
   </body>
 </html>
+
+<script>
+  import { watchReveals } from '@/shared/reveal';
+  import { enableTilt } from '@/shared/tilt';
+
+  watchReveals();
+  enableTilt();
+</script>

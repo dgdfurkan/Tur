@@ -3,6 +3,7 @@
   "category": "kultur",
   "summary": "Peribacaları, kaya kiliseleri ve yeraltı şehirleri üç günlük bir programda, profesyonel rehber eşliğinde gezilir.",
   "emblem": "peribacasi",
+  "scene": "uc-guzeller",
   "destination": "Kapadokya",
   "nights": 2,
   "distanceFromAnkaraKm": 290,
@@ -44,7 +45,8 @@
           "kind": "departure",
           "lat": 39.9208,
           "lon": 32.8541,
-          "summary": "Saat 07.00'de Kızılay'daki buluşma noktasından hareket edilir."
+          "summary": "Saat 07.00'de Kızılay'daki buluşma noktasından hareket edilir.",
+          "scene": "sehir"
         },
         {
           "id": "tuz-golu",
@@ -53,6 +55,17 @@
           "lat": 38.87,
           "lon": 33.45,
           "summary": "Türkiye'nin ikinci büyük gölünün kıyısında fotoğraf molası verilir.",
+          "scene": "tuz-golu",
+          "facts": [
+            {
+              "label": "Rakım",
+              "value": "905 m"
+            },
+            {
+              "label": "Bilinen Yönü",
+              "value": "Flamingoların üreme alanı"
+            }
+          ],
           "durationMinutes": 30
         },
         {
@@ -62,6 +75,17 @@
           "lat": 38.248,
           "lon": 33.5465,
           "summary": "1229 yılında yaptırılan, Anadolu'nun en büyük Selçuklu kervansarayı gezilir.",
+          "scene": "kervansaray",
+          "facts": [
+            {
+              "label": "Yapım Yılı",
+              "value": "1229"
+            },
+            {
+              "label": "Yaptıran",
+              "value": "I. Alâeddin Keykubad"
+            }
+          ],
           "durationMinutes": 45
         },
         {
@@ -71,6 +95,17 @@
           "lat": 38.253,
           "lon": 34.299,
           "summary": "Melendiz Çayı boyunca yürünür, kayaya oyulmuş kiliseler görülür. Öğle yemeği molası Belisırma'da verilir.",
+          "scene": "vadi",
+          "facts": [
+            {
+              "label": "Uzunluk",
+              "value": "14 km"
+            },
+            {
+              "label": "Derinlik",
+              "value": "100-150 m"
+            }
+          ],
           "durationMinutes": 150
         },
         {
@@ -80,6 +115,17 @@
           "lat": 38.3735,
           "lon": 34.735,
           "summary": "Sekiz katı ziyarete açık olan yeraltı şehrinin yaşam alanları gezilir.",
+          "scene": "yeralti",
+          "facts": [
+            {
+              "label": "Ziyarete Açık Kat",
+              "value": "8"
+            },
+            {
+              "label": "Keşif Yılı",
+              "value": "1963"
+            }
+          ],
           "durationMinutes": 60
         },
         {
@@ -88,7 +134,8 @@
           "kind": "lodging",
           "lat": 38.631,
           "lon": 34.913,
-          "summary": "Otele yerleşilir; akşam yemeği otelde alınır."
+          "summary": "Otele yerleşilir; akşam yemeği otelde alınır.",
+          "scene": "otel"
         }
       ]
     },
@@ -103,6 +150,17 @@
           "lat": 38.64,
           "lon": 34.845,
           "summary": "UNESCO Dünya Mirası Listesi'ndeki kaya kiliseleri ve freskler rehber anlatımıyla gezilir.",
+          "scene": "kaya-kilise",
+          "facts": [
+            {
+              "label": "UNESCO Dünya Mirası",
+              "value": "1985"
+            },
+            {
+              "label": "Dönem",
+              "value": "10-12. yüzyıl"
+            }
+          ],
           "durationMinutes": 120
         },
         {
@@ -112,6 +170,13 @@
           "lat": 38.63,
           "lon": 34.805,
           "summary": "Bölgenin en yüksek noktasından Güvercinlik Vadisi izlenir.",
+          "scene": "kaya-kale",
+          "facts": [
+            {
+              "label": "Yapı",
+              "value": "Kayaya oyulmuş doğal kale"
+            }
+          ],
           "durationMinutes": 45
         },
         {
@@ -121,6 +186,13 @@
           "lat": 38.672,
           "lon": 34.85,
           "summary": "Üç başlıklı peribacalarının arasında yürünür.",
+          "scene": "peribacasi",
+          "facts": [
+            {
+              "label": "Diğer Adı",
+              "value": "Rahipler Vadisi"
+            }
+          ],
           "durationMinutes": 45
         },
         {
@@ -130,6 +202,17 @@
           "lat": 38.715,
           "lon": 34.847,
           "summary": "Kızılırmak kıyısındaki çömlek atölyesinde çark başında uygulama izlenir.",
+          "scene": "comlek",
+          "facts": [
+            {
+              "label": "Zanaat",
+              "value": "Çömlekçilik"
+            },
+            {
+              "label": "Kızılırmak'ın Uzunluğu",
+              "value": "1.355 km"
+            }
+          ],
           "durationMinutes": 60
         },
         {
@@ -139,6 +222,13 @@
           "lat": 38.669,
           "lon": 34.89,
           "summary": "Hayvan siluetlerini andıran kaya oluşumları görülür.",
+          "scene": "peribacasi",
+          "facts": [
+            {
+              "label": "Diğer Adı",
+              "value": "Hayal Vadisi"
+            }
+          ],
           "durationMinutes": 30
         },
         {
@@ -147,7 +237,8 @@
           "kind": "lodging",
           "lat": 38.631,
           "lon": 34.913,
-          "summary": "Otele dönülür; akşam yemeği otelde alınır."
+          "summary": "Otele dönülür; akşam yemeği otelde alınır.",
+          "scene": "otel"
         }
       ]
     },
@@ -162,6 +253,13 @@
           "lat": 38.651,
           "lon": 34.887,
           "summary": "Kapadokya'nın simgesi sayılan üç peribacasının önünde fotoğraf molası verilir.",
+          "scene": "uc-guzeller",
+          "facts": [
+            {
+              "label": "Konum",
+              "value": "Ürgüp girişi"
+            }
+          ],
           "durationMinutes": 30
         },
         {
@@ -171,6 +269,17 @@
           "lat": 38.577,
           "lon": 34.897,
           "summary": "Eski adı Sinasos olan köyün taş konakları ve sokakları gezilir.",
+          "scene": "tas-konak",
+          "facts": [
+            {
+              "label": "Eski Adı",
+              "value": "Sinasos"
+            },
+            {
+              "label": "Mimari",
+              "value": "19. yüzyıl taş konakları"
+            }
+          ],
           "durationMinutes": 75
         },
         {
@@ -180,6 +289,7 @@
           "lat": 38.3687,
           "lon": 34.037,
           "summary": "Dönüş yolunda yemek molası verilir.",
+          "scene": "mola",
           "durationMinutes": 45
         },
         {
@@ -188,7 +298,8 @@
           "kind": "arrival",
           "lat": 39.9208,
           "lon": 32.8541,
-          "summary": "Saat 20.30 civarında Kızılay'a varılır."
+          "summary": "Saat 20.30 civarında Kızılay'a varılır.",
+          "scene": "sehir"
         }
       ]
     }

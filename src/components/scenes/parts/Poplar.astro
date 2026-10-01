@@ -1,0 +1,16 @@
+---
+/** A tall, narrow tree standing on the point (`x`, `y`). */
+interface Props {
+  x: number;
+  y: number;
+  height?: number;
+  fill?: string;
+}
+
+const { x, y, height = 36, fill = '#6fa45c' } = Astro.props;
+---
+
+<g>
+  <rect x={x - 1} y={y - height * 0.25} width="2" height={height * 0.25} fill="#553c28"></rect>
+  <ellipse cx={x} cy={y - height * 0.6} rx={height * 0.13} ry={height * 0.42} fill={fill}></ellipse>
+</g>

@@ -1,0 +1,36 @@
+---
+import { ink } from '../palette';
+import Cloud from '../parts/Cloud.astro';
+import Poplar from '../parts/Poplar.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyDay}></rect>
+<Cloud x={60} y={34} scale={1.2} />
+<Cloud x={258} y={52} scale={0.9} />
+<path d="M0 124q90-18 170-8t150-10v50H0z" fill={ink.farSand}></path>
+<!-- Smaller mounds on the horizon -->
+<path d="M8 130q22-26 44 0z" fill={ink.steppe}></path>
+<path d="M254 128q26-30 52 0z" fill={ink.steppe}></path>
+<!-- The great mound -->
+<path d="M54 146q106-150 212 0z" fill={ink.grass}></path>
+<path d="M160 72q60 8 106 74h-60q-10-50-46-74z" fill={ink.grassDeep}></path>
+<!-- Entrance passage -->
+<path d="M136 146v-16q10-10 20 0v16z" fill={ink.stoneShade}></path>
+<path d="M141 146v-12q5-6 10 0v12z" fill={ink.dark}></path>
+<!-- Museum -->
+<rect x="226" y="126" width="58" height="22" fill={ink.wall}></rect>
+<path d="M220 128l35-14 35 14z" fill={ink.roof}></path>
+<g fill={ink.glass}>
+  <rect x="234" y="133" width="9" height="9"></rect>
+  <rect x="250" y="133" width="9" height="9"></rect>
+  <rect x="266" y="133" width="9" height="9"></rect>
+</g>
+<Poplar x={214} y={148} height={34} />
+<Poplar x={296} y={148} height={30} fill={ink.grassDeep} />
+<!-- Fields -->
+<rect x="0" y="146" width="320" height="54" fill={ink.steppe}></rect>
+<g fill={ink.sandDeep}>
+  <path d="M0 160l120-8v10L0 176z"></path>
+  <path d="M320 156l-150 10v10l150-4z"></path>
+  <path d="M0 188l200-6v10L0 200z"></path>
+</g>

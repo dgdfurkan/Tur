@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test';
+import { TEST_PANEL_CODE } from '../panelCode';
 
 /**
  * Collects console errors and uncaught exceptions. A Content Security Policy
@@ -15,4 +16,42 @@ export function trackErrors(page: Page): string[] {
 
 export function expectNoErrors(errors: string[]): void {
   expect(errors, `Unexpected console errors:\n${errors.join('\n')}`).toEqual([]);
+}
+
+/**
+ * Opens a page of the operations panel with the access code of test builds.
+ * The site under test is built by `npm run build:e2e`, whose lock accepts it.
+ */
+export async function openPanelPage(page: Page, path: string): Promise<void> {
+  await page.goto(path);
+  const panel = page.locator('[data-admin]');
+  await expect(panel).toHaveAttribute('data-access', 'locked');
+  await page.getByLabel('Erişim Kodu').fill(TEST_PANEL_CODE);
+  await page.getByRole('button', { name: 'Paneli Aç' }).click();
+  await expect(panel).toHaveAttribute('data-access', 'open');
+}
+
+/**
+ * Waits until nothing on the page is fading or moving over time. Loops that
+ * never end, motion tied to scrolling and animations still waiting out their
+ * delay do not count. Axe judges contrast on what is painted at that instant,
+ * so a label caught halfway through fading in would fail it.
+ */
+export async function waitForStillness(page: Page): Promise<void> {
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          document.getAnimations().filter((animation) => {
+            const timing = animation.effect?.getComputedTiming();
+            return (
+              animation.playState === 'running' &&
+              animation.timeline === document.timeline &&
+              timing?.iterations !== Infinity &&
+              timing?.progress !== null
+            );
+          }).length,
+      ),
+    )
+    .toBe(0);
 }

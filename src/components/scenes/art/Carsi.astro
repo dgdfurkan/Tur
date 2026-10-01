@@ -1,0 +1,60 @@
+---
+import { ink } from '../palette';
+---
+
+<rect width="320" height="200" fill={ink.skyPale}></rect>
+<!-- Street narrowing towards the far end -->
+<path d="M120 60h80l120 140H0z" fill={ink.rock}></path>
+<path d="M146 60h28l40 140H106z" fill={ink.rockShade} opacity="0.5"></path>
+<!-- Left row of shops -->
+<path d="M0 0h120v60L0 200z" fill={ink.wall}></path>
+<path d="M0 84l120-42v18L0 176z" fill={ink.wood}></path>
+<path d="M0 40l120-24v14L0 60z" fill={ink.roof}></path>
+<g fill={ink.woodDeep}>
+  <path d="M14 162v-66l22-7v58z"></path>
+  <path d="M50 138v-54l18-6v49z"></path>
+  <path d="M80 118v-44l14-5v40z"></path>
+  <path d="M102 102v-36l10-3v33z"></path>
+</g>
+<!-- Right row of shops -->
+<path d="M320 0H200v60l120 140z" fill={ink.wallShade}></path>
+<path d="M320 84L200 42v18l120 116z" fill={ink.woodDeep}></path>
+<path d="M320 40L200 16v14l120 30z" fill={ink.roofShade}></path>
+<g fill={ink.dark}>
+  <path d="M306 162v-66l-22-7v58z"></path>
+  <path d="M270 138v-54l-18-6v49z"></path>
+  <path d="M240 118v-44l-14-5v40z"></path>
+  <path d="M218 102v-36l-10-3v33z"></path>
+</g>
+<!-- Awnings -->
+<path d="M0 96l40-13 8 14-48 20z" fill={ink.red}></path>
+<path d="M48 80l26-9 6 12-30 12z" fill={ink.yellow}></path>
+<path d="M320 96l-40-13-8 14 48 20z" fill={ink.blue}></path>
+<path d="M272 80l-26-9-6 12 30 12z" fill={ink.clay}></path>
+<!-- Lamps strung across the street -->
+<path d="M120 36q40 22 80 0" fill="none" stroke={ink.dark} stroke-width="1"></path>
+<path d="M70 22q90 50 180 0" fill="none" stroke={ink.dark} stroke-width="1"></path>
+<g fill={ink.lit}>
+  <circle cx="140" cy="44" r="3"></circle>
+  <circle cx="160" cy="47" r="3"></circle>
+  <circle cx="180" cy="44" r="3"></circle>
+  <circle cx="106" cy="38" r="4"></circle>
+  <circle cx="160" cy="47" r="3"></circle>
+  <circle cx="214" cy="38" r="4"></circle>
+</g>
+<!-- Copper trays and rugs on display -->
+<g>
+  <circle cx="26" cy="150" r="9" fill={ink.clay}></circle>
+  <circle cx="26" cy="150" r="5" fill={ink.clayDeep}></circle>
+  <circle cx="58" cy="128" r="7" fill={ink.yellow}></circle>
+  <rect x="280" y="130" width="16" height="26" fill={ink.red}></rect>
+  <rect x="283" y="134" width="10" height="18" fill={ink.sunPale}></rect>
+  <rect x="254" y="116" width="12" height="20" fill={ink.blue}></rect>
+</g>
+<!-- Shoppers -->
+<g fill={ink.dark}>
+  <circle cx="150" cy="120" r="4"></circle>
+  <rect x="146" y="125" width="8" height="18" rx="3.5"></rect>
+  <circle cx="174" cy="98" r="3"></circle>
+  <rect x="171" y="102" width="6" height="13" rx="3"></rect>
+</g>

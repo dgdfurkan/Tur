@@ -1,11 +1,8 @@
 import { Vector3, type Camera } from 'three';
+import type { LabelState, LabelSurface, LabelTone } from './LabelSurface';
 import type { Disposable } from '@/shared/lifecycle';
 
-export type LabelTone = 'stop' | 'city' | 'sea';
-export type LabelState = 'idle' | 'active' | 'visited';
-
 interface Label {
-  readonly element: HTMLElement;
   readonly position: Vector3;
   readonly priority: number;
   /** Empty room the sign asks for around itself, in pixels. */
@@ -23,34 +20,26 @@ const ACTIVE_BONUS = 1000;
 const SPACING: Record<LabelTone, number> = { stop: 0, city: 18, sea: 6 };
 
 /**
- * Place names drawn as small road signs in HTML on top of the canvas, so text
- * stays crisp and selectable by assistive technology. Labels follow their 3D
- * anchor every frame; overlaps are resolved by priority every few frames.
+ * Decides where place-name signs stand and which ones are shown. Labels follow
+ * their 3D anchor every frame; overlaps are resolved by priority every few
+ * frames. How a sign looks is left to the surface it is given.
  */
 export class LabelLayer implements Disposable {
   private readonly labels = new Map<string, Label>();
   private readonly projected = new Vector3();
   private frame = 0;
 
-  constructor(private readonly container: HTMLElement) {}
+  constructor(private readonly surface: LabelSurface) {}
 
   add(id: string, text: string, position: Vector3, tone: LabelTone, priority: number): void {
-    const element = document.createElement('div');
-    element.className = `map-label map-label--${tone}`;
-    element.dataset['state'] = 'idle';
-    const plate = document.createElement('span');
-    plate.className = 'map-label__plate';
-    plate.textContent = text;
-    element.append(plate);
-    this.container.append(element);
+    const { width, height } = this.surface.create(id, text, tone);
     this.labels.set(id, {
-      element,
       position: position.clone(),
       priority,
       spacing: SPACING[tone],
       state: 'idle',
-      width: element.offsetWidth,
-      height: element.offsetHeight,
+      width,
+      height,
       shown: false,
     });
   }
@@ -59,17 +48,17 @@ export class LabelLayer implements Disposable {
     const label = this.labels.get(id);
     if (!label || label.state === state) return;
     label.state = state;
-    label.element.dataset['state'] = state;
     // The active sign is larger, so its footprint has to be measured again.
-    label.width = label.element.offsetWidth;
-    label.height = label.element.offsetHeight;
+    const { width, height } = this.surface.restyle(id, state);
+    label.width = width;
+    label.height = height;
     this.frame = 0;
   }
 
   remove(prefix: string): void {
-    for (const [id, label] of this.labels) {
+    for (const id of this.labels.keys()) {
       if (!id.startsWith(prefix)) continue;
-      label.element.remove();
+      this.surface.destroy(id);
       this.labels.delete(id);
     }
   }
@@ -79,10 +68,10 @@ export class LabelLayer implements Disposable {
     this.frame += 1;
     const placed: { left: number; top: number; right: number; bottom: number }[] = [];
     const ordered = relayout
-      ? [...this.labels.values()].sort((a, b) => this.rank(b) - this.rank(a))
-      : this.labels.values();
+      ? [...this.labels].sort(([, a], [, b]) => this.rank(b) - this.rank(a))
+      : this.labels;
 
-    for (const label of ordered) {
+    for (const [id, label] of ordered) {
       this.projected.copy(label.position).project(camera);
       const x = ((this.projected.x + 1) / 2) * width;
       const y = ((1 - this.projected.y) / 2) * height;
@@ -111,20 +100,17 @@ export class LabelLayer implements Disposable {
         if (shown) placed.push(box);
         if (shown !== label.shown) {
           label.shown = shown;
-          label.element.classList.toggle('map-label--shown', shown);
+          this.surface.setShown(id, shown);
         }
       }
       // Hidden labels keep following their anchor, so one that is still fading
       // out never lingers where the map used to be.
-      if (onScreen) {
-        // Anchored at the bottom centre, where the sign post meets the ground.
-        label.element.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translate(-50%, -100%)`;
-      }
+      if (onScreen) this.surface.move(id, x, y);
     }
   }
 
   dispose(): void {
-    for (const label of this.labels.values()) label.element.remove();
+    this.surface.dispose();
     this.labels.clear();
   }
 

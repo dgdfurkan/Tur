@@ -1,0 +1,53 @@
+---
+import { ink } from '../palette';
+import Poplar from '../parts/Poplar.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyNight}></rect>
+<path d="M0 96q80-30 160-18t160-22v144H0z" fill="#4a5f86"></path>
+<!-- Moon and stars -->
+<circle cx="258" cy="40" r="15" fill={ink.sunPale}></circle>
+<circle cx="265" cy="35" r="13" fill={ink.skyNight}></circle>
+<g fill={ink.sunPale}>
+  <circle cx="40" cy="30" r="1.6"></circle>
+  <circle cx="92" cy="18" r="1.2"></circle>
+  <circle cx="150" cy="36" r="1.5"></circle>
+  <circle cx="204" cy="20" r="1.2"></circle>
+  <circle cx="300" cy="76" r="1.4"></circle>
+  <circle cx="22" cy="70" r="1.2"></circle>
+</g>
+<Poplar x={44} y={160} height={62} fill="#2c4f3f" />
+<Poplar x={280} y={160} height={54} fill="#2c4f3f" />
+<!-- Hotel -->
+<rect x="72" y="70" width="176" height="90" fill="#e9dcc3"></rect>
+<rect x="72" y="62" width="176" height="10" fill="#c9b792"></rect>
+<rect x="132" y="50" width="56" height="14" rx="2" fill={ink.blue}></rect>
+<g fill={ink.line}>
+  <rect x="140" y="56" width="6" height="2.6"></rect>
+  <rect x="150" y="56" width="6" height="2.6"></rect>
+  <rect x="160" y="56" width="6" height="2.6"></rect>
+  <rect x="170" y="56" width="6" height="2.6"></rect>
+</g>
+<g fill={ink.lit}>
+  <rect x="84" y="80" width="18" height="16" rx="2"></rect>
+  <rect x="112" y="80" width="18" height="16" rx="2"></rect>
+  <rect x="190" y="80" width="18" height="16" rx="2"></rect>
+  <rect x="218" y="80" width="18" height="16" rx="2"></rect>
+  <rect x="84" y="106" width="18" height="16" rx="2"></rect>
+  <rect x="218" y="106" width="18" height="16" rx="2"></rect>
+  <rect x="112" y="132" width="18" height="16" rx="2"></rect>
+</g>
+<g fill="#55668a">
+  <rect x="112" y="106" width="18" height="16" rx="2"></rect>
+  <rect x="190" y="106" width="18" height="16" rx="2"></rect>
+  <rect x="84" y="132" width="18" height="16" rx="2"></rect>
+  <rect x="190" y="132" width="18" height="16" rx="2"></rect>
+  <rect x="218" y="132" width="18" height="16" rx="2"></rect>
+</g>
+<!-- Entrance -->
+<path d="M136 118h48l8 10h-64z" fill={ink.roof}></path>
+<rect x="144" y="128" width="32" height="32" fill={ink.lit}></rect>
+<rect x="159" y="128" width="2" height="32" fill="#c9b792"></rect>
+<!-- Forecourt -->
+<rect x="0" y="160" width="320" height="40" fill="#26334d"></rect>
+<path d="M134 160h52l26 40H108z" fill="#3a4a6b"></path>

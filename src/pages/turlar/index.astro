@@ -1,4 +1,6 @@
 ---
+import PageHead from '@/components/layout/PageHead.astro';
+import SceneSprite from '@/components/scenes/SceneSprite.astro';
 import TourTicket from '@/components/tour/TourTicket.astro';
 import { tourCatalog } from '@/composition/catalog';
 import { tr } from '@/i18n/tr';
@@ -20,12 +22,10 @@ const filters = [
   title={tr.nav.tours}
   description="Ankara çıkışlı tüm turlar: kalkış tarihleri, fiyatlar ve güncel doluluk durumu."
 >
-  <div class="container page-head">
-    <h1>{tr.nav.tours}</h1>
-    <p class="lead">
-      Ankara çıkışlı tüm programlar, en yakın kalkış tarihi ve güncel doluluk durumuyla listelenir.
-    </p>
-  </div>
+  <PageHead
+    title={tr.nav.tours}
+    lead="Ankara çıkışlı tüm programlar, en yakın kalkış tarihi ve güncel doluluk durumuyla listelenir."
+  />
 
   <section class="container tours" aria-label="Tur Listesi">
     <fieldset class="filter">
@@ -46,30 +46,18 @@ const filters = [
 
     <ul class="ticket-list">
       {tours.map((tour) => (
-        <li data-category={tour.category}>
+        <li data-category={tour.category} data-reveal>
           <TourTicket tour={tour} departure={tour.nextDeparture(today)} headingLevel="h2" />
         </li>
       ))}
     </ul>
   </section>
+  <SceneSprite scenes={tours.map((tour) => tour.scene)} />
 </BaseLayout>
 
 <style>
-  .page-head {
-    padding-block: var(--space-7) var(--space-6);
-  }
-
-  .page-head h1 {
-    font-stretch: var(--wdth-display);
-    font-weight: 780;
-  }
-
-  .page-head .lead {
-    margin-top: var(--space-4);
-  }
-
   .tours {
-    padding-bottom: var(--space-section);
+    padding-block: var(--space-6) var(--space-section);
   }
 
   .filter {
@@ -117,11 +105,53 @@ const filters = [
     gap: var(--space-5);
   }
 
+  @media (min-width: 40rem) {
+    .ticket-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 68rem) {
+    .ticket-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
   /* Filtering needs no script: the checked radio decides which tickets show. */
   .tours:has(input[value='kultur']:checked) li:not([data-category='kultur']),
   .tours:has(input[value='doga']:checked) li:not([data-category='doga']),
   .tours:has(input[value='gunubirlik']:checked) li:not([data-category='gunubirlik']) {
     display: none;
+  }
+
+  /*
+   * A ticket the filter brings back arrives rather than appears: the animation
+   * starts again each time the ticket is shown. It ends at whatever the ticket's
+   * own state is, so it never shows a ticket that has yet to be revealed.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    .ticket-list li {
+      animation: ticket-arrives 420ms var(--ease-out) backwards;
+    }
+
+    .ticket-list li:nth-child(2) {
+      animation-delay: 60ms;
+    }
+
+    .ticket-list li:nth-child(3) {
+      animation-delay: 120ms;
+    }
+
+    .ticket-list li:nth-child(n + 4) {
+      animation-delay: 180ms;
+    }
+
+    @keyframes ticket-arrives {
+      from {
+        opacity: 0;
+        transform: translateY(0.75rem);
+      }
+    }
   }
 
   @media (hover: hover) and (pointer: fine) {

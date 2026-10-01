@@ -3,6 +3,7 @@
   "category": "gunubirlik",
   "summary": "Tarihî evleri, telkâri gümüş işçiliği ve yöresel mutfağıyla Beypazarı bir günde gezilir.",
   "emblem": "vadi",
+  "scene": "seyir",
   "destination": "Beypazarı",
   "nights": 0,
   "distanceFromAnkaraKm": 100,
@@ -28,7 +29,8 @@
           "kind": "departure",
           "lat": 39.9208,
           "lon": 32.8541,
-          "summary": "Saat 08.00'de Kızılay'daki buluşma noktasından hareket edilir."
+          "summary": "Saat 08.00'de Kızılay'daki buluşma noktasından hareket edilir.",
+          "scene": "sehir"
         },
         {
           "id": "ayas",
@@ -37,6 +39,7 @@
           "lat": 40.017,
           "lon": 32.333,
           "summary": "Kısa bir çay molası verilir.",
+          "scene": "mola",
           "durationMinutes": 20
         },
         {
@@ -46,6 +49,7 @@
           "lat": 40.172,
           "lon": 31.923,
           "summary": "İlçenin tamamı seyir tepesinden izlenir.",
+          "scene": "seyir",
           "durationMinutes": 30
         },
         {
@@ -55,6 +59,13 @@
           "lat": 40.1675,
           "lon": 31.9211,
           "summary": "Üç katlı ahşap konakların bulunduğu sokaklar ve Yaşayan Müze gezilir.",
+          "scene": "konak",
+          "facts": [
+            {
+              "label": "Mimari",
+              "value": "Ahşap çatkılı, üç katlı evler"
+            }
+          ],
           "durationMinutes": 120
         },
         {
@@ -64,6 +75,17 @@
           "lat": 40.169,
           "lon": 31.92,
           "summary": "Telkâri gümüş atölyeleri görülür; öğle yemeği için serbest zaman verilir.",
+          "scene": "carsi",
+          "facts": [
+            {
+              "label": "Zanaat",
+              "value": "Telkâri gümüş işçiliği"
+            },
+            {
+              "label": "Yöresel Tat",
+              "value": "Beypazarı kurusu"
+            }
+          ],
           "durationMinutes": 120
         },
         {
@@ -73,6 +95,13 @@
           "lat": 40.183,
           "lon": 31.915,
           "summary": "Kaya mezarlarının bulunduğu vadide yürüyüş yapılır.",
+          "scene": "vadi",
+          "facts": [
+            {
+              "label": "Öne Çıkan",
+              "value": "Kaya mezarları"
+            }
+          ],
           "durationMinutes": 60
         },
         {
@@ -81,7 +110,8 @@
           "kind": "arrival",
           "lat": 39.9208,
           "lon": 32.8541,
-          "summary": "Saat 19.00 civarında Kızılay'a varılır."
+          "summary": "Saat 19.00 civarında Kızılay'a varılır.",
+          "scene": "sehir"
         }
       ]
     }

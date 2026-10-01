@@ -45,6 +45,7 @@ function tour(): Tour {
     category: 'kultur',
     summary: '',
     emblem: 'konak',
+    scene: 'konak',
     destination: 'D',
     nights: 0,
     distanceFromOriginKm: 100,
@@ -65,6 +66,8 @@ function tour(): Tour {
             kind: 'departure',
             location: new GeoPoint(39.9, 32.8),
             summary: '',
+            scene: 'sehir',
+            facts: [],
           },
         ],
       },
@@ -180,6 +183,47 @@ describe('BookingService', () => {
     bookings.removePassenger(added.passenger.id);
     bookings.addPassenger(draft({ fullName: 'Ali Demir' }));
     expect(removed && bookings.restorePassenger(removed)).toBe(false);
+  });
+
+  it('changes a record, which keeps its identity and may keep or give up its seat', () => {
+    const bookings = service();
+    const added = bookings.addPassenger(draft());
+    if (!added.ok) throw new Error('setup failed');
+    const original = added.passenger;
+
+    // Its own seat is no clash with itself.
+    const renamed = bookings.updatePassenger(original, draft({ fullName: 'Ayşe Kaya' }));
+    expect(renamed).toMatchObject({
+      ok: true,
+      passenger: { id: original.id, createdAt: original.createdAt, fullName: 'Ayşe Kaya' },
+    });
+    expect(bookings.booking('soon')?.passengers).toHaveLength(1);
+
+    // Moving to another departure frees the seat on the first one.
+    expect(
+      bookings.updatePassenger(original, draft({ departureId: 'later', seatNumber: 1 })).ok,
+    ).toBe(true);
+    expect(bookings.booking('soon')?.departure.isBooked(5)).toBe(false);
+    expect(bookings.booking('later')?.passengers.map((passenger) => passenger.id)).toEqual([
+      original.id,
+    ]);
+  });
+
+  it('does not let a changed record take a seat that someone else holds', () => {
+    const bookings = service();
+    const first = bookings.addPassenger(draft());
+    if (!first.ok) throw new Error('setup failed');
+    bookings.addPassenger(draft({ fullName: 'Ali Demir', seatNumber: 6 }));
+
+    for (const seatNumber of [6, 1]) {
+      expect(bookings.updatePassenger(first.passenger, draft({ seatNumber }))).toMatchObject({
+        ok: false,
+        errors: { seatNumber: 'taken' },
+      });
+    }
+    expect(bookings.booking('soon')?.passengers.map((passenger) => passenger.seatNumber)).toEqual([
+      5, 6,
+    ]);
   });
 
   it('clears every record', () => {

@@ -1,4 +1,5 @@
 dist/
+dist-e2e/
 .astro/
 node_modules/
 .claude/

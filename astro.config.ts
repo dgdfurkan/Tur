@@ -10,6 +10,8 @@ const FONT_FILES = '@fontsource-variable/encode-sans/files';
 export default defineConfig({
   site,
   base,
+  // The end-to-end tests build into a directory of their own, so they never overwrite the site to be published.
+  outDir: process.env.OUT_DIR ?? './dist',
   output: 'static',
   trailingSlash: 'always',
   devToolbar: { enabled: false },

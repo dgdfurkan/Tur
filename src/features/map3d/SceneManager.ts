@@ -1,56 +1,40 @@
 import { Color, Fog, PerspectiveCamera, Scene, WebGLRenderer, type Texture } from 'three';
-import type { MapSurface } from './MapSurface';
+import type { FixedFrame, MapSurface } from './MapSurface';
 import { lowerQuality, type QualityProfile } from './QualityProfile';
 import type { Disposable, Updatable } from '@/shared/lifecycle';
 
-const SAMPLE_FRAMES = 90;
-const SLOW_FRAME_MS = 22;
-const MAX_DELTA_SECONDS = 0.1;
-
 /**
- * Owns the renderer and the frame loop. The loop only runs while the canvas is
- * on screen and the tab is visible, and the pixel ratio drops automatically
- * when the first frames come in slow.
+ * Owns the renderer, the scene and the camera, and draws one frame at a time.
+ * On a page a frame loop calls it; for film frames the caller steps it itself.
  */
 export class SceneManager implements Disposable {
   readonly scene = new Scene();
   readonly camera = new PerspectiveCamera(32, 1, 1, 1600);
+  readonly canvas: HTMLCanvasElement;
   private readonly renderer: WebGLRenderer;
   private readonly updatables = new Set<Updatable>();
-  private readonly resizeObserver: ResizeObserver;
-  private readonly visibilityObserver: IntersectionObserver;
+  private readonly resizeObserver: ResizeObserver | undefined;
+  private frame: FixedFrame | undefined;
   private readonly backdrop = new Color();
   private readonly fog = new Fog(this.backdrop, 1, 2);
-  private frameHandle = 0;
-  private lastTime = 0;
   private elapsed = 0;
-  private onScreen = true;
-  private running = false;
-  private sampleCount = 0;
-  private sampleTotal = 0;
-
-  private readonly canvas: HTMLCanvasElement;
 
   constructor(
     surface: MapSurface,
     private profile: QualityProfile,
   ) {
     this.canvas = surface.canvas;
+    this.frame = surface.frame;
     this.scene.background = this.backdrop;
     this.scene.fog = this.fog;
-    const { canvas } = this;
     // The context is already open: whoever chose the 3D map had to look at it first.
-    this.renderer = new WebGLRenderer({ canvas, context: surface.context });
+    this.renderer = new WebGLRenderer({ canvas: this.canvas, context: surface.context });
     this.applyPixelRatio();
 
-    this.resizeObserver = new ResizeObserver(() => this.resize());
-    this.resizeObserver.observe(canvas);
-    this.visibilityObserver = new IntersectionObserver(([entry]) => {
-      this.onScreen = entry?.isIntersecting ?? true;
-      this.sync();
-    });
-    this.visibilityObserver.observe(canvas);
-    document.addEventListener('visibilitychange', this.sync);
+    if (!this.frame) {
+      this.resizeObserver = new ResizeObserver(() => this.resize());
+      this.resizeObserver.observe(this.canvas);
+    }
     this.resize();
   }
 
@@ -58,8 +42,14 @@ export class SceneManager implements Disposable {
     return this.profile;
   }
 
+  /** Size in layout pixels. */
   get size(): { width: number; height: number } {
-    return { width: this.canvas.clientWidth, height: this.canvas.clientHeight };
+    return this.frame ?? { width: this.canvas.clientWidth, height: this.canvas.clientHeight };
+  }
+
+  /** Seconds of animation drawn so far. */
+  get time(): number {
+    return this.elapsed;
   }
 
   /** The sky behind the map; distant land fades into the same colour. */
@@ -88,70 +78,43 @@ export class SceneManager implements Disposable {
     this.updatables.add(updatable);
   }
 
-  start(): void {
-    this.running = true;
-    this.sync();
+  /** Moves everything on by `deltaSeconds` and draws the result. */
+  step(deltaSeconds: number): void {
+    this.elapsed += deltaSeconds;
+    for (const updatable of this.updatables) updatable.update(deltaSeconds, this.elapsed);
+    this.renderer.render(this.scene, this.camera);
   }
 
-  stop(): void {
-    this.running = false;
-    this.sync();
+  /** Gives a map that is drawn frame by frame another size or sharpness. */
+  reframe(frame: FixedFrame): void {
+    this.frame = frame;
+    this.applyPixelRatio();
+    this.resize();
+  }
+
+  /** Drops to the next cheaper profile; returns false when there is none. */
+  lowerQuality(): boolean {
+    if (this.profile.name === 'low' || this.frame) return false;
+    this.profile = lowerQuality(this.profile);
+    this.applyPixelRatio();
+    this.resize();
+    return true;
   }
 
   dispose(): void {
-    this.stop();
-    this.resizeObserver.disconnect();
-    this.visibilityObserver.disconnect();
-    document.removeEventListener('visibilitychange', this.sync);
+    this.resizeObserver?.disconnect();
     this.updatables.clear();
     this.renderer.dispose();
   }
 
-  private readonly sync = (): void => {
-    const shouldRun = this.running && this.onScreen && !document.hidden;
-    if (shouldRun && this.frameHandle === 0) {
-      this.lastTime = performance.now();
-      this.frameHandle = requestAnimationFrame(this.frame);
-    } else if (!shouldRun && this.frameHandle !== 0) {
-      cancelAnimationFrame(this.frameHandle);
-      this.frameHandle = 0;
-    }
-  };
-
-  private readonly frame = (now: number): void => {
-    this.frameHandle = requestAnimationFrame(this.frame);
-    const frameMs = now - this.lastTime;
-    this.lastTime = now;
-    // A long gap (tab switch, breakpoint) must not fling the animation forward.
-    const delta = Math.min(frameMs / 1000, MAX_DELTA_SECONDS);
-    this.elapsed += delta;
-    for (const updatable of this.updatables) updatable.update(delta, this.elapsed);
-    this.renderer.render(this.scene, this.camera);
-    this.sampleFrame(frameMs);
-  };
-
-  private sampleFrame(frameMs: number): void {
-    if (this.sampleCount >= SAMPLE_FRAMES) return;
-    // The first frames compile shaders and upload geometry; they say nothing about steady state.
-    if (this.elapsed < 0.5) return;
-    this.sampleCount += 1;
-    this.sampleTotal += frameMs;
-    if (this.sampleCount < SAMPLE_FRAMES) return;
-    if (this.sampleTotal / SAMPLE_FRAMES > SLOW_FRAME_MS && this.profile.name !== 'low') {
-      this.profile = lowerQuality(this.profile);
-      this.applyPixelRatio();
-      this.resize();
-      this.sampleCount = 0;
-      this.sampleTotal = 0;
-    }
-  }
-
   private applyPixelRatio(): void {
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, this.profile.pixelRatioCap));
+    this.renderer.setPixelRatio(
+      this.frame?.pixelRatio ?? Math.min(window.devicePixelRatio, this.profile.pixelRatioCap),
+    );
   }
 
   private resize(): void {
-    const { clientWidth: width, clientHeight: height } = this.canvas;
+    const { width, height } = this.size;
     if (width === 0 || height === 0) return;
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;

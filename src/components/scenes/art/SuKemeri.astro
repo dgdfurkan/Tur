@@ -1,0 +1,41 @@
+---
+import { ink } from '../palette';
+import Birds from '../parts/Birds.astro';
+import Cloud from '../parts/Cloud.astro';
+import Tree from '../parts/Tree.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyDay}></rect>
+<Cloud x={250} y={30} scale={1.1} />
+<Birds x={70} y={44} />
+<path d="M100 120q60-30 120 0v40H100z" fill={ink.farGreen}></path>
+<!-- Canyon walls -->
+<path d="M0 66h92l18 50-14 84H0z" fill={ink.rock}></path>
+<path d="M92 66l18 50-14 84H76l12-84z" fill={ink.rockShade}></path>
+<path d="M320 66h-92l-18 50 14 84h96z" fill={ink.rockShade}></path>
+<path d="M228 66l-18 50 14 84h20l-12-84z" fill={ink.rockDeep}></path>
+<Tree x={30} y={68} size={11} fill={ink.grassDeep} />
+<Tree x={286} y={68} size={12} fill={ink.forest} />
+<!-- Aqueduct spanning the gap -->
+<rect x="72" y="62" width="176" height="14" fill={ink.marble}></rect>
+<rect x="72" y="72" width="176" height="4" fill={ink.stoneShade}></rect>
+<g fill={ink.stone}>
+  <rect x="96" y="76" width="18" height="124"></rect>
+  <rect x="148" y="76" width="24" height="124"></rect>
+  <rect x="206" y="76" width="18" height="124"></rect>
+</g>
+<g fill={ink.stoneShade}>
+  <rect x="108" y="76" width="6" height="124"></rect>
+  <rect x="164" y="76" width="8" height="124"></rect>
+  <rect x="218" y="76" width="6" height="124"></rect>
+</g>
+<path d="M114 76h34v22q-17-24-34 0zM172 76h34v22q-17-24-34 0z" fill={ink.stone}></path>
+<!-- People crossing on top -->
+<g fill={ink.dark}>
+  <circle cx="134" cy="52" r="2.6"></circle>
+  <rect x="131.8" y="55" width="4.4" height="8" rx="2"></rect>
+  <circle cx="190" cy="52" r="2.6"></circle>
+  <rect x="187.8" y="55" width="4.4" height="8" rx="2"></rect>
+</g>
+<!-- Stream at the bottom -->
+<path d="M114 200q20-30 46-32t46 32z" fill={ink.water}></path>

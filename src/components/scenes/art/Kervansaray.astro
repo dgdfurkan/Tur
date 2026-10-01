@@ -1,0 +1,46 @@
+---
+import { ink } from '../palette';
+import Cloud from '../parts/Cloud.astro';
+import Poplar from '../parts/Poplar.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyDay}></rect>
+<Cloud x={58} y={34} scale={1.1} />
+<Cloud x={262} y={46} scale={0.9} />
+<path d="M0 126q80-16 160-6t160-10v40H0z" fill={ink.farSand}></path>
+<rect x="0" y="150" width="320" height="50" fill={ink.sand}></rect>
+<Poplar x={18} y={152} height={52} />
+<Poplar x={304} y={152} height={46} fill={ink.grassDeep} />
+<!-- Curtain wall with buttress towers -->
+<rect x="34" y="86" width="252" height="66" fill={ink.stone}></rect>
+<g fill={ink.stoneShade}>
+  <rect x="28" y="80" width="24" height="72"></rect>
+  <rect x="88" y="84" width="16" height="68"></rect>
+  <rect x="216" y="84" width="16" height="68"></rect>
+  <rect x="268" y="80" width="24" height="72"></rect>
+</g>
+<g fill={ink.stone}>
+  <rect x="28" y="80" width="14" height="72"></rect>
+  <rect x="88" y="84" width="9" height="68"></rect>
+  <rect x="216" y="84" width="9" height="68"></rect>
+  <rect x="268" y="80" width="14" height="72"></rect>
+</g>
+<g fill="none" stroke={ink.stoneShade} stroke-width="1">
+  <path d="M52 104h36M104 104h22M194 104h22M232 104h36M52 124h36M104 124h22M194 124h22M232 124h36"></path>
+</g>
+<!-- Crown portal -->
+<rect x="126" y="58" width="68" height="94" fill={ink.marble}></rect>
+<rect x="126" y="58" width="68" height="8" fill={ink.stoneShade}></rect>
+<g fill={ink.stoneDeep}>
+  <rect x="132" y="70" width="6" height="6"></rect>
+  <rect x="142" y="70" width="6" height="6"></rect>
+  <rect x="152" y="70" width="6" height="6"></rect>
+  <rect x="162" y="70" width="6" height="6"></rect>
+  <rect x="172" y="70" width="6" height="6"></rect>
+  <rect x="182" y="70" width="6" height="6"></rect>
+</g>
+<path d="M138 152V104q22-30 44 0v48z" fill={ink.stoneShade}></path>
+<path d="M146 152v-42q14-20 28 0v42z" fill={ink.stoneDeep}></path>
+<path d="M152 152v-26q8-10 16 0v26z" fill={ink.dark}></path>
+<!-- Path to the gate -->
+<path d="M146 152h28l30 48H116z" fill={ink.sandDeep}></path>

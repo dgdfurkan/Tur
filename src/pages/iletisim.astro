@@ -1,4 +1,5 @@
 ---
+import PageHead from '@/components/layout/PageHead.astro';
 import Icon, { type IconName } from '@/components/ui/Icon.astro';
 import { siteConfig } from '@/config/site';
 import { tr } from '@/i18n/tr';
@@ -19,10 +20,11 @@ const rows: { icon: IconName; label: string; value: string | null }[] = [
   title={tr.nav.contact}
   description="Rezervasyon, teklif ve sorular için ofis iletişim bilgileri."
 >
+  <PageHead
+    title={tr.nav.contact}
+    lead="Rezervasyon, teklif ve sorularınız için ofisimize ulaşabilirsiniz."
+  />
   <div class="container page">
-    <h1>{tr.nav.contact}</h1>
-    <p class="lead">Rezervasyon, teklif ve sorularınız için ofisimize ulaşabilirsiniz.</p>
-
     <dl class="contact">
       {rows.map((row) => (
         <div class="contact__row">
@@ -41,22 +43,13 @@ const rows: { icon: IconName; label: string; value: string | null }[] = [
 
 <style>
   .page {
-    padding-block: var(--space-7) var(--space-section);
-  }
-
-  .page h1 {
-    font-stretch: var(--wdth-display);
-    font-weight: 780;
-  }
-
-  .page .lead {
-    margin-top: var(--space-4);
+    padding-block: var(--space-5) var(--space-section);
   }
 
   .contact {
     display: grid;
     max-width: 44rem;
-    margin: var(--space-7) 0 0;
+    margin: 0;
     border-top: 1px solid var(--c-line);
   }
 

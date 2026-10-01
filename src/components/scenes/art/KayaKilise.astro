@@ -1,0 +1,40 @@
+---
+import { ink } from '../palette';
+import Cloud from '../parts/Cloud.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyDay}></rect>
+<Cloud x={264} y={34} scale={1.1} />
+<path d="M0 120q70-22 150-10t170-14v60H0z" fill={ink.farSand}></path>
+<!-- Small cones behind -->
+<path d="M262 150l12-58q8-10 16 0l14 58z" fill={ink.tuffShade}></path>
+<path d="M268 94q10-16 20 0l-4 8h-12z" fill={ink.tuffCap}></path>
+<!-- The rock -->
+<path d="M18 160c4-50 20-96 66-112 22-8 58-14 96 4 44 20 62 62 66 108z" fill={ink.tuff}></path>
+<path d="M180 52c44 20 62 62 66 108h-34c-2-40-10-80-32-108z" fill={ink.tuffShade}></path>
+<!-- Blind arcade carved into the face -->
+<rect x="58" y="92" width="134" height="56" rx="4" fill={ink.tuffShade}></rect>
+<g fill={ink.rockDeep}>
+  <path d="M66 148v-34q9-14 18 0v34z"></path>
+  <path d="M96 148v-34q9-14 18 0v34z"></path>
+  <path d="M156 148v-34q9-14 18 0v34z"></path>
+</g>
+<path d="M124 148v-40q11-16 22 0v40z" fill={ink.dark}></path>
+<!-- Traces of wall painting -->
+<g fill={ink.clayDeep}>
+  <path d="M74 118h2v-4h2v4h2v2h-2v6h-2v-6h-2z"></path>
+  <path d="M164 118h2v-4h2v4h2v2h-2v6h-2v-6h-2z"></path>
+  <rect x="60" y="96" width="130" height="3"></rect>
+</g>
+<g fill={ink.rockDeep}>
+  <rect x="92" y="68" width="8" height="11" rx="4"></rect>
+  <rect x="148" y="66" width="8" height="11" rx="4"></rect>
+  <rect x="202" y="104" width="7" height="10" rx="3.5"></rect>
+</g>
+<!-- Steps and ground -->
+<rect x="0" y="156" width="320" height="44" fill={ink.sand}></rect>
+<g fill={ink.sandDeep}>
+  <rect x="112" y="148" width="46" height="5"></rect>
+  <rect x="106" y="153" width="58" height="5"></rect>
+  <rect x="100" y="158" width="70" height="5"></rect>
+</g>

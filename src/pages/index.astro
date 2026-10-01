@@ -1,7 +1,8 @@
 ---
 import DistanceSign from '@/components/home/DistanceSign.astro';
+import RoadScene from '@/components/home/RoadScene.astro';
+import SceneSprite from '@/components/scenes/SceneSprite.astro';
 import ServiceSign from '@/components/home/ServiceSign.astro';
-import Skyline from '@/components/home/Skyline.astro';
 import TourMap from '@/components/home/TourMap.astro';
 import TourTicket from '@/components/tour/TourTicket.astro';
 import Button from '@/components/ui/Button.astro';
@@ -66,7 +67,7 @@ const services = [
         <p class="hero__caption">Mesafeler Ankara'dan itibaren kilometre cinsindendir.</p>
       </div>
     </div>
-    <Skyline />
+    <RoadScene />
   </section>
 
   <section class="section section--mist" aria-labelledby="yaklasan-turlar">
@@ -78,7 +79,7 @@ const services = [
       />
       <ul class="ticket-list">
         {upcoming.map(({ tour, departure }) => (
-          <li>
+          <li data-reveal>
             <TourTicket tour={tour} departure={departure} />
           </li>
         ))}
@@ -113,39 +114,46 @@ const services = [
     </div>
   </section>
 
-  <section class="section corporate" aria-labelledby="kurumsal">
-    <div class="container corporate__inner">
-      <div>
-        <h2 id="kurumsal">Kurumsal ve Okul Turları</h2>
-        <p class="lead">
-          Okullar, kamu kurumları ve şirketler için tarih, program ve bütçeye göre özel turlar
-          düzenlenir.
-        </p>
+  <section class="corporate" aria-labelledby="kurumsal">
+    <div class="container">
+      <div class="corporate__sign" data-reveal>
+        <div>
+          <h2 id="kurumsal">Kurumsal ve Okul Turları</h2>
+          <p class="lead">
+            Okullar, kamu kurumları ve şirketler için tarih, program ve bütçeye göre özel turlar
+            düzenlenir.
+          </p>
+        </div>
+        <Button href={pageUrl('kurumsal')} size="lg">
+          Kurumsal Turları İncele
+        </Button>
       </div>
-      <Button href={pageUrl('kurumsal')} size="lg">
-        Kurumsal Turları İncele
-      </Button>
     </div>
   </section>
+  <SceneSprite scenes={tours.map((tour) => tour.scene)} />
 </BaseLayout>
 
 <style>
   .hero {
-    padding-top: clamp(2.5rem, 1rem + 6vw, 6rem);
+    /* Tall enough to show the whole landscape with its sky: the stage is 1440 by 420. */
+    --scene-height: max(clamp(11.5rem, 26vw, 25rem), calc(100vw * 420 / 1440));
+    /* The ground the sign's posts stand on is this far above the hero's bottom edge. */
+    --ground: calc(var(--scene-height) * 0.171);
+    position: relative;
+    padding-top: clamp(2rem, 1rem + 5vw, 5rem);
+    /* Sky: clear overhead, warm towards the horizon. */
+    background: linear-gradient(180deg, #fff 0%, #eef6fb 16%, #d3e8f6 60%, #f6e8d1 100%);
     overflow: hidden;
   }
 
-  /* The skyline stands on the section below, so nothing may separate them. */
-  .hero :global(.skyline) {
-    margin-top: var(--space-5);
-    margin-bottom: -1px;
-  }
-
   .hero__inner {
+    position: relative;
+    z-index: 1;
     display: grid;
-    grid-template-areas: 'copy' 'sign' 'actions';
+    grid-template-areas: 'copy' 'actions' 'sign';
     gap: var(--space-6);
     align-items: center;
+    padding-bottom: var(--ground);
   }
 
   .hero__copy {
@@ -171,17 +179,31 @@ const services = [
     gap: var(--space-3);
   }
 
+  /* As wide as the board, so the plate under it can be centred between the posts. */
   .hero__sign {
+    --post-height: 5.75rem;
+    position: relative;
     grid-area: sign;
-    display: grid;
-    justify-items: center;
+    justify-self: center;
+    width: min(100%, 32rem);
   }
 
+  /* A small plate under the board, as on the road. */
   .hero__caption {
-    margin-top: var(--space-3);
-    color: var(--c-muted);
-    font-size: var(--text-small);
+    position: absolute;
+    top: calc(100% - var(--post-height) + var(--space-3));
+    left: 50%;
+    width: max-content;
+    max-width: 58%;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-sm);
+    background: rgb(255 255 255 / 0.92);
+    box-shadow: var(--shadow-1);
+    color: var(--c-asphalt);
+    font-size: var(--text-caption);
+    line-height: 1.35;
     text-align: center;
+    transform: translateX(-50%);
   }
 
   .section--mist {
@@ -193,6 +215,18 @@ const services = [
     gap: var(--space-5);
   }
 
+  @media (min-width: 40rem) {
+    .ticket-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 76rem) {
+    .ticket-list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
   .section__more {
     margin-top: var(--space-6);
   }
@@ -202,15 +236,20 @@ const services = [
     gap: var(--space-6);
   }
 
+  /* The last thing before the road: a blue direction sign as wide as the page. */
   .corporate {
+    padding-block: var(--space-7) var(--space-8);
     background: var(--c-blue);
     color: var(--c-white);
   }
 
-  .corporate__inner {
+  .corporate__sign {
     display: grid;
     gap: var(--space-6);
     align-items: center;
+    padding: clamp(1.5rem, 1rem + 3vw, 3.5rem);
+    border: 0.1875rem solid var(--c-white);
+    border-radius: var(--radius-lg);
   }
 
   .corporate .lead {
@@ -237,30 +276,22 @@ const services = [
     .hero__inner {
       grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
       grid-template-areas: 'copy sign' 'actions sign';
+      grid-template-rows: auto 1fr;
       gap: var(--space-6) var(--space-8);
-    }
-
-    .hero__copy {
-      align-self: end;
     }
 
     .hero__actions {
       align-self: start;
     }
 
+    /* Tall posts carry the board above the landscape and leave the text clear of it. */
     .hero__sign {
-      justify-items: end;
+      --post-height: clamp(9rem, 17vw, 16rem);
+      align-self: end;
+      justify-self: end;
     }
 
-    /* The posts pass on either side of the caption. */
-    .hero__caption {
-      width: 100%;
-      max-width: 32rem;
-      margin-top: var(--space-4);
-      padding-inline: 22%;
-    }
-
-    .corporate__inner {
+    .corporate__sign {
       grid-template-columns: 1fr auto;
     }
   }

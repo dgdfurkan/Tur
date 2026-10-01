@@ -1,0 +1,61 @@
+---
+import { ink } from '../palette';
+import Birds from '../parts/Birds.astro';
+import Cloud from '../parts/Cloud.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyDay}></rect>
+<Cloud x={70} y={34} scale={1.1} />
+<Birds x={250} y={50} />
+<rect x="0" y="116" width="320" height="84" fill={ink.sea}></rect>
+<rect x="0" y="116" width="320" height="8" fill={ink.seaDeep} opacity="0.5"></rect>
+<!-- Island offshore -->
+<path d="M236 118q10-16 28-14t26 14z" fill={ink.farGreen}></path>
+<!-- Headland -->
+<path d="M0 200V128q30-34 84-40t94 18 60 94z" fill={ink.grassDeep}></path>
+<path d="M0 200v-46q50-20 110-8t100 54z" fill={ink.rock}></path>
+<path d="M110 146q50 10 100 54h-40q-20-36-60-54z" fill={ink.rockShade}></path>
+<!-- Castle walls following the ridge -->
+<g>
+  <path d="M22 110l120-16 50 18v22l-50-14-120 14z" fill={ink.stone}></path>
+  <path d="M142 94l50 18v22l-50-14z" fill={ink.stoneShade}></path>
+  <g fill={ink.stone}>
+    <rect x="22" y="104" width="10" height="7"></rect>
+    <rect x="42" y="101" width="10" height="7"></rect>
+    <rect x="62" y="99" width="10" height="7"></rect>
+    <rect x="82" y="96" width="10" height="7"></rect>
+    <rect x="102" y="93" width="10" height="7"></rect>
+    <rect x="122" y="91" width="10" height="7"></rect>
+  </g>
+  <!-- Keep -->
+  <rect x="56" y="66" width="38" height="48" fill={ink.stone}></rect>
+  <rect x="82" y="66" width="12" height="48" fill={ink.stoneShade}></rect>
+  <g fill={ink.stone}>
+    <rect x="52" y="58" width="9" height="9"></rect>
+    <rect x="66" y="58" width="9" height="9"></rect>
+    <rect x="80" y="58" width="9" height="9"></rect>
+    <rect x="52" y="64" width="46" height="4"></rect>
+  </g>
+  <path d="M68 114v-16q7-8 14 0v16z" fill={ink.dark}></path>
+  <rect x="70" y="78" width="5" height="9" rx="2.5" fill={ink.stoneDeep}></rect>
+  <rect x="73" y="36" width="1.8" height="22" fill={ink.woodDeep}></rect>
+  <path d="M75 37h16v10H75z" fill={ink.red}></path>
+</g>
+<!-- Harbour houses and a boat -->
+<g>
+  <rect x="150" y="150" width="22" height="16" fill={ink.wall}></rect>
+  <path d="M146 151l15-9 15 9z" fill={ink.roof}></path>
+  <rect x="178" y="158" width="20" height="14" fill={ink.wall}></rect>
+  <path d="M174 159l14-8 14 8z" fill={ink.roof}></path>
+</g>
+<g>
+  <path d="M242 164h44l-8 12h-28z" fill={ink.wall}></path>
+  <rect x="263" y="138" width="2" height="26" fill={ink.woodDeep}></rect>
+  <path d="M266 140l16 22h-16z" fill={ink.wall}></path>
+  <path d="M244 172h40l-4 4h-30z" fill={ink.red}></path>
+</g>
+<g fill={ink.foam} opacity="0.75">
+  <rect x="220" y="186" width="34" height="2.4" rx="1.2"></rect>
+  <rect x="276" y="146" width="26" height="2.4" rx="1.2"></rect>
+  <rect x="200" y="134" width="22" height="2.4" rx="1.2"></rect>
+</g>

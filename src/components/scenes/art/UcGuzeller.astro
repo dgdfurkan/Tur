@@ -1,0 +1,32 @@
+---
+import { ink } from '../palette';
+import Balloon from '../parts/Balloon.astro';
+import Cloud from '../parts/Cloud.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyDay}></rect>
+<Cloud x={250} y={36} scale={1.2} />
+<Balloon x={46} y={50} scale={1.2} fill={ink.yellow} stripe={ink.red} />
+<Balloon x={284} y={84} scale={0.7} fill={ink.clay} />
+<path d="M0 124q60-18 130-8t190-14v60H0z" fill={ink.farSand}></path>
+<path d="M0 150q70-24 160-24t160 24v50H0z" fill={ink.sand}></path>
+<!-- The three chimneys on their ridge -->
+<g>
+  <path d="M96 142l12-66q10-8 20 0l12 66z" fill={ink.tuff}></path>
+  <path d="M122 74q3 1 6 2l12 66h-16z" fill={ink.tuffShade}></path>
+  <path d="M100 80q18-34 36 0l-6 8h-24z" fill={ink.tuffCap}></path>
+  <path d="M150 140l14-86q11-8 22 0l14 86z" fill={ink.tuff}></path>
+  <path d="M180 52q3 1 6 2l14 86h-18z" fill={ink.tuffShade}></path>
+  <path d="M156 58q19-36 38 0l-6 9h-26z" fill={ink.tuffCap}></path>
+  <path d="M210 144l8-42q7-6 14 0l8 42z" fill={ink.tuff}></path>
+  <path d="M228 100q2 1 4 2l8 42h-11z" fill={ink.tuffShade}></path>
+  <path d="M212 106q13-24 26 0l-5 6h-16z" fill={ink.tuffCap}></path>
+</g>
+<path d="M0 176q160-34 320 0v24H0z" fill={ink.sandDeep} opacity="0.55"></path>
+<!-- Visitors for scale -->
+<g fill={ink.dark}>
+  <circle cx="252" cy="160" r="2.6"></circle>
+  <rect x="249.8" y="163" width="4.4" height="10" rx="2"></rect>
+  <circle cx="262" cy="162" r="2.4"></circle>
+  <rect x="260" y="165" width="4" height="9" rx="2"></rect>
+</g>

@@ -22,18 +22,19 @@ export interface SimulationListener {
   changed?(snapshot: SimulationSnapshot): void;
 }
 
-const SECONDS_PER_KM = 0.016;
-const MIN_LEG_SECONDS = 1.1;
-const MAX_LEG_SECONDS = 5.5;
+const SECONDS_PER_KM = 0.0105;
+const MIN_LEG_SECONDS = 0.9;
+const MAX_LEG_SECONDS = 3.4;
 /** Hops inside one town should not look like a journey. */
 const SHORT_HOP_KM = 2;
-const SHORT_HOP_SECONDS = 0.5;
+const SHORT_HOP_SECONDS = 0.45;
 
+/** Long enough to read the card about the place, short enough to keep the journey moving. */
 const DWELL_SECONDS: Record<StopKind, number> = {
   departure: 0,
-  rest: 1.5,
-  sight: 2.3,
-  lodging: 2.6,
+  rest: 1.2,
+  sight: 2.4,
+  lodging: 2.4,
   arrival: 0,
 };
 
@@ -108,7 +109,10 @@ export class RouteSimulation {
     this.notifyChanged();
   }
 
-  /** Jumps straight to a stop and waits there as if the coach had just arrived. */
+  /**
+   * Jumps straight to a stop and waits there as if the coach had just arrived.
+   * Jumping to the last stop ends the journey, as arriving there does.
+   */
   seekToStop(stopIndex: number): void {
     const lastIndex = this.plan.stops.length - 1;
     if (!Number.isInteger(stopIndex) || stopIndex < 0 || stopIndex > lastIndex) {
@@ -116,7 +120,8 @@ export class RouteSimulation {
     }
     this.stopIndex = stopIndex;
     this.legProgress = 0;
-    if (stopIndex === lastIndex) {
+    const finished = stopIndex === lastIndex;
+    if (finished) {
       this.legIndex = lastIndex - 1;
       this.legProgress = 1;
       this.phase = 'finished';
@@ -127,6 +132,7 @@ export class RouteSimulation {
       this.dwellRemaining = this.dwellSeconds(stopIndex);
     }
     this.emit((listener) => listener.stopReached?.(stopIndex));
+    if (finished) this.emit((listener) => listener.finished?.());
     this.notifyChanged();
   }
 
@@ -142,9 +148,7 @@ export class RouteSimulation {
   }
 
   legSeconds(legIndex: number): number {
-    const km = this.plan.legKm(legIndex);
-    if (km < SHORT_HOP_KM) return SHORT_HOP_SECONDS;
-    return Math.min(MAX_LEG_SECONDS, Math.max(MIN_LEG_SECONDS, km * SECONDS_PER_KM));
+    return driveSeconds(this.plan.legKm(legIndex));
   }
 
   private dwellSeconds(stopIndex: number): number {
@@ -201,8 +205,23 @@ export class RouteSimulation {
   }
 }
 
+/** How long the coach takes over a leg of the given length; the scale is the map's, not the road's. */
+export function driveSeconds(km: number): number {
+  if (km < SHORT_HOP_KM) return SHORT_HOP_SECONDS;
+  return Math.min(MAX_LEG_SECONDS, Math.max(MIN_LEG_SECONDS, km * SECONDS_PER_KM));
+}
+
 /** Coaches pull away and brake gently; applied by views to the linear leg progress. */
 export function easeLeg(progress: number): number {
   const clamped = Math.min(1, Math.max(0, progress));
   return clamped < 0.5 ? 2 * clamped * clamped : 1 - (-2 * clamped + 2) ** 2 / 2;
+}
+
+/**
+ * The progress that `easeLeg` turns into the given share of a leg. It lets a
+ * caller place the coach at an exact point, for motion that must not slow at stops.
+ */
+export function uneaseLeg(share: number): number {
+  const clamped = Math.min(1, Math.max(0, share));
+  return clamped < 0.5 ? Math.sqrt(clamped / 2) : 1 - Math.sqrt((1 - clamped) / 2);
 }

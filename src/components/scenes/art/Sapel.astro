@@ -1,0 +1,35 @@
+---
+import { ink } from '../palette';
+import Pine from '../parts/Pine.astro';
+---
+
+<rect width="320" height="200" fill={ink.skyPale}></rect>
+<path d="M0 96q90-40 170-24t150-30v70H0z" fill={ink.farGreen}></path>
+<Pine x={26} y={160} height={96} fill={ink.forestDeep} />
+<Pine x={66} y={162} height={72} />
+<Pine x={256} y={160} height={88} fill={ink.forestDeep} />
+<Pine x={296} y={164} height={104} />
+<Pine x={222} y={160} height={60} />
+<!-- Stone chapel -->
+<g>
+  <rect x="96" y="96" width="60" height="66" fill={ink.stone}></rect>
+  <path d="M90 98l36-26 36 26z" fill={ink.roof}></path>
+  <rect x="150" y="108" width="62" height="54" fill={ink.stoneShade}></rect>
+  <path d="M146 110l35-20 35 20z" fill={ink.roofShade}></path>
+  <g fill="none" stroke={ink.stoneDeep} stroke-width="1" opacity="0.6">
+    <path d="M96 112h60M96 128h60M96 144h60M150 124h62M150 140h62"></path>
+  </g>
+  <path d="M114 162v-32q12-14 24 0v32z" fill={ink.woodDeep}></path>
+  <path d="M170 140v-10q5-7 10 0v10zM190 140v-10q5-7 10 0v10z" fill={ink.dark}></path>
+  <rect x="125" y="58" width="2.4" height="16" fill={ink.stoneDeep}></rect>
+  <rect x="120" y="62" width="12" height="2.4" fill={ink.stoneDeep}></rect>
+</g>
+<!-- Ground, path and candles -->
+<rect x="0" y="160" width="320" height="40" fill={ink.grass}></rect>
+<path d="M112 162h28l34 38H78z" fill={ink.sand}></path>
+<g>
+  <rect x="64" y="172" width="3" height="10" fill={ink.wall}></rect>
+  <rect x="72" y="174" width="3" height="8" fill={ink.wall}></rect>
+  <circle cx="65.5" cy="170" r="2" fill={ink.lit}></circle>
+  <circle cx="73.5" cy="172" r="2" fill={ink.lit}></circle>
+</g>

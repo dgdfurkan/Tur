@@ -147,8 +147,66 @@ summary {
   padding-block: var(--space-section);
 }
 
+/*
+ * Contour lines, as on a walking map, in two corners of the quiet sections.
+ * They are part of the paper the page is printed on, not of its content.
+ */
 .section--mist {
-  background: var(--c-mist);
+  background-color: var(--c-mist);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 420' fill='none' stroke='%23dbe3e9' stroke-width='1.4'%3E%3Cpath d='M388 40c70-30 170-6 196 66s-24 150-104 168-176-10-208-82 46-122 116-152z'/%3E%3Cpath d='M404 78c52-22 124-4 144 50s-18 110-78 124-130-8-154-60 36-92 88-114z'/%3E%3Cpath d='M420 116c34-14 80-2 94 34s-12 72-52 82-86-6-102-40 26-62 60-76z'/%3E%3Cpath d='M438 152c18-8 42 0 50 20s-8 38-28 42-46-2-54-20 14-34 32-42z'/%3E%3Cpath d='M40 300c60-40 170-30 220 20s40 120-20 150'/%3E%3Cpath d='M70 330c44-28 120-22 156 14s28 84-14 106'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 520 360' fill='none' stroke='%23dbe3e9' stroke-width='1.4'%3E%3Cpath d='M60 250c-40-70 0-170 90-196s190 10 214 86-30 150-120 170-144 10-184-60z'/%3E%3Cpath d='M96 236c-30-52 0-128 68-148s144 8 162 66-22 114-90 128-110 6-140-46z'/%3E%3Cpath d='M132 222c-20-36 0-86 46-100s98 6 110 46-16 78-62 88-74 2-94-34z'/%3E%3Cpath d='M166 208c-10-20 2-46 26-54s52 4 58 26-8 42-32 48-42-2-52-20z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position:
+    right -6rem top -4rem,
+    left -8rem bottom -5rem;
+  background-size:
+    38rem auto,
+    32rem auto;
+}
+
+/*
+ * Things that arrive as they scroll into view. The starting state only applies
+ * where scripts run and motion is welcome; everywhere else they are simply
+ * there, a printed page included. Should the script never mark them, they show
+ * themselves after a while.
+ */
+@media screen and (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    transition:
+      opacity 600ms ease,
+      transform 800ms var(--ease-out);
+  }
+
+  [data-reveal]:not([data-revealed]) {
+    opacity: 0;
+    transform: translateY(1.5rem);
+    animation: reveal-anyway 1ms 5s forwards;
+  }
+
+  /* Siblings arrive one after another. */
+  [data-reveal]:nth-child(2) {
+    transition-delay: 80ms;
+  }
+
+  [data-reveal]:nth-child(3) {
+    transition-delay: 160ms;
+  }
+
+  [data-reveal]:nth-child(4) {
+    transition-delay: 240ms;
+  }
+
+  [data-reveal]:nth-child(n + 5) {
+    transition-delay: 320ms;
+  }
+
+  @keyframes reveal-anyway {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 }
 
 .lead {

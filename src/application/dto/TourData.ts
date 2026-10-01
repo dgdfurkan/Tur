@@ -1,4 +1,4 @@
-import type { EmblemKey, StopKind, TourCategory } from '@/domain/tour/Tour';
+import type { EmblemKey, SceneKey, StopFact, StopKind, TourCategory } from '@/domain/tour/Tour';
 import type { SeatLayoutCode } from '@/domain/vehicle/SeatLayout';
 
 /**
@@ -13,6 +13,8 @@ export interface StopData {
   lat: number;
   lon: number;
   summary: string;
+  scene: SceneKey;
+  facts?: StopFact[] | undefined;
   durationMinutes?: number | undefined;
 }
 
@@ -44,6 +46,7 @@ export interface TourData {
   category: TourCategory;
   summary: string;
   emblem: EmblemKey;
+  scene: SceneKey;
   destination: string;
   nights: number;
   distanceFromAnkaraKm: number;

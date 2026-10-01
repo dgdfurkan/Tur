@@ -1,0 +1,50 @@
+---
+import { ink } from '../palette';
+---
+
+<rect width="320" height="200" fill="#f3dfc3"></rect>
+<!-- Workshop window onto the river -->
+<path d="M196 30h92v70h-92z" fill={ink.skyDay}></path>
+<path d="M196 74q46-14 92 0v26h-92z" fill={ink.grass}></path>
+<path d="M196 84q46-10 92 2v14h-92z" fill={ink.water}></path>
+<rect x="190" y="26" width="104" height="6" fill={ink.wood}></rect>
+<rect x="190" y="98" width="104" height="6" fill={ink.wood}></rect>
+<rect x="190" y="26" width="6" height="78" fill={ink.wood}></rect>
+<rect x="288" y="26" width="6" height="78" fill={ink.wood}></rect>
+<rect x="240" y="30" width="4" height="70" fill={ink.wood}></rect>
+<!-- Shelves of finished pots -->
+<rect x="18" y="56" width="150" height="5" fill={ink.wood}></rect>
+<rect x="18" y="100" width="150" height="5" fill={ink.wood}></rect>
+<g fill={ink.clay}>
+  <path d="M30 56c-6-8-6-18 0-24h10c6 6 6 16 0 24z"></path>
+  <path d="M62 56c-4-6-4-12-1-16v-8h10v8c3 4 3 10-1 16z"></path>
+  <path d="M96 56c-7-6-7-14 0-18h16c7 4 7 12 0 18z"></path>
+  <path d="M134 56c-5-8-5-18 0-24h10c5 6 5 16 0 24z"></path>
+  <path d="M38 100c-7-6-7-14 0-18h16c7 4 7 12 0 18z"></path>
+  <path d="M82 100c-5-8-5-18 0-24h10c5 6 5 16 0 24z"></path>
+  <path d="M126 100c-4-6-4-12-1-16v-8h10v8c3 4 3 10-1 16z"></path>
+</g>
+<g fill={ink.clayDeep}>
+  <rect x="28" y="40" width="14" height="3"></rect>
+  <rect x="132" y="40" width="14" height="3"></rect>
+  <rect x="80" y="84" width="14" height="3"></rect>
+</g>
+<!-- Floor -->
+<rect x="0" y="162" width="320" height="38" fill={ink.sandDeep}></rect>
+<!-- The wheel with a pot taking shape -->
+<rect x="144" y="150" width="8" height="26" fill={ink.woodDeep}></rect>
+<ellipse cx="148" cy="178" rx="34" ry="6" fill={ink.woodDeep}></ellipse>
+<ellipse cx="148" cy="150" rx="44" ry="7" fill={ink.wood}></ellipse>
+<path
+  d="M130 148c-10-14-8-30 4-38-4-6-2-12 2-14h24c4 2 6 8 2 14 12 8 14 24 4 38z"
+  fill={ink.clay}
+></path>
+<path d="M150 96h10c4 2 6 8 2 14 12 8 14 24 4 38h-14c8-16 8-36-2-52z" fill={ink.clayDeep}></path>
+<!-- Large jars in front -->
+<path
+  d="M44 186c-12-14-12-34 0-44-4-6-2-12 2-14h20c4 2 6 8 2 14 12 10 12 30 0 44z"
+  fill={ink.clay}
+></path>
+<path d="M58 128h8c4 2 6 8 2 14 12 10 12 30 0 44h-12c10-16 10-42 2-58z" fill={ink.clayDeep}></path>
+<path d="M248 186c-8-10-8-24 0-32v-10h20v10c8 8 8 22 0 32z" fill={ink.clay}></path>
+<path d="M262 144h6v10c8 8 8 22 0 32h-8c8-12 8-30 2-42z" fill={ink.clayDeep}></path>

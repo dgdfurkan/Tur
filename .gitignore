@@ -3,7 +3,11 @@ node_modules/
 
 # Build output
 dist/
+dist-e2e/
 .astro/
+
+# The panel's access code in plain text; only its fingerprint is committed
+erisim-kodu.txt
 
 # Environment
 .env
