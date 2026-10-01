@@ -1,4 +1,5 @@
 import type { BookingService } from '@/application/BookingService';
+import type { FaqEditor } from '@/application/FaqEditor';
 import type { JourneyArchiveEditor } from '@/application/JourneyArchiveEditor';
 import type { SiteSettingsService } from '@/application/SiteSettings';
 import type { TourCatalogEditor } from '@/application/TourCatalogEditor';
@@ -15,6 +16,7 @@ export interface AdminServices {
   readonly bookings: BookingService;
   readonly catalog: TourCatalogEditor;
   readonly journeys: JourneyArchiveEditor;
+  readonly faq: FaqEditor;
   readonly settings: SiteSettingsService;
   readonly exporter: ListExporter;
   readonly backup: {
@@ -44,6 +46,7 @@ export class AdminApp implements AppContext {
   readonly bookings: BookingService;
   readonly catalog: TourCatalogEditor;
   readonly journeys: JourneyArchiveEditor;
+  readonly faq: FaqEditor;
   readonly settings: SiteSettingsService;
   readonly exporter: ListExporter;
   readonly backup: AdminServices['backup'];
@@ -65,6 +68,7 @@ export class AdminApp implements AppContext {
     this.bookings = services.bookings;
     this.catalog = services.catalog;
     this.journeys = services.journeys;
+    this.faq = services.faq;
     this.settings = services.settings;
     this.exporter = services.exporter;
     this.backup = services.backup;

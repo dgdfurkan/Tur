@@ -7,6 +7,7 @@ import { Passenger } from '@/domain/booking/Passenger';
 import { Phone } from '@/domain/booking/Phone';
 import { Money } from '@/domain/shared/Money';
 import { createBackup, restoreBackup, type PanelStores } from '@/infrastructure/backup/PanelBackup';
+import { LocalFaqDraft } from '@/infrastructure/storage/LocalFaqDraft';
 import { LocalJourneyDrafts } from '@/infrastructure/storage/LocalJourneyDrafts';
 import { LocalPassengerRepository } from '@/infrastructure/storage/LocalPassengerRepository';
 import { LocalSiteSettings } from '@/infrastructure/storage/LocalSiteSettings';
@@ -36,6 +37,7 @@ function device(): PanelStores {
     passengers: new LocalPassengerRepository(storage),
     drafts: new LocalTourDrafts(storage),
     journeys: new LocalJourneyDrafts(storage),
+    faq: new LocalFaqDraft(storage),
     settings: new LocalSiteSettings(storage),
   };
 }
@@ -107,6 +109,7 @@ describe('panel backup', () => {
       siteSettings: null,
     });
     expect(restoreBackup(old, laptop)).toEqual({ ok: true, passengers: 0, tours: 0, journeys: 0 });
+    expect(laptop.faq.load()).toBeNull();
   });
 
   it('leaves the device untouched when the file is not a backup of this panel', () => {

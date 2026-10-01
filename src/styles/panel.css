@@ -2708,3 +2708,15 @@ button.block__link {
   background: none;
   cursor: pointer;
 }
+
+/* A switch inside a sheet's form lines up with the fields above it. */
+.row--plain {
+  padding-inline: 0;
+}
+
+.row__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.375rem;
+}

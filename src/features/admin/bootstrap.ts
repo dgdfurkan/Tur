@@ -1,4 +1,5 @@
 import { BookingService } from '@/application/BookingService';
+import type { FaqEntry } from '@/application/dto/faqSchema';
 import type { JourneySnapshot } from '@/application/dto/JourneyData';
 import type { TourSnapshot } from '@/application/dto/TourData';
 import { openPanelData } from '@/composition/panelData';
@@ -16,7 +17,14 @@ export function mountAdmin(root: HTMLElement): void {
   const journeySnapshots = JSON.parse(
     required<HTMLScriptElement>(root, '[data-journeys]').textContent ?? '[]',
   ) as JourneySnapshot[];
-  const { stores, catalog, journeys, settings } = openPanelData(snapshots, journeySnapshots);
+  const questions = JSON.parse(
+    required<HTMLScriptElement>(root, '[data-faq]').textContent ?? '[]',
+  ) as FaqEntry[];
+  const { stores, catalog, journeys, faq, settings } = openPanelData(
+    snapshots,
+    journeySnapshots,
+    questions,
+  );
   const bookings = new BookingService(
     catalog,
     stores.passengers,
@@ -28,6 +36,7 @@ export function mountAdmin(root: HTMLElement): void {
     bookings,
     catalog,
     journeys,
+    faq,
     settings,
     exporter: new CsvListExporter(),
     backup: {

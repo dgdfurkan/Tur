@@ -67,6 +67,8 @@ test('the locked panel has no accessibility violations', async ({ page }) => {
 test('every screen of the operations panel is free of accessibility violations', async ({
   page,
 }) => {
+  // Every screen and sheet in one walk through the panel takes a while.
+  test.slow();
   await openPanelPage(page, './yonetim/');
   await expect(page.locator('[data-admin]')).toHaveAttribute('data-ready', 'true');
   const screens = [
@@ -84,6 +86,7 @@ test('every screen of the operations panel is free of accessibility violations',
     '/gecmis',
     '/gecmis/yeni',
     '/gecmis/2026-09-18-kapadokya',
+    '/site/sorular',
   ];
   for (const screen of screens) {
     await goToScreen(page, screen);
@@ -114,4 +117,11 @@ test('every screen of the operations panel is free of accessibility violations',
   await waitForStillness(page);
   const moment = await new AxeBuilder({ page }).analyze();
   expect(moment.violations, 'moment sheet').toEqual([]);
+
+  await goToScreen(page, '/site/sorular');
+  await page.getByRole('button', { name: /^Yerimi Nasıl Ayırtırım\?/ }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await waitForStillness(page);
+  const question = await new AxeBuilder({ page }).analyze();
+  expect(question.violations, 'question sheet').toEqual([]);
 });

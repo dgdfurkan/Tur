@@ -8,10 +8,11 @@ import { tr } from '@/i18n/tr';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 
 const questions = await loadFaq();
+// Every topic is drawn, even one without questions yet, so the panel can add one to it.
 const topics = FAQ_TOPICS.map((topic) => ({
   topic,
   items: questions.filter((question) => question.topic === topic),
-})).filter((group) => group.items.length > 0);
+}));
 ---
 
 <BaseLayout title={tr.faq.title} description={tr.faq.lead}>
@@ -32,7 +33,7 @@ const topics = FAQ_TOPICS.map((topic) => ({
       {topics.map(({ topic, items }) => (
         <section class="group" aria-labelledby={topic}>
           <h2 id={topic}>{tr.faq.topics[topic]}</h2>
-          <FaqList items={items} name={`sss-${topic}`} />
+          <FaqList items={items} name={`sss-${topic}`} show={{ topic }} />
         </section>
       ))}
     </div>
@@ -81,6 +82,10 @@ const topics = FAQ_TOPICS.map((topic) => ({
     display: grid;
     gap: var(--space-5);
     scroll-margin-top: var(--space-6);
+  }
+
+  .group:not(:has(.faq__item)) {
+    display: none;
   }
 
   .group h2 {

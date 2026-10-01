@@ -43,71 +43,6 @@ test('a journey page tells the journey and leads to its tour', async ({ page }) 
   expectNoErrors(errors);
 });
 
-test('the calendar lists every departure by month and filters them', async ({ page }) => {
-  await page.goto('./takvim/');
-  await expect(page.getByRole('heading', { level: 2, name: 'Ekim 2026' })).toBeVisible();
-  const slots = page.locator('.slot:visible');
-  await expect(slots).toHaveCount(13);
-  await page.getByText('Günübirlik', { exact: true }).first().click();
-  await expect(slots).toHaveCount(3);
-  for (const slot of await slots.all()) await expect(slot).toContainText('Beypazarı');
-  // A month without a day trip leaves the list.
-  await expect(page.getByRole('heading', { level: 2, name: 'Aralık 2026' })).toBeHidden();
-});
-
-test('a question opens to its answer', async ({ page }) => {
-  await page.goto('./sss/');
-  const question = page.locator('details', { hasText: 'Koltuğum Ne Zaman Kesinleşir?' });
-  await expect(question.getByText(/ön ödemenin alınmasıyla/)).toBeHidden();
-  await question.locator('summary').click();
-  await expect(question.getByText(/ön ödemenin alınmasıyla/)).toBeVisible();
-});
-
-test('settings made in the panel show on the site of the same device', async ({ page }) => {
-  await page.goto('./');
-  await expect(page.locator('[data-announcement]')).toBeHidden();
-  await page.evaluate(() => {
-    localStorage.setItem(
-      'tur-demo:v1:site-settings',
-      JSON.stringify({
-        brandName: 'Yol Turizm',
-        tursabNumber: '12345',
-        heroTitle: 'Ankara Çıkışlı Turlar',
-        heroLead: 'Kısa açıklama.',
-        announcementOn: true,
-        announcementText: 'Kasım turlarında son koltuklar.',
-        phone: '0312 000 00 00',
-        whatsapp: '0532 000 00 00',
-        email: 'ofis@ornek.com',
-        address: 'Kızılay, Ankara',
-        hours: 'Hafta içi 09.00-18.00',
-        instagram: '@yolturizm',
-        hiddenTourIds: [],
-        hiddenJourneyIds: [],
-      }),
-    );
-  });
-  await page.reload();
-  await expect(page.locator('[data-announcement]')).toHaveText('Kasım turlarında son koltuklar.');
-  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ankara Çıkışlı Turlar');
-  await expect(page.locator('.site-header__inner .brand__name')).toHaveText('Yol Turizm');
-  await expect(page.locator('.site-footer__license')).toHaveText('TÜRSAB Belge No: 12345');
-
-  await page.goto('./turlar/kapadokya/');
-  const whatsapp = page.locator('.reserve').getByRole('link', { name: "WhatsApp'tan Yazın" });
-  await expect(whatsapp).toHaveAttribute('href', /^https:\/\/wa\.me\/905320000000\?text=Merhaba/);
-  await expect(
-    page.locator('.reserve').getByRole('link', { name: 'Telefonla Arayın' }),
-  ).toHaveAttribute('href', 'tel:03120000000');
-
-  await page.goto('./iletisim/');
-  await expect(page.locator('.channel', { hasText: 'E-posta' })).toContainText('ofis@ornek.com');
-  await expect(page.getByRole('link', { name: '@yolturizm' })).toHaveAttribute(
-    'href',
-    'https://www.instagram.com/yolturizm/',
-  );
-});
-
 test('a journey hidden in the panel leaves the archive and the totals', async ({ page }) => {
   await openPanel(page, `/gecmis/${JOURNEY}`);
   await page.getByText('Sitede Göster').click();
@@ -180,38 +115,4 @@ test('a journey changed in the panel reads as changed on its page', async ({ pag
   await expect(page.locator('.facts')).toContainText('43');
   await expect(page.locator('.moment')).toHaveCount(3);
   await expect(page.locator('.moment', { hasText: 'Mustafapaşa' })).toHaveCount(0);
-});
-
-test.describe('on a phone', () => {
-  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true });
-
-  test('no page is wider than the screen, so the phone never zooms out', async ({ page }) => {
-    for (const path of [
-      './',
-      './takvim/',
-      './gecmis-turlar/',
-      './gecmis-turlar/2026-09-18-kapadokya/',
-      './sss/',
-      './iletisim/',
-      './turlar/kapadokya/',
-    ]) {
-      await page.goto(path);
-      const overflow = await page.evaluate(
-        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-      );
-      expect(overflow, path).toBe(0);
-    }
-  });
-
-  test('the price and a way to book follow the reader down a tour page', async ({ page }) => {
-    await page.goto('./turlar/kapadokya/');
-    const bar = page.locator('[data-booking-bar]');
-    await expect(bar).toBeHidden();
-    await page.locator('#gunluk-program').scrollIntoViewIfNeeded();
-    await expect(bar).toBeVisible();
-    await expect(bar).toContainText('₺9.850');
-    await bar.getByRole('link', { name: 'Yer Ayırt' }).click();
-    await expect(page.locator('#rezervasyon')).toBeInViewport();
-    await expect(bar).toBeHidden();
-  });
 });

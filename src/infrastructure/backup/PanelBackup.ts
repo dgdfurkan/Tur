@@ -1,7 +1,9 @@
+import type { FaqDraftRepository } from '@/application/FaqEditor';
 import type { JourneyDraftRepository } from '@/application/JourneyArchiveEditor';
 import { siteSettingsSchema, type SiteSettingsRepository } from '@/application/SiteSettings';
 import type { TourDraftRepository } from '@/application/TourCatalogEditor';
 import type { PassengerRepository } from '@/domain/booking/PassengerRepository';
+import { LocalFaqDraft } from '../storage/LocalFaqDraft';
 import { LocalJourneyDrafts } from '../storage/LocalJourneyDrafts';
 import { LocalPassengerRepository } from '../storage/LocalPassengerRepository';
 import { LocalTourDrafts } from '../storage/LocalTourDrafts';
@@ -14,6 +16,7 @@ export interface PanelStores {
   readonly passengers: PassengerRepository;
   readonly drafts: TourDraftRepository;
   readonly journeys: JourneyDraftRepository;
+  readonly faq: FaqDraftRepository;
   readonly settings: SiteSettingsRepository;
 }
 
@@ -28,7 +31,7 @@ export type RestoreResult =
 
 /**
  * Everything the panel keeps on this device in one JSON file: passengers,
- * changed tours, changed and recorded journeys, and site settings. Until the
+ * changed tours, changed and recorded journeys, questions and site settings. Until the
  * panel shares its data through a server, a backup is how records move to
  * another device or survive a cleared browser.
  */
@@ -41,6 +44,7 @@ export function createBackup(stores: PanelStores, now: Date): string {
       passengers: stores.passengers.findAll().map(LocalPassengerRepository.toPlain),
       tourDrafts: stores.drafts.load(),
       journeyDrafts: stores.journeys.load(),
+      faqDraft: stores.faq.load(),
       siteSettings: stores.settings.load(),
     },
     null,
@@ -74,6 +78,9 @@ export function restoreBackup(text: string, stores: PanelStores): RestoreResult 
   stores.passengers.replaceAll(passengers);
   stores.drafts.save(drafts);
   stores.journeys.save(journeys);
+  const faq = LocalFaqDraft.revive(backup['faqDraft']);
+  if (faq) stores.faq.save(faq);
+  else stores.faq.clear();
   const settings = siteSettingsSchema.safeParse(backup['siteSettings']);
   if (settings.success) stores.settings.save(settings.data);
   else stores.settings.clear();

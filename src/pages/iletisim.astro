@@ -174,7 +174,7 @@ const featured = (await loadFaq()).filter((question) => question.featured);
           {tr.actions.allQuestions}
         </Button>
       </div>
-      <FaqList items={featured} name="iletisim-sss" />
+      <FaqList items={featured} name="iletisim-sss" show="featured" />
     </div>
   </section>
 </BaseLayout>

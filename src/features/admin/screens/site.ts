@@ -107,6 +107,7 @@ export function siteScreen(): Screen {
           if (!yes) return;
           const result = context.backup.restore(text);
           context.catalog.reload();
+          context.journeys.reload();
           context.refresh();
           context.toast.show(
             result.ok
@@ -177,6 +178,18 @@ export function siteScreen(): Screen {
               ),
               icon: { name: 'eye', tone: 'green' },
               href: href('/site/turlar'),
+            }),
+            row({
+              title: tr.admin.journeys.title,
+              value: tr.admin.journeys.count(formatNumber(context.journeys.journeys().length)),
+              icon: { name: 'ticket', tone: 'brown' },
+              href: href('/gecmis'),
+            }),
+            row({
+              title: tr.admin.faq.title,
+              value: tr.admin.faq.count(formatNumber(context.faq.items().length)),
+              icon: { name: 'message', tone: 'blue' },
+              href: href('/site/sorular'),
             }),
           ]),
         ]),
@@ -290,6 +303,11 @@ export function siteScreen(): Screen {
                     if (!yes) return;
                     context.bookings.clear();
                     for (const tour of context.catalog.tours()) context.catalog.discard(tour.id);
+                    for (const journey of context.journeys.journeys()) {
+                      if (context.journeys.isNew(journey.id)) context.journeys.remove(journey.id);
+                      else context.journeys.discard(journey.id);
+                    }
+                    context.faq.discard();
                     context.settings.reset();
                     context.refresh();
                     context.toast.show(tr.admin.data.cleared);

@@ -1,19 +1,28 @@
 ---
-import type { FaqEntry } from '@/application/dto/faqSchema';
+import type { FaqEntry, FaqTopic } from '@/application/dto/faqSchema';
 
 /**
  * Questions that open to their answers. Opening one closes the others in the
- * same list, so the page stays short.
+ * same list, so the page stays short. The list says which questions it shows,
+ * so the panel's changes on this device can be drawn into it the same way.
  */
 interface Props {
   items: readonly FaqEntry[];
   name: string;
+  /** The questions of one topic, or those marked to be shown beyond the questions page. */
+  show: { topic: FaqTopic } | 'featured';
 }
 
-const { items, name } = Astro.props;
+const { items, name, show } = Astro.props;
 ---
 
-<div class="faq">
+<div
+  class="faq"
+  data-faq-list
+  data-faq-name={name}
+  data-faq-topic={show === 'featured' ? undefined : show.topic}
+  data-faq-featured={show === 'featured' ? '' : undefined}
+>
   {items.map((item) => (
     <details class="faq__item" name={name} id={`soru-${item.id}`}>
       <summary class="faq__question">
@@ -25,7 +34,27 @@ const { items, name } = Astro.props;
       </div>
     </details>
   ))}
+  <template data-faq-template>
+    <details class="faq__item">
+      <summary class="faq__question">
+        <span data-faq-question></span>
+        <span class="faq__sign" aria-hidden="true"></span>
+      </summary>
+      <div class="faq__answer">
+        <p data-faq-answer></p>
+      </div>
+    </details>
+  </template>
 </div>
+
+<script>
+  import { readLocalFaq, syncFaq } from '@/features/site-sync/faq';
+  import { SafeStorage } from '@/infrastructure/storage/SafeStorage';
+
+  // On the office's device, the questions read as the panel changed them.
+  const questions = readLocalFaq(new SafeStorage());
+  if (questions) syncFaq(document, questions);
+</script>
 
 <style>
   .faq {

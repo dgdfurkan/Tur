@@ -73,27 +73,25 @@ const services = [
           <Icon slot="icon" name="route" />
           Kapadokya Rotasını Ön İzle
         </Button>
-        {
-          soonest && (
-            <a
-              class="next-board"
-              href={`${pageUrl(`turlar/${soonest.tour.id}`)}#kalkis-tarihleri`}
-              data-tour-card={soonest.tour.id}
-            >
-              <span class="next-board__label">{tr.nextBoard.label}</span>
-              <span class="next-board__line">
-                {tr.nextBoard.line(
-                  formatDate(soonest.departure.startDate),
-                  formatTime(soonest.departure.time),
-                  soonest.tour.title,
-                )}
-              </span>
-              <span class="next-board__seats" data-level={soonest.departure.occupancy.level}>
-                {occupancyText(soonest.departure.occupancy).status}
-              </span>
-            </a>
-          )
-        }
+        {soonest && (
+          <a
+            class="next-board"
+            href={`${pageUrl(`turlar/${soonest.tour.id}`)}#kalkis-tarihleri`}
+            data-tour-card={soonest.tour.id}
+          >
+            <span class="next-board__label">{tr.nextBoard.label}</span>
+            <span class="next-board__line">
+              {tr.nextBoard.line(
+                formatDate(soonest.departure.startDate),
+                formatTime(soonest.departure.time),
+                soonest.tour.title,
+              )}
+            </span>
+            <span class="next-board__seats" data-level={soonest.departure.occupancy.level}>
+              {occupancyText(soonest.departure.occupancy).status}
+            </span>
+          </a>
+        )}
       </div>
       <div class="hero__sign">
         <DistanceSign tours={tours} />
@@ -199,7 +197,7 @@ const services = [
             {tr.actions.allQuestions}
           </Button>
         </div>
-        <FaqList items={questions} name="ana-sayfa-sss" />
+        <FaqList items={questions} name="ana-sayfa-sss" show="featured" />
       </div>
     </div>
   </section>

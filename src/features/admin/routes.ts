@@ -2,6 +2,7 @@ import type { AppContext, Screen } from './context';
 import { hotelsScreen, listScreen, programScreen } from './screens/content';
 import { departureScreen } from './screens/departure';
 import { departureEditScreen } from './screens/departureEdit';
+import { faqScreen } from './screens/faq';
 import { homeScreen } from './screens/home';
 import { journeyFormScreen, journeyScreen, journeysScreen } from './screens/journeys';
 import { passengerFormScreen } from './screens/passengerForm';
@@ -66,6 +67,7 @@ const ROUTES: readonly (readonly [string, Factory])[] = [
   ],
   ['/site', () => siteScreen()],
   ['/site/turlar', () => shownToursScreen()],
+  ['/site/sorular', () => faqScreen()],
 ];
 
 function known(tourId: string | undefined, context: AppContext): boolean {

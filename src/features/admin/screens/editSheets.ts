@@ -1,3 +1,4 @@
+import { InvalidFaqError } from '@/application/FaqEditor';
 import { InvalidJourneyError } from '@/application/JourneyArchiveEditor';
 import { InvalidTourError } from '@/application/TourCatalogEditor';
 import { SCENE_KEYS, type SceneKey } from '@/domain/tour/Tour';
@@ -29,6 +30,7 @@ export function attempt(
     if (!(
       problem instanceof InvalidTourError ||
       problem instanceof InvalidJourneyError ||
+      problem instanceof InvalidFaqError ||
       problem instanceof RangeError
     )) {
       throw problem;
