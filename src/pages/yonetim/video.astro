@@ -19,12 +19,12 @@ const templates = ['journey', 'day', 'highlights', 'outline'] as const;
 ---
 
 <PanelShell title={studio.title} description={studio.intro} current="video">
-  <div class="admin__body admin__body--wide">
+  <div class="studio-page">
     <section class="studio" data-studio data-state="loading" data-format="reels">
       <script is:inline type="application/json" data-tours set:html={toursJson} />
-      <header class="studio__head">
+      <header class="screen__head">
         <h1 tabindex="-1">{studio.title}</h1>
-        <p>{studio.intro}</p>
+        <p class="screen__subtitle">{studio.intro}</p>
       </header>
 
       <div class="studio__layout">
@@ -48,7 +48,7 @@ const templates = ['journey', 'day', 'highlights', 'outline'] as const;
           <p class="studio__message" data-studio-message role="status"></p>
 
           <div class="studio__transport">
-            <button class="button button--secondary" type="button" data-action="preview">
+            <button class="btn btn--secondary" type="button" data-action="preview">
               <span class="icon-play">
                 <Icon name="play" />
               </span>
@@ -78,7 +78,7 @@ const templates = ['journey', 'day', 'highlights', 'outline'] as const;
           <p class="studio__summary" data-summary></p>
 
           <button
-            class="button button--primary button--block studio__create"
+            class="btn btn--primary btn--lg btn--block studio__create"
             type="button"
             data-action="create"
           >
@@ -89,21 +89,17 @@ const templates = ['journey', 'day', 'highlights', 'outline'] as const;
           <div class="studio__progress" data-progress>
             <progress max="1" value="0" aria-label={studio.create}></progress>
             <span class="tabular" data-progress-text></span>
-            <button class="button button--quiet" type="button" data-action="cancel">
+            <button class="btn btn--quiet" type="button" data-action="cancel">
               {studio.cancel}
             </button>
           </div>
 
           <div class="studio__result">
-            <a class="button button--primary button--block" data-download>
+            <a class="btn btn--primary btn--lg btn--block" data-download>
               <Icon name="download" />
               <span>{studio.download}</span>
             </a>
-            <button
-              class="button button--secondary button--block"
-              type="button"
-              data-action="again"
-            >
+            <button class="btn btn--secondary btn--block" type="button" data-action="again">
               {studio.again}
             </button>
           </div>
@@ -216,7 +212,7 @@ const templates = ['journey', 'day', 'highlights', 'outline'] as const;
                 {studio.logoHint}
               </p>
               <p class="field__error" id="studio-logo-error" role="alert" data-logo-error></p>
-              <button class="button button--quiet" type="button" data-action="remove-logo" hidden>
+              <button class="btn btn--quiet" type="button" data-action="remove-logo" hidden>
                 {studio.removeLogo}
               </button>
             </div>

@@ -25,7 +25,7 @@ Bildirimler yedi gün içinde yanıtlanır. Doğrulanan açıklar için düzeltm
 ## Bilinen Sınırlar
 
 - GitHub Pages özel HTTP başlığı tanımlamaya izin vermez. Bu nedenle `frame-ancestors`, HSTS ve `Permissions-Policy` gibi başlıklar, site Cloudflare üzerine taşındığında etkinleştirilecektir.
-- Site, `dgdfurkan.github.io` adresindeki diğer projelerle aynı tarayıcı deposunu paylaşır. Bu nedenle panel yalnızca demo verisiyle kullanılmalıdır.
+- Site, `dgdfurkan.github.io` adresindeki diğer projelerle aynı tarayıcı deposunu paylaşır. Kendi alan adına geçilene kadar panele gerçek kişi bilgisi girilmemelidir.
 - Panel kilidi, statik bir sitede gerçek erişim denetimi sağlamaz. Kilit ziyaretçinin paneli açmasını önler; ancak panelin yazılımı yayınlanan dosyaların içindedir ve kayıtlar yalnızca girildiği cihazda durur. Gerçek erişim denetimi, paylaşımlı panelle birlikte Cloudflare Access üzerinden kurulur.
 
 Ayrıntılar `docs/yol-haritasi.md` dosyasındadır.

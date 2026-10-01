@@ -41,6 +41,11 @@ export function formatMoney(money: Money): string {
   return moneyFormat.format(money.lira);
 }
 
+/** A lira amount that is not a Money value, such as a figure counting up on screen. */
+export function formatLira(lira: number): string {
+  return moneyFormat.format(lira);
+}
+
 export function formatNumber(value: number): string {
   return numberFormat.format(value);
 }
@@ -97,6 +102,20 @@ export function formatDuration(nights: number, days: number): string {
   return nights === 0 ? 'Günübirlik' : `${nights} Gece ${days} Gün`;
 }
 
+// The agency works on Turkish time; en-CA happens to write dates as YYYY-MM-DD.
+const turkishCalendarDate = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'Europe/Istanbul',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+
+/** The calendar date in Turkey at the given moment, as YYYY-MM-DD. */
 export function todayIso(now: Date = new Date()): string {
-  return now.toISOString().slice(0, 10);
+  return turkishCalendarDate.format(now);
+}
+
+/** The calendar date in Turkey of an ISO 8601 timestamp, as YYYY-MM-DD. */
+export function dateOfInstant(instant: string): string {
+  return turkishCalendarDate.format(new Date(instant));
 }

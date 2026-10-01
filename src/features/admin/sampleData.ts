@@ -1,4 +1,4 @@
-import type { PassengerDraft } from '@/application/BookingService';
+import type { BookingService, PassengerDraft } from '@/application/BookingService';
 
 type SamplePerson = Pick<
   PassengerDraft,
@@ -6,8 +6,8 @@ type SamplePerson = Pick<
 >;
 
 /**
- * Invented passengers for demonstrations. The 0500 prefix is not assigned to
- * any operator, so none of these numbers can belong to a real person.
+ * Invented passengers, for trying the panel out. The 0500 prefix is not
+ * assigned to any operator, so none of these numbers can belong to a person.
  */
 export const SAMPLE_PEOPLE: readonly SamplePerson[] = [
   {
@@ -53,3 +53,33 @@ export const SAMPLE_PEOPLE: readonly SamplePerson[] = [
     note: 'Kapora kalkış günü alınacak.',
   },
 ];
+
+/** How many departures the sample passengers are spread over. */
+const SAMPLE_DEPARTURES = 2;
+
+/**
+ * Records the sample passengers on the two nearest departures that have room
+ * for them, each on the first free seat. Returns how many were recorded.
+ */
+export function loadSamples(bookings: BookingService, today: string): number {
+  const perDeparture = Math.ceil(SAMPLE_PEOPLE.length / SAMPLE_DEPARTURES);
+  const targets = bookings
+    .bookings(today)
+    .filter(({ departure }) => departure.occupancy.remaining >= perDeparture)
+    .slice(0, SAMPLE_DEPARTURES);
+  let added = 0;
+  SAMPLE_PEOPLE.forEach((person, index) => {
+    const target = targets[index % Math.max(1, targets.length)];
+    if (!target) return;
+    // Read the departure again so seats taken earlier in this loop are left alone.
+    const seat = bookings.booking(target.departure.id)?.departure.freeSeats[0];
+    if (seat === undefined) return;
+    const result = bookings.addPassenger({
+      ...person,
+      departureId: target.departure.id,
+      seatNumber: seat,
+    });
+    if (result.ok) added += 1;
+  });
+  return added;
+}

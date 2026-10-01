@@ -4,6 +4,7 @@ import { Phone } from '@/domain/booking/Phone';
 import { Money } from '@/domain/shared/Money';
 import type { Departure } from '@/domain/tour/Departure';
 import type { Tour } from '@/domain/tour/Tour';
+import type { TourSource } from './TourCatalogEditor';
 
 /** What the entry form collects, before anything has been validated. */
 export interface PassengerDraft {
@@ -48,7 +49,7 @@ const isPaymentMethod = (value: string): value is PaymentMethod =>
 /** Use cases of the operations panel: record passengers and deposits, watch occupancy. */
 export class BookingService {
   constructor(
-    private readonly tours: readonly Tour[],
+    private readonly catalog: TourSource,
     private readonly repository: PassengerRepository,
     private readonly now: () => Date,
     private readonly newId: () => string,
@@ -57,7 +58,8 @@ export class BookingService {
   /** Departures that have not left yet, soonest first. */
   bookings(today: string): readonly DepartureBooking[] {
     const passengers = this.repository.findAll();
-    return this.tours
+    return this.catalog
+      .tours()
       .flatMap((tour) =>
         tour.upcomingDepartures(today).map((departure) => this.merge(tour, departure, passengers)),
       )
@@ -90,6 +92,18 @@ export class BookingService {
    */
   updatePassenger(original: Passenger, draft: PassengerDraft): SavePassengerResult {
     return this.save(draft, original);
+  }
+
+  /** All records, for searching across departures. */
+  passengers(): readonly Passenger[] {
+    return this.repository.findAll();
+  }
+
+  /** What is still to be paid after the deposit, at the tour's price per person. */
+  balance(passenger: Passenger): Money {
+    const booking = this.booking(passenger.departureId);
+    if (!booking) return Money.zero();
+    return Money.fromKurus(Math.max(0, booking.tour.price.kurus - passenger.deposit.kurus));
   }
 
   /** Removes a record and returns it, so the caller can offer to undo. */
@@ -167,7 +181,7 @@ export class BookingService {
     departureId: string,
     passengers: readonly Passenger[],
   ): DepartureBooking | undefined {
-    for (const tour of this.tours) {
+    for (const tour of this.catalog.tours()) {
       const departure = tour.findDeparture(departureId);
       if (departure) return this.merge(tour, departure, passengers);
     }

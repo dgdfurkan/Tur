@@ -82,8 +82,9 @@ function tour(): Tour {
 
 function service(): BookingService {
   let counter = 0;
+  const tours = [tour()];
   return new BookingService(
-    [tour()],
+    { tours: () => tours },
     new MemoryRepository(),
     () => new Date('2026-10-20T09:00:00Z'),
     () => `id-${(counter += 1)}`,

@@ -107,12 +107,25 @@ Kareler zamanla değil, sırayla üretilir: her kare için sahne sabit bir süre
 
 ## Operasyon Paneli
 
-Panel `PanelShell` bileşeniyle kurulur: üst bilgi, kilit formu ve alt sekme çubuğu her panel sayfasında aynıdır. Panel içeriği ancak kilit açıldığında kurulur (`whenPanelOpens`).
+Panel, telefonda kullanılmak üzere yazılmış bir uygulamadır. `PanelShell` kilit ekranını ve gezinmeyi kurar: telefonda alt sekme çubuğu, geniş ekranda yan menü. `/yonetim/` sayfasındaki bölümler (Özet, Turlar, Yolcular, Site) adresteki `#` işaretinden sonraki yolla seçilir; Video stüdyosu kendi sayfasındadır. Uygulamanın kodu ancak kilit açıldıktan sonra yüklenir.
 
-- `PanelLock`, girilen kodu PBKDF2 (SHA-256, 310.000 tur) ile anahtara çevirir ve anahtarın özetini sayfadaki parmak iziyle karşılaştırır. Kod depoda bulunmaz; parmak izi `npm run panel:code` ile üretilir.
-- Açık panel, anahtarı sekme boyunca veya "Bu Cihazda Hatırla" seçildiyse cihazda tutar.
+| Sınıf veya Modül        | Görev                                                                                                 |
+| ----------------------- | ----------------------------------------------------------------------------------------------------- |
+| `AdminApp`              | Adresi okuyup ekranı kurar; ileri, geri ve sekme geçişlerini görünüm geçişiyle canlandırır            |
+| `routes.ts`             | Panelin bütün adresleri ve karşılık gelen ekranlar                                                    |
+| `screens/`              | Her ekran, verisini servislerden okuyup her çizimde baştan kurar                                      |
+| `ui/kit.ts`, `parts.ts` | Satır, grup, düğme, anahtar, koltuk planı, doluluk halkası gibi ortak parçalar                        |
+| `Sheet`                 | Alttan açılan, aşağı çekilerek kapanan kipli pencere (`<dialog>`)                                     |
+| `TourCatalogEditor`     | Yayınlanan turlar ile paneldeki değişiklikleri birleştirir; her değişikliği içerik şemasıyla denetler |
+| `SiteSettingsService`   | Ana sayfa metni, duyuru, iletişim, marka ve gizlenen turlar                                           |
+| `BookingService`        | Yolcu, kapora, kalan ödeme ve doluluk                                                                 |
+| `PanelBackup`           | Cihazdaki bütün kayıtları tek JSON dosyasına yazar ve geri yükler                                     |
+
+- Tur verisinin kuralları `src/application/dto/tourSchema.ts` dosyasındadır. İçerik dosyaları derleme sırasında, paneldeki değişiklikler kaydedilmeden önce aynı şemadan geçer; alan katmanının kendi denetimleri (tarih sırası, araçta olmayan koltuk) de uygulanır.
+- Değişiklikler şimdilik cihazda taslak olarak tutulur. Her taslak, başladığı yayınlanmış turun parmak izini taşır; site sonradan güncellenirse panel bunu bildirir.
+- Herkese açık sayfalar (`syncLocalChanges`) aynı cihazdaki fiyat, satılan koltuk, panel kaydı ve gizlenen tur bilgisini okuyup gösterir. Bu okuma Zod kullanmaz; değerler sayfaya yalnızca metin ve öznitelik olarak yazılır.
+- `PanelLock`, girilen kodu PBKDF2 (SHA-256, 310.000 tur) ile anahtara çevirir ve anahtarın özetini sayfadaki parmak iziyle karşılaştırır. Kod rakamlardan oluşuyorsa telefon rakam klavyesini açar ve son rakamla birlikte gönderilir.
 - `astro build --mode e2e` ile derlenen test sürümü herkese açık test koduyla açılır. Üretim derlemesinde bu dal derleme sırasında atılır.
-- `AdminApp`, her değişiklikten sonra tüm görünümleri `BookingService` üzerinden yeniden çizer. Form, düzenlenen kaydı hatırlar; düzenlenen kaydın kendi koltuğu ona boş sayılır.
 
 ## Hareket
 

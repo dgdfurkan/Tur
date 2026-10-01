@@ -1,6 +1,6 @@
 # Tur Sitesi Prototipi
 
-Ankara çıkışlı kültür turları için hazırlanan tanıtım sitesi, 3D rota simülasyonu ve demo operasyon paneli.
+Ankara çıkışlı kültür turları için hazırlanan tanıtım sitesi, 3D rota simülasyonu ve operasyon paneli.
 
 **Canlı sürüm:** https://dgdfurkan.github.io/Tur/
 
@@ -11,7 +11,7 @@ Ankara çıkışlı kültür turları için hazırlanan tanıtım sitesi, 3D rot
 - **Tur Vitrini:** Her tur için ayrı sayfa, günlük program, konaklama, fiyata dâhil olan ve olmayan hizmetler. Her durak bir çizimle ve rakım, yapım yılı gibi kısa bilgilerle gösterilir.
 - **Doluluk Görünümü:** Kalkış tarihine göre doluluk oranı, kalan koltuk sayısı ve koltuk durumu.
 - **Rota Ön İzlemesi:** Çizim tarzında 3D Türkiye haritası üzerinde biniş kartı, mühür ve otobüs animasyonuyla ilerleyen rota simülasyonu. Otobüs bir durağa vardığında o yerin çizimi ve bilgileri ekranda belirir; yolculuğun sonunda kalkış tarihlerine geçilir. Grafik işlemcisi bulunmayan cihazlarda aynı simülasyon düz harita üzerinde çalışır.
-- **Demo Operasyon Paneli:** Telefondan yolcu ve kapora kaydı, kayıtların düzenlenmesi ve silinmesi, anlık doluluk, sigorta listesi dışa aktarımı. Veriler yalnızca cihazda saklanır. Panel erişim koduyla açılır ve siteden bağlantı verilmez.
+- **Operasyon Paneli:** Telefonda kullanılmak üzere tasarlanmış yönetim uygulaması. Turların fiyatı, kalkışları, başka kanaldan satılan koltukları, sitede görünüp görünmeyeceği ve sayfa içeriği; yolcu ve kapora kaydı, kalan ödemeler, sigorta listesi; ana sayfa metni, duyuru ve iletişim bilgileri buradan yönetilir. Panel erişim koduyla açılır ve siteden bağlantı verilmez.
 - **Video Stüdyosu:** Panelde, tur rotasından Instagram boyutlarında (9:16, 4:5, 1:1, 16:9) 4K çözünürlüğe kadar MP4 video üretilir. Videoya logo, ajans adı ve iletişim satırı eklenir; video cihazda hazırlanır ve hiçbir sunucuya yüklenmez.
 - **Erişilebilirlik:** Klavye ile kullanım, ekran okuyucu duyuruları ve azaltılmış hareket tercihi desteklenir.
 
@@ -88,6 +88,8 @@ Panel `/yonetim/` adresindedir ve sitenin hiçbir sayfasından bağlantı verilm
 - Depoda yalnızca kodun tuzlanmış parmak izi (`src/config/panel-lock.json`) tutulur. Kod değiştirildikten sonra site yeniden derlenip yayınlanır.
 - "Bu Cihazda Hatırla" seçilmezse panel, sekme kapandığında yeniden kilitlenir.
 - Uçtan uca testler için derlenen sürüm herkese açık bir test koduyla açılır; yayınlanan sürüm bu kodu tanımaz.
+
+Paneldeki değişiklikler şimdilik girildiği cihazda saklanır. Fiyat, doluluk ve tur görünürlüğü o cihazdaki site görünümüne hemen yansır; herkesin görmesi için site içeriğinin panelden yayınlanması gerekir (`docs/yol-haritasi.md`). Kayıtlar Site bölümündeki **Yedek Al** ve **Yedekten Geri Yükle** ile başka bir cihaza taşınır.
 
 Kilit, ziyaretçilerin paneli açmasını önler; ancak gerçek bir erişim denetimi değildir. Site statiktir ve depo herkese açıktır; panelin yazılımı ve örnek veriler yayınlanan dosyaların içindedir. Paneldeki kayıtlar yalnızca girildiği cihazda durur. Gerçek erişim denetimi, paylaşımlı panelle birlikte Cloudflare Access üzerinden kurulur (`docs/yol-haritasi.md`).
 

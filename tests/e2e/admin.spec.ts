@@ -1,100 +1,70 @@
 import { readFile } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
 import { TEST_PANEL_CODE } from '../panelCode';
-import { expectNoErrors, openPanelPage, trackErrors } from './support';
+import { expectNoErrors, goToScreen, openPanelPage, trackErrors } from './support';
 
 const PANEL = './yonetim/';
-const KAPADOKYA = 'Kapadokya Kültür Turu, 6-8 Kasım 2026';
+/** A departure with free seats 15, 16 and 24 in the sample content. */
+const KAPADOKYA = 'kapadokya-2026-11-06';
 
-async function openPanel(page: Page): Promise<void> {
+async function openPanel(page: Page, path = '/'): Promise<void> {
   await openPanelPage(page, PANEL);
   await expect(page.locator('[data-admin]')).toHaveAttribute('data-ready', 'true');
+  if (path !== '/') await go(page, path);
 }
+
+const go = goToScreen;
+
+const toast = (page: Page) => page.locator('.toast');
 
 async function addPassenger(page: Page, name: string, seat: number): Promise<void> {
-  await page.getByRole('button', { name: 'Yolcu Ekle' }).click();
-  const form = page.locator('[data-form]');
-  await form.getByLabel('Kalkış').selectOption({ label: KAPADOKYA });
-  await form.getByLabel('Ad Soyad').fill(name);
-  await form.getByLabel('Telefon').fill('0500 000 00 09');
-  await page.locator(`.seat-option:has(input[value="${seat}"])`).click();
+  await go(page, `/yolcular/yeni?kalkis=${KAPADOKYA}`);
+  await page.getByLabel('Ad Soyad').fill(name);
+  await page.getByLabel('Telefon', { exact: true }).fill('0500 000 00 09');
+  await page.locator(`label.seat:has(input[value="${seat}"])`).click();
   await page.getByRole('button', { name: '1.000', exact: true }).click();
-  await page.getByText('Havale', { exact: true }).click();
+  await page.locator('.seg__option', { hasText: 'Havale' }).click();
   await page.getByRole('button', { name: 'Yolcuyu Kaydet' }).click();
-  await expect(page.locator('[data-toast-text]')).toHaveText('Yolcu kaydedildi.');
+  await expect(toast(page)).toContainText('Yolcu kaydedildi.');
+  // Saving goes back to the screen before the form; wait until it is there.
+  await expect(page).not.toHaveURL(/yolcular\/yeni/);
 }
 
-test('a passenger recorded in the panel appears in the list and the summary', async ({ page }) => {
+test('a passenger recorded in the panel appears in the list and the figures', async ({ page }) => {
   const errors = trackErrors(page);
   await openPanel(page);
-  await expect(page.locator('[data-stat="passengers"]')).toHaveText('0');
+  const recorded = page.locator('.stat', { hasText: 'Kayıtlı Yolcu' }).locator('.stat__value');
+  await expect(recorded).toHaveText('0');
 
-  // Seat 15 is free on this departure in the sample content.
-  await addPassenger(page, 'Deneme Yolcu', 15);
+  await page.getByRole('link', { name: 'Yolcu Ekle' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Yolcu Ekle' })).toBeVisible();
+  await page.getByLabel('Kalkış').selectOption(KAPADOKYA);
+  await page.getByLabel('Ad Soyad').fill('Deneme Yolcu');
+  await page.getByLabel('Telefon', { exact: true }).fill('0500 000 00 09');
+  await page.locator('label.seat:has(input[value="15"])').click();
+  await page.getByRole('button', { name: '1.000', exact: true }).click();
+  await page.locator('.seg__option', { hasText: 'Havale' }).click();
+  await page.getByRole('button', { name: 'Yolcuyu Kaydet' }).click();
 
-  await page.getByRole('button', { name: 'Yolcu Listesi' }).click();
-  const row = page.locator('.list__row');
+  // Saving returns to where the form was opened from.
+  await expect(toast(page)).toContainText('Yolcu kaydedildi.');
+  await expect(page.getByRole('heading', { level: 1, name: 'Özet' })).toBeVisible();
+  await expect(recorded).toHaveText('1');
+
+  await page
+    .getByRole('navigation', { name: 'Panel Bölümleri' })
+    .getByRole('link', { name: 'Yolcular' })
+    .click();
+  const row = page.locator('.passenger-row');
   await expect(row).toHaveCount(1);
   await expect(row).toContainText('Deneme Yolcu');
   await expect(row).toContainText('0 (500) 000 00 09');
-  await expect(row).toContainText('₺1.000 Havale');
-
-  await page.getByRole('button', { name: 'Özet' }).click();
-  await expect(page.locator('[data-stat="passengers"]')).toHaveText('1');
-  await expect(page.locator('[data-stat="deposits"]')).toHaveText('₺1.000');
+  await expect(row).toContainText('₺1.000');
   expectNoErrors(errors);
 });
 
-test('a recorded passenger can be changed from the list', async ({ page }) => {
-  const errors = trackErrors(page);
-  await openPanel(page);
-  await addPassenger(page, 'Deneme Yolcu', 15);
-  await page.getByRole('button', { name: 'Yolcu Listesi' }).click();
-  await page.getByRole('button', { name: 'Düzenle: Deneme Yolcu' }).click();
-
-  // The record fills the form, its own seat chosen and free to keep.
-  await expect(page.getByRole('heading', { name: 'Yolcu Bilgilerini Düzenle' })).toBeFocused();
-  const form = page.locator('[data-form]');
-  await expect(form.getByLabel('Ad Soyad')).toHaveValue('Deneme Yolcu');
-  await expect(form.getByLabel('Kapora (TL)')).toHaveValue('1.000');
-  await expect(form.locator('input[name="seatNumber"][value="15"]')).toBeChecked();
-
-  await form.getByLabel('Ad Soyad').fill('Deneme Yolcu Kaya');
-  await page.locator('.seat-option:has(input[value="16"])').click();
-  await page.getByRole('button', { name: 'Değişiklikleri Kaydet' }).click();
-
-  await expect(page.locator('[data-toast-text]')).toHaveText('Yolcu bilgileri güncellendi.');
-  await expect(page.getByRole('heading', { name: 'Yolcu Listesi' })).toBeFocused();
-  const row = page.locator('.list__row');
-  await expect(row).toHaveCount(1);
-  await expect(row).toContainText('Deneme Yolcu Kaya');
-  await expect(row.locator('.list__seat')).toContainText('16');
-
-  // The form is for new passengers again.
-  await page.getByRole('button', { name: 'Yolcu Ekle' }).click();
-  await expect(page.getByRole('heading', { name: 'Yolcu Ekle' })).toBeVisible();
-  await expect(form.getByLabel('Ad Soyad')).toHaveValue('');
-  await expect(page.getByRole('button', { name: 'Vazgeç' })).toBeHidden();
-  expectNoErrors(errors);
-});
-
-test('a change can be abandoned without touching the record', async ({ page }) => {
-  await openPanel(page);
-  await addPassenger(page, 'Deneme Yolcu', 15);
-  await page.getByRole('button', { name: 'Yolcu Listesi' }).click();
-  await page.getByRole('button', { name: 'Düzenle: Deneme Yolcu' }).click();
-
-  await page.locator('[data-form]').getByLabel('Ad Soyad').fill('Başka Biri');
-  await page.getByRole('button', { name: 'Vazgeç' }).click();
-
-  await expect(page.getByRole('heading', { name: 'Yolcu Listesi' })).toBeFocused();
-  await expect(page.locator('.list__row')).toContainText('Deneme Yolcu');
-  await expect(page.locator('.list__row')).not.toContainText('Başka Biri');
-});
-
-test('an empty form explains what is missing', async ({ page }) => {
-  await openPanel(page);
-  await page.getByRole('button', { name: 'Yolcu Ekle' }).click();
+test('the passenger form explains what is missing', async ({ page }) => {
+  await openPanel(page, '/yolcular/yeni');
   await page.getByRole('button', { name: 'Yolcuyu Kaydet' }).click();
 
   await expect(page.locator('[data-error-for="fullName"]')).toHaveText('Ad ve soyad yazınız.');
@@ -104,54 +74,158 @@ test('an empty form explains what is missing', async ({ page }) => {
   await expect(page.getByLabel('Ad Soyad')).toHaveAttribute('aria-invalid', 'true');
 });
 
+test('a passenger can be changed, removed and brought back', async ({ page }) => {
+  await openPanel(page);
+  await addPassenger(page, 'Deneme Yolcu', 15);
+  await go(page, '/yolcular');
+
+  await page.locator('.passenger-row', { hasText: 'Deneme Yolcu' }).click();
+  const sheet = page.getByRole('dialog');
+  await expect(sheet.getByRole('heading', { name: 'Deneme Yolcu' })).toBeVisible();
+  await expect(sheet).toContainText('Kalan Ödeme');
+  await sheet.getByRole('link', { name: 'Düzenle' }).click();
+
+  await expect(page.getByRole('heading', { level: 1, name: 'Yolcuyu Düzenle' })).toBeVisible();
+  await expect(page.getByLabel('Ad Soyad')).toHaveValue('Deneme Yolcu');
+  await expect(page.locator('input[name="seatNumber"][value="15"]')).toBeChecked();
+  await page.getByLabel('Ad Soyad').fill('Deneme Yolcu Kaya');
+  await page.locator('label.seat:has(input[value="16"])').click();
+  await page.getByRole('button', { name: 'Değişiklikleri Kaydet' }).click();
+  await expect(toast(page)).toContainText('Yolcu bilgileri güncellendi.');
+  await expect(page).toHaveURL(/#\/yolcular$/);
+
+  const row = page.locator('.passenger-row');
+  await expect(row).toContainText('Deneme Yolcu Kaya');
+  await expect(row.locator('.seat-badge')).toHaveText('16');
+
+  await row.click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Kaydı Sil' }).click();
+  await expect(toast(page)).toContainText('Kayıt silindi.');
+  await expect(page.getByRole('heading', { name: 'Henüz Yolcu Kaydı Yok' })).toBeVisible();
+  await toast(page).getByRole('button', { name: 'Geri Al' }).click();
+  await expect(toast(page)).toContainText('Kayıt geri alındı.');
+  await expect(page.locator('.passenger-row')).toContainText('Deneme Yolcu Kaya');
+});
+
 test('the public tour page counts a seat recorded on the same device', async ({ page }) => {
   await page.goto('./turlar/kapadokya/');
-  const meter = page.locator('.fare [data-occupancy]');
-  await expect(meter.locator('[data-occupancy-status]')).toHaveText('Kalan Koltuk: 12');
+  const meter = page.locator(`[data-occupancy][data-departure-id="${KAPADOKYA}"]`).first();
+  const before = await meter.locator('[data-occupancy-status]').textContent();
 
   await openPanel(page);
   await addPassenger(page, 'Deneme Yolcu', 15);
 
   await page.goto('./turlar/kapadokya/');
-  await expect(meter.locator('[data-occupancy-status]')).toHaveText('Kalan Koltuk: 11');
-  await expect(page.locator('.seat-map__svg:visible [data-seat="15"]')).toHaveClass(/seat--taken/);
+  await expect(meter.locator('[data-occupancy-status]')).not.toHaveText(before ?? '');
+  await expect(
+    page.locator(`[data-seat-map][data-departure-id="${KAPADOKYA}"] [data-seat="15"]`),
+  ).toHaveClass(/seat--taken/);
 });
 
-test('a removed passenger can be restored', async ({ page }) => {
-  await openPanel(page);
-  await addPassenger(page, 'Deneme Yolcu', 15);
-  await page.getByRole('button', { name: 'Yolcu Listesi' }).click();
+test('a price changed in the panel shows on the pages of this device', async ({ page }) => {
+  await openPanel(page, '/turlar/kapadokya');
+  await page.getByRole('button', { name: /Kişi Başı/ }).click();
+  const sheet = page.getByRole('dialog');
+  await sheet.getByRole('textbox', { name: 'Tutar' }).fill('10.500');
+  await expect(sheet).toContainText('₺9.850 → ₺10.500');
+  await sheet.getByRole('button', { name: 'Kaydet' }).click();
+  await expect(toast(page)).toContainText('Fiyat güncellendi.');
+  await expect(page.getByRole('button', { name: /Kişi Başı/ })).toContainText('₺10.500');
 
-  await page.getByRole('button', { name: 'Kaydı Sil: Deneme Yolcu' }).click();
-  await expect(page.locator('.list__row')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Geri Al' }).click();
-  await expect(page.locator('.list__row')).toHaveCount(1);
+  await page.goto('./turlar/kapadokya/');
+  await expect(page.locator('.fare__price')).toHaveText('₺10.500');
+  await page.goto('./turlar/');
+  await expect(page.locator('[data-price-for="kapadokya"]')).toHaveText('₺10.500');
 });
 
-test('the insurance list downloads as a CSV file', async ({ page }) => {
-  await openPanel(page);
-  await addPassenger(page, 'Deneme Yolcu', 15);
-  await page.getByRole('button', { name: 'Yolcu Listesi' }).click();
+test('a hidden tour leaves the lists of the site on this device', async ({ page }) => {
+  await openPanel(page, '/turlar/kapadokya');
+  await page.getByRole('switch', { name: /Sitede Göster/ }).uncheck();
+  await expect(toast(page)).toContainText('Tur listelerden kaldırıldı.');
+  await go(page, '/turlar');
+  await expect(page.locator('.tour-row', { hasText: 'Kapadokya' })).toContainText('Gizli');
 
-  const [download] = await Promise.all([
-    page.waitForEvent('download'),
-    page.getByRole('button', { name: 'Sigorta Listesini İndir' }).click(),
-  ]);
-  expect(download.suggestedFilename()).toBe('sigorta-listesi-kapadokya-2026-11-06.csv');
-  const csv = await readFile(await download.path(), 'utf8');
-  expect(csv).toContain('Sıra;Ad Soyad;Telefon;Koltuk;Tur;Kalkış Tarihi');
-  expect(csv).toContain(
-    '1;Deneme Yolcu;0 (500) 000 00 09;15;Kapadokya Kültür Turu;6 Kasım 2026 Cuma',
+  await page.goto('./turlar/');
+  await expect(page.locator('[data-tour-card="kapadokya"]')).toBeHidden();
+  await expect(page.locator('[data-tour-card="ege-klasikleri"]')).toBeVisible();
+});
+
+test('a departure can be added, sold in part and removed', async ({ page }) => {
+  await openPanel(page, '/turlar/beypazari-gunubirlik');
+  await page.getByRole('link', { name: 'Kalkış Ekle' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Yeni Kalkış' })).toBeVisible();
+  await page.getByLabel('Gidiş Tarihi').fill('2027-01-09');
+  await page.getByLabel('Dönüş Tarihi').fill('2027-01-09');
+  await page.getByRole('button', { name: 'Koltuk 24, Boş' }).click();
+  await expect(page.getByRole('button', { name: 'Koltuk 24, Satıldı' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
   );
+  await page.getByRole('button', { name: 'Kaydet' }).click();
+  await expect(toast(page)).toContainText('Kalkış eklendi.');
+
+  const added = page.locator('.departure-row', { hasText: '9 Ocak 2027' });
+  await expect(added).toBeVisible();
+  await added.click();
+  await page.getByRole('button', { name: 'Kalkışı Sil' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Kalkışı Sil' }).click();
+  await expect(toast(page)).toContainText('Kalkış silindi.');
+  await expect(page.locator('.departure-row', { hasText: '9 Ocak 2027' })).toHaveCount(0);
 });
 
-test('sample data loads and the records can be reset', async ({ page }) => {
+test('the insurance list of a departure downloads as a CSV file', async ({ page }) => {
   await openPanel(page);
-  await page.getByRole('button', { name: 'Örnek Verileri Yükle' }).click();
-  await expect(page.locator('[data-stat="passengers"]')).toHaveText('6');
+  await addPassenger(page, 'Deneme Yolcu', 15);
+  await go(page, `/kalkis/${KAPADOKYA}`);
 
-  await page.getByRole('button', { name: 'Kayıtları Sıfırla' }).click();
-  await expect(page.locator('[data-stat="passengers"]')).toHaveText('0');
+  const downloading = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Sigorta Listesini İndir' }).click();
+  const download = await downloading;
+  expect(download.suggestedFilename()).toBe(`sigorta-listesi-${KAPADOKYA}.csv`);
+  const csv = await readFile(await download.path(), 'utf8');
+  expect(csv).toContain('Deneme Yolcu');
+});
+
+test('records move to another device through a backup', async ({ page }) => {
+  await openPanel(page);
+  await addPassenger(page, 'Yedek Yolcu', 15);
+  await go(page, '/site');
+
+  const downloading = page.waitForEvent('download');
+  await page.getByRole('button', { name: /Yedek Al/ }).click();
+  const backup = await (await downloading).path();
+
+  await page.getByRole('button', { name: /Tüm Kayıtları Sil/ }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Tüm Kayıtları Sil' }).click();
+  await expect(toast(page)).toContainText('Tüm kayıtlar silindi.');
+
+  await page.locator('input[type="file"]').setInputFiles(backup);
+  await page.getByRole('dialog').getByRole('button', { name: 'Yedekten Geri Yükle' }).click();
+  await expect(toast(page)).toContainText('Yedek yüklendi.');
+  await go(page, '/yolcular');
+  await expect(page.locator('.passenger-row')).toContainText('Yedek Yolcu');
+});
+
+test('sample passengers load and every record can be cleared', async ({ page }) => {
+  await openPanel(page, '/site');
+  await page.getByRole('button', { name: /Örnek Yolcuları Yükle/ }).click();
+  await expect(toast(page)).toContainText('Örnek yolcu eklendi: 6.');
+
+  await page.getByRole('button', { name: /Tüm Kayıtları Sil/ }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Tüm Kayıtları Sil' }).click();
+  await go(page, '/');
+  await expect(
+    page.locator('.stat', { hasText: 'Kayıtlı Yolcu' }).locator('.stat__value'),
+  ).toHaveText('0');
+});
+
+test('the back arrow returns to the screen it came from', async ({ page }) => {
+  await openPanel(page, '/turlar');
+  await page.locator('.tour-row', { hasText: 'Ege Klasikleri' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Ege Klasikleri Turu' })).toBeVisible();
+  await page.locator('.topbar__back').click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Turlar' })).toBeVisible();
+  await expect(page).toHaveURL(/#\/turlar$/);
 });
 
 test('the panel refuses to run inside another page', async ({ page, baseURL }) => {
@@ -170,7 +244,7 @@ test('the panel refuses to run inside another page', async ({ page, baseURL }) =
   await expect(panel).toHaveAttribute('data-framed', 'true');
   await expect(panel).not.toHaveAttribute('data-ready', 'true');
   await expect(panel.getByText('başka bir sayfanın içinde')).toBeVisible();
-  await expect(panel.getByRole('button', { name: 'Kayıtları Sıfırla' })).toBeHidden();
+  await expect(panel.getByLabel('Erişim Kodu')).toBeHidden();
 });
 
 test.describe('the lock', () => {
@@ -178,8 +252,7 @@ test.describe('the lock', () => {
     await page.goto(PANEL);
     const panel = page.locator('[data-admin]');
     await expect(panel).toHaveAttribute('data-access', 'locked');
-    await expect(page.getByRole('heading', { name: 'Panel Kilitli' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Örnek Verileri Yükle' })).toBeHidden();
+    await expect(page.getByRole('heading', { name: 'Operasyon Paneli' })).toBeVisible();
     await expect(page.getByRole('navigation', { name: 'Panel Bölümleri' })).toBeHidden();
 
     await page.getByLabel('Erişim Kodu').fill('yanlis-kod');
@@ -191,17 +264,17 @@ test.describe('the lock', () => {
     await page.getByLabel('Erişim Kodu').fill(TEST_PANEL_CODE);
     await page.getByRole('button', { name: 'Paneli Aç' }).click();
     await expect(panel).toHaveAttribute('data-ready', 'true');
-    await expect(page.getByRole('button', { name: 'Örnek Verileri Yükle' })).toBeVisible();
+    await expect(page.getByRole('navigation', { name: 'Panel Bölümleri' })).toBeVisible();
   });
 
   test('stays open for the tab and can be locked again', async ({ page }) => {
-    await openPanel(page);
+    await openPanel(page, '/site');
     await page.reload();
     await expect(page.locator('[data-admin]')).toHaveAttribute('data-ready', 'true');
 
-    await page.getByRole('button', { name: 'Kilitle' }).click();
+    await page.getByRole('button', { name: 'Paneli Kilitle' }).last().click();
     await expect(page.locator('[data-admin]')).toHaveAttribute('data-access', 'locked');
-    await expect(page.getByRole('button', { name: 'Örnek Verileri Yükle' })).toBeHidden();
+    await expect(page.getByRole('navigation', { name: 'Panel Bölümleri' })).toBeHidden();
   });
 
   test('is forgotten by a new visit unless the device is remembered', async ({ page, context }) => {

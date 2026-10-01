@@ -84,7 +84,9 @@ const facts = [
 
         <aside class="fare" aria-label="Fiyat ve En Yakın Kalkış">
           <p class="fare__label">{tr.tour.perPerson}</p>
-          <p class="fare__price tabular">{formatMoney(tour.price)}</p>
+          <p class="fare__price tabular" data-price-for={tour.id}>
+            {formatMoney(tour.price)}
+          </p>
           {tour.singleSupplement && (
             <p class="fare__note">
               {`${tr.tour.singleSupplement}: ${formatMoney(tour.singleSupplement)}`}

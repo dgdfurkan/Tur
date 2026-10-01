@@ -4,7 +4,7 @@ import { occupancyText } from '@/shared/occupancyText';
 
 interface Props {
   occupancy: Occupancy;
-  /** Lets the demo panel update the figures on the same device. */
+  /** Lets the operations panel update the figures on the same device. */
   departureId?: string;
 }
 
@@ -116,9 +116,11 @@ const text = occupancyText(occupancy);
 </style>
 
 <script>
-  import { syncOccupancy } from '@/features/occupancy-sync/syncOccupancy';
+  import { readLocalChanges } from '@/features/occupancy-sync/localChanges';
+  import { syncLocalChanges } from '@/features/occupancy-sync/syncOccupancy';
   import { LocalPassengerRepository } from '@/infrastructure/storage/LocalPassengerRepository';
   import { SafeStorage } from '@/infrastructure/storage/SafeStorage';
 
-  syncOccupancy(document, new LocalPassengerRepository(new SafeStorage()));
+  const storage = new SafeStorage();
+  syncLocalChanges(document, new LocalPassengerRepository(storage), readLocalChanges(storage));
 </script>

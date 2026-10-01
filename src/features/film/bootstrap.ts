@@ -1,5 +1,5 @@
 import type { TourSnapshot } from '@/application/dto/TourData';
-import { toTour } from '@/application/tourMapper';
+import { openPanelData } from '@/composition/panelData';
 import { tr } from '@/i18n/tr';
 import { SafeStorage } from '@/infrastructure/storage/SafeStorage';
 import { mp4Recorders } from '@/infrastructure/video/Mp4Recorder';
@@ -30,9 +30,11 @@ export async function mountStudio(root: HTMLElement): Promise<void> {
     return;
   }
 
-  const tours = (
-    JSON.parse(find<HTMLScriptElement>(root, '[data-tours]').textContent ?? '[]') as TourSnapshot[]
-  ).map(toTour);
+  // The tours as the panel has them on this device, so a changed price is filmed as it is now.
+  const { catalog, settings } = openPanelData(
+    JSON.parse(find<HTMLScriptElement>(root, '[data-tours]').textContent ?? '[]') as TourSnapshot[],
+  );
+  const tours = catalog.tours();
   const output = find<HTMLCanvasElement>(root, '[data-film-canvas]');
   const format = FILM_FORMATS[0];
   if (!format) throw new Error('There are no film formats');
@@ -53,11 +55,13 @@ export async function mountStudio(root: HTMLElement): Promise<void> {
     return;
   }
 
-  const form = new StudioForm(
-    find<HTMLFormElement>(root, '[data-studio-form]'),
-    tours,
-    new SafeStorage(),
-  );
+  const formElement = find<HTMLFormElement>(root, '[data-studio-form]');
+  // The agency's name and phone from the panel's settings, unless the studio remembers others.
+  const site = settings.get();
+  find<HTMLInputElement>(formElement, 'input[name="brandName"]').value = site.brandName;
+  find<HTMLInputElement>(formElement, 'input[name="contactLine"]').value =
+    site.phone || (site.instagram ? `@${site.instagram.replace(/^@/, '')}` : '');
+  const form = new StudioForm(formElement, tours, new SafeStorage());
   const logos = new LogoPicker(
     find(root, 'input[name="logo"]'),
     find(root, '[data-action="remove-logo"]'),

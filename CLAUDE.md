@@ -1,6 +1,6 @@
 # Tur: Proje Kuralları
 
-Ankara çıkışlı turlar için tanıtım sitesi, 3D rota simülasyonu ve demo operasyon paneli. Statik olarak derlenir ve GitHub Pages'te `https://dgdfurkan.github.io/Tur/` adresinde yayınlanır. Bu sürüm bir prototiptir; tur, fiyat ve konaklama bilgileri örnektir.
+Ankara çıkışlı turlar için tanıtım sitesi, 3D rota simülasyonu ve operasyon paneli. Statik olarak derlenir ve GitHub Pages'te `https://dgdfurkan.github.io/Tur/` adresinde yayınlanır. Bu sürüm bir prototiptir; tur, fiyat ve konaklama bilgileri örnektir.
 
 ## Komutlar
 
@@ -26,6 +26,8 @@ Bağımlılık yönü içeriye doğrudur: `features` ve `components` → `applic
 - `src/components/`, `src/layouts/`, `src/pages/`: Astro sunum katmanı.
 - `src/content/tours/`: tur verisi; şema `src/content.config.ts` içindedir.
 - `src/config/site.ts`: marka ve iletişim bilgisinin tek kaynağı. `src/config/paths.ts`: `pageUrl()` ve `assetUrl()`.
+- Operasyon paneli `src/features/admin/` altındadır: ekranlar `screens/`, ortak arayüz parçaları `ui/kit.ts` ve `ui/parts.ts`, adresler `routes.ts`. Turlardaki değişiklikler `TourCatalogEditor` ile içerik şemasına göre denetlenerek tutulur.
+- Zod yalnızca `src/application/zod.ts` üzerinden içe aktarılır; o dosya Zod'un `Function()` denemesini kapatır, aksi hâlde Trusted Types bunu engeller ve konsola hata yazar. Zod herkese açık sayfaların paketine girmez.
 
 ## Kod Kuralları
 
@@ -55,7 +57,7 @@ Kullanıcıya görünen her Türkçe metin `.claude/skills/turkce-icerik-standar
 - CSP `astro.config.ts` içindeki `security.csp` ile üretilir. Inline `style` özniteliği ve satır içi `<script>` yazılmaz; stil sınıfla veya CSSOM ile verilir.
 - Dinamik veri DOM'a `textContent` ile yazılır; `innerHTML` kullanılmaz. CSP, Trusted Types'ı politikasız olarak zorunlu kılar; `innerHTML`, `eval` ve benzerleri çalışma anında hata verir.
 - Üçüncü taraf istek, analitik ve CDN yoktur; yazı tipleri kendi sunucumuzdan gelir.
-- Repo herkese açıktır. Gerçek kişisel veri, parola, anahtar veya iş ortaklarına dair iç bilgi commit'lenmez. Panel yalnızca demo verisi tutar; localStorage anahtarları `tur-demo:v1:` önekiyle başlar.
+- Repo herkese açıktır. Gerçek kişisel veri, parola, anahtar veya iş ortaklarına dair iç bilgi commit'lenmez. Panel kayıtları yalnızca cihazda tutulur; localStorage anahtarları `tur-demo:v1:` önekiyle başlar.
 - Panelin erişim kodu depoya yazılmaz; `npm run panel:code` yalnızca parmak izini (`src/config/panel-lock.json`) günceller. Üretilen kodun yazıldığı `erisim-kodu.txt` depoya eklenmez. Testler yalnızca `--mode e2e` derlemesinin tanıdığı herkese açık test kodunu kullanır.
 - Panele ve video stüdyosuna sitenin hiçbir sayfasından bağlantı verilmez.
 - Tüm sayfalar `noindex` taşır; site gerçek içerikle yayına alınırken kaldırılır.

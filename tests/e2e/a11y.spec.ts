@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
-import { openPanelPage, waitForStillness } from './support';
+import { goToScreen, openPanelPage, waitForStillness } from './support';
 
 const PAGES: Record<string, string> = {
   'home page': './',
@@ -55,17 +55,44 @@ test('the home page map has no accessibility violations once it is interactive',
 test('the locked panel has no accessibility violations', async ({ page }) => {
   await page.goto('./yonetim/');
   await expect(page.locator('[data-admin]')).toHaveAttribute('data-access', 'locked');
+  await waitForStillness(page);
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
 });
 
-test('operations panel has no accessibility violations on any tab', async ({ page }) => {
+test('every screen of the operations panel is free of accessibility violations', async ({
+  page,
+}) => {
   await openPanelPage(page, './yonetim/');
   await expect(page.locator('[data-admin]')).toHaveAttribute('data-ready', 'true');
-  await page.getByRole('button', { name: 'Örnek Verileri Yükle' }).click();
-  for (const tab of ['Özet', 'Yolcu Ekle', 'Yolcu Listesi']) {
-    await page.getByRole('button', { name: tab, exact: true }).click();
+  const screens = [
+    '/site',
+    '/',
+    '/turlar',
+    '/turlar/kapadokya',
+    '/turlar/kapadokya/kalkis/kapadokya-2026-11-06',
+    '/turlar/kapadokya/program',
+    '/turlar/kapadokya/liste/dahil',
+    '/turlar/kapadokya/konaklama',
+    '/kalkis/kapadokya-2026-11-06',
+    '/yolcular',
+    '/yolcular/yeni',
+  ];
+  for (const screen of screens) {
+    await goToScreen(page, screen);
+    if (screen === '/site') {
+      await page.getByRole('button', { name: /Örnek Yolcuları Yükle/ }).click();
+    }
+    await waitForStillness(page);
     const results = await new AxeBuilder({ page }).analyze();
-    expect(results.violations, `${tab} tab`).toEqual([]);
+    expect(results.violations, screen).toEqual([]);
   }
+
+  // An open sheet, with the page behind it out of reach.
+  await goToScreen(page, '/yolcular');
+  await page.locator('.passenger-row').first().click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await waitForStillness(page);
+  const sheet = await new AxeBuilder({ page }).analyze();
+  expect(sheet.violations, 'passenger sheet').toEqual([]);
 });

@@ -10,6 +10,7 @@ import Icon from '@/components/ui/Icon.astro';
 import SectionHeading from '@/components/ui/SectionHeading.astro';
 import { tourCatalog } from '@/composition/catalog';
 import { pageUrl } from '@/config/paths';
+import { siteConfig } from '@/config/site';
 import { tr } from '@/i18n/tr';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { todayIso } from '@/shared/format';
@@ -47,11 +48,8 @@ const services = [
   <section class="hero">
     <div class="container hero__inner">
       <div class="hero__copy">
-        <h1>Ankara Çıkışlı Kültür Turları</h1>
-        <p class="lead">
-          Kapadokya'dan Karadeniz yaylalarına uzanan programlarda ulaşım, konaklama ve rehberlik tek
-          elden planlanır. Her turun rotası, yola çıkmadan önce harita üzerinde izlenebilir.
-        </p>
+        <h1>{siteConfig.home.title}</h1>
+        <p class="lead">{siteConfig.home.lead}</p>
       </div>
       <div class="hero__actions">
         <Button href={pageUrl('turlar')} size="lg">
@@ -79,7 +77,7 @@ const services = [
       />
       <ul class="ticket-list">
         {upcoming.map(({ tour, departure }) => (
-          <li data-reveal>
+          <li data-reveal data-tour-card={tour.id}>
             <TourTicket tour={tour} departure={departure} />
           </li>
         ))}
