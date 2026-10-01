@@ -5,6 +5,8 @@ export type FaqTopic = (typeof FAQ_TOPICS)[number];
 
 /** A question visitors ask, with the office's answer. */
 export interface FaqData {
+  /** Where the question stands in its list; the content collection does not keep file order. */
+  order: number;
   topic: FaqTopic;
   /** Also shown on the home page and on tour pages. */
   featured: boolean;
@@ -17,6 +19,7 @@ export interface FaqEntry extends FaqData {
 }
 
 export const faqSchema = z.object({
+  order: z.number().int().min(1),
   topic: z.enum(FAQ_TOPICS),
   featured: z.boolean(),
   question: z.string().trim().min(1).max(120),

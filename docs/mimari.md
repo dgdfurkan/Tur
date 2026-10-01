@@ -32,11 +32,14 @@ Bağımlılık her zaman içeriye doğrudur; alan katmanı başka hiçbir katman
 | `Money`                                 | Kuruş cinsinden tamsayıyla tutulan para değeri                                                                          |
 | `GeoPoint`, `MapProjection`             | Coğrafi konum, mesafe ve haritaya izdüşüm                                                                               |
 | `Passenger`, `Phone`                    | Panel kaydı ve telefon numarası doğrulaması                                                                             |
+| `Journey`, `Moment`, `totalsOf`         | Tamamlanan bir yolculuk, yolculuktan notlar ve yolculukların toplam misafir ve yol hesabı                               |
 | `TourRepository`, `PassengerRepository` | Verinin nereden geldiğini gizleyen arayüzler                                                                            |
 
 ## Veri Akışı
 
 Tur içerikleri `src/content/tours/*.json` dosyalarında tutulur ve `src/content.config.ts` içindeki şemayla derleme sırasında doğrulanır; hatalı içerik derlemeyi durdurur. `ContentTourRepository` bu içeriği alan nesnelerine çevirir. Tarayıcıda çalışan bölümler aynı veriyi sayfaya gömülen bir JSON anlık görüntüsünden (`TourSnapshot`) okur ve `toTour()` ile aynı alan nesnelerini kurar; böylece doluluk ve rota hesapları iki tarafta tek bir koddan yürür.
+
+Geçmiş turlar `src/content/journeys/*.json`, sıkça sorulan sorular `src/content/faq.json` dosyasında tutulur ve aynı biçimde derleme sırasında doğrulanır. Bir yolculuk, turun o günkü adını, resmini, yolunu ve notlarını kendi kaydında saklar; turun programı sonradan değişse de geçmiş yolculuk değişmez.
 
 Operasyon panelinin kayıtları `PassengerRepository` arayüzünün ardında durur. Bugünkü uygulama `LocalPassengerRepository` sınıfıdır ve kayıtları yalnızca tarayıcıda saklar; okunan her kayıt yeniden doğrulanır. Paylaşımlı sürümde aynı arayüzü uygulayan bir HTTP sınıfı yazılır, panelin geri kalanı değişmez.
 
@@ -117,13 +120,14 @@ Panel, telefonda kullanılmak üzere yazılmış bir uygulamadır. `PanelShell` 
 | `ui/kit.ts`, `parts.ts` | Satır, grup, düğme, anahtar, koltuk planı, doluluk halkası gibi ortak parçalar                        |
 | `Sheet`                 | Alttan açılan, aşağı çekilerek kapanan kipli pencere (`<dialog>`)                                     |
 | `TourCatalogEditor`     | Yayınlanan turlar ile paneldeki değişiklikleri birleştirir; her değişikliği içerik şemasıyla denetler |
+| `JourneyArchiveEditor`  | Geçmiş turlar için aynı işi yapar; panelde kaydedilen yeni yolculukları da tutar                      |
 | `SiteSettingsService`   | Ana sayfa metni, duyuru, iletişim, marka ve gizlenen turlar                                           |
 | `BookingService`        | Yolcu, kapora, kalan ödeme ve doluluk                                                                 |
 | `PanelBackup`           | Cihazdaki bütün kayıtları tek JSON dosyasına yazar ve geri yükler                                     |
 
 - Tur verisinin kuralları `src/application/dto/tourSchema.ts` dosyasındadır. İçerik dosyaları derleme sırasında, paneldeki değişiklikler kaydedilmeden önce aynı şemadan geçer; alan katmanının kendi denetimleri (tarih sırası, araçta olmayan koltuk) de uygulanır.
 - Değişiklikler şimdilik cihazda taslak olarak tutulur. Her taslak, başladığı yayınlanmış turun parmak izini taşır; site sonradan güncellenirse panel bunu bildirir.
-- Herkese açık sayfalar (`syncLocalChanges`) aynı cihazdaki fiyat, satılan koltuk, panel kaydı ve gizlenen tur bilgisini okuyup gösterir. Bu okuma Zod kullanmaz; değerler sayfaya yalnızca metin ve öznitelik olarak yazılır.
+- Herkese açık sayfalar aynı cihazdaki panel kayıtlarını okuyup gösterir: `syncLocalChanges` fiyat, satılan koltuk, panel kaydı ve gizlenen turu; `applySiteSettings` marka adını, ana sayfa metnini, duyuru bandını ve iletişim bağlantılarını; `syncJourneys` gizlenen, değişen ve panelde kaydedilen geçmiş turları. Bu okumalar Zod kullanmaz; değerler sayfaya yalnızca metin ve öznitelik olarak yazılır, bağlantılar `contactLinks.ts` içindeki denetimden geçen değerlerden kurulur.
 - `PanelLock`, girilen kodu PBKDF2 (SHA-256, 310.000 tur) ile anahtara çevirir ve anahtarın özetini sayfadaki parmak iziyle karşılaştırır. Kod rakamlardan oluşuyorsa telefon rakam klavyesini açar ve son rakamla birlikte gönderilir.
 - `astro build --mode e2e` ile derlenen test sürümü herkese açık test koduyla açılır. Üretim derlemesinde bu dal derleme sırasında atılır.
 
@@ -194,6 +198,8 @@ Uçtan uca testler geliştirme sunucusunda değil, `npm run test:e2e` komutunun 
 ## Sık Yapılan İşler
 
 - **Yeni Tur Ekleme:** `src/content/tours/` altına yeni bir JSON dosyası eklenir. Liste, tur sayfası, rota sayfası ve harita kendiliğinden güncellenir.
+- **Geçmiş Tur Ekleme:** Panelde kaydedilir ya da `src/content/journeys/` altına `YYYY-AA-GG-tur-kimligi.json` adıyla eklenir. Arşiv, yolculuk sayfası, turun sayfası ve ana sayfa kendiliğinden güncellenir.
+- **Soru Ekleme:** `src/content/faq.json` dosyasına `order` değeriyle eklenir; `featured` işaretli sorular ana sayfada, tur sayfalarında ve iletişim sayfasında da görünür.
 - **Marka ve İletişim Bilgisi:** `src/config/site.ts` dosyasından değiştirilir.
 - **Arayüz Metni:** `src/i18n/tr.ts` dosyasından değiştirilir; metinler `turkce-icerik-standardi` kurallarına uyar.
 - **Harita Verisi:** `npm run map:build` komutuyla yeniden üretilir.

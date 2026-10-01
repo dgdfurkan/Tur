@@ -24,9 +24,10 @@ Bağımlılık yönü içeriye doğrudur: `features` ve `components` → `applic
 - `src/infrastructure/`: repository implementasyonları, depolama, dışa aktarma.
 - `src/features/`: etkileşimli özellikler (3D harita, rota simülasyonu, panel). Her özelliğin tek bir composition root'u bağımlılıkları elle kurar.
 - `src/components/`, `src/layouts/`, `src/pages/`: Astro sunum katmanı.
-- `src/content/tours/`: tur verisi; şema `src/content.config.ts` içindedir.
+- `src/content/`: içerik. `tours/` turlar, `journeys/` tamamlanan yolculuklar (Geçmiş Turlar), `faq.json` sıkça sorulan sorular. Şemalar `src/application/dto/` altındadır ve `src/content.config.ts` onları kullanır.
 - `src/config/site.ts`: marka ve iletişim bilgisinin tek kaynağı. `src/config/paths.ts`: `pageUrl()` ve `assetUrl()`.
-- Operasyon paneli `src/features/admin/` altındadır: ekranlar `screens/`, ortak arayüz parçaları `ui/kit.ts` ve `ui/parts.ts`, adresler `routes.ts`. Turlardaki değişiklikler `TourCatalogEditor` ile içerik şemasına göre denetlenerek tutulur.
+- Operasyon paneli `src/features/admin/` altındadır: ekranlar `screens/`, ortak arayüz parçaları `ui/kit.ts` ve `ui/parts.ts`, adresler `routes.ts`. Turlardaki değişiklikler `TourCatalogEditor`, geçmiş turlardakiler `JourneyArchiveEditor` ile içerik şemasına göre denetlenerek tutulur.
+- Panelin cihazda tuttuğu değişiklikleri herkese açık sayfalara `src/features/site-sync/` (ayarlar ve geçmiş turlar) ile `src/features/occupancy-sync/` (fiyat, doluluk, gizli turlar) taşır. Sayfalar bunun için `data-site-text`, `data-contact-link`, `data-journey-card` gibi işaretler taşır; yeni bir değer sayfada gösterilecekse işaret ve okuyucusu birlikte eklenir.
 - Zod yalnızca `src/application/zod.ts` üzerinden içe aktarılır; o dosya Zod'un `Function()` denemesini kapatır, aksi hâlde Trusted Types bunu engeller ve konsola hata yazar. Zod herkese açık sayfaların paketine girmez.
 
 ## Kod Kuralları

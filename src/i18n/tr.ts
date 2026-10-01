@@ -666,6 +666,10 @@ export const tr = {
     bar: 'Yer Ayırtma',
   },
   announcement: 'Duyuru',
+  nextBoard: {
+    label: 'Sıradaki Kalkış',
+    line: (date: string, time: string, tour: string) => `${date}, ${time}: ${tour}`,
+  },
   categories: {
     all: 'Tümü',
     kultur: 'Kültür',

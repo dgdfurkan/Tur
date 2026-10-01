@@ -9,6 +9,8 @@ Bu sürüm, tasarımı ve fikri göstermek için hazırlanmış bir prototiptir.
 | Marka                 | Ad, logo ve iletişim bilgileri `src/config/site.ts` dosyasına yazılır                             |
 | Belge Bilgisi         | TÜRSAB belge numarası ve işletme unvanı alt bilgiye eklenir                                       |
 | Gerçek İçerik         | Tur programları, fiyatlar ve konaklama bilgileri örnek içeriğin yerini alır                       |
+| Geçmiş Turlar         | Örnek yolculuklar silinir; acentenin gerçek yolculukları panelden kaydedilir                      |
+| Sıkça Sorulan Sorular | Ödeme, iptal ve ön ödeme koşulları sözleşmeyle birlikte kesinleştirilir ve yanıtlara işlenir      |
 | Fotoğraf              | Kullanım hakkı acenteye ait olan tur fotoğrafları eklenir                                         |
 | Yasal Metinler        | KVKK aydınlatma metni ile paket tur sözleşmesi ve ön bilgilendirme metinleri hazırlanır           |
 | Arama Motorları       | `noindex` etiketi kaldırılır; site haritası ve yapılandırılmış veri eklenir                       |
@@ -30,7 +32,7 @@ Kendi alan adı, tarayıcı deposunu da ayırır: bugün `dgdfurkan.github.io` a
 
 Panel turları, fiyatları, kalkışları ve site içeriğini yönetir; ancak değişiklikler bugün yalnızca girildiği cihazda durur. Gerçek kullanım için iki şey gerekir: değişikliklerin siteye yayınlanması ve kayıtların ofisteki ve sahadaki herkes tarafından aynı anda görülmesi.
 
-- Yayın: paneldeki taslaklar tek dokunuşla yayınlanır. GitHub ile yayında taslaklar depodaki içerik dosyalarına yazılır ve site bir iki dakikada yeniden derlenir; Cloudflare ile yayında değişiklik anında görünür.
+- Yayın: paneldeki taslaklar (turlar, geçmiş turlar ve site ayarları) tek dokunuşla yayınlanır. GitHub ile yayında taslaklar depodaki içerik dosyalarına yazılır ve site bir iki dakikada yeniden derlenir; Cloudflare ile yayında değişiklik anında görünür. Panelde kaydedilen bir geçmiş tur, yayınla birlikte kendi sayfasına kavuşur.
 
 - Veri, Cloudflare Workers ve D1 üzerinde tutulur.
 - Giriş Cloudflare Access ile yapılır; ofis, satış ve rehber rolleri ayrılır. Bugünkü erişim kodu kilidi bu girişle değiştirilir.
