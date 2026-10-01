@@ -6,6 +6,8 @@ export interface LockSettings {
   readonly verifier: string;
   /** PBKDF2 rounds; more rounds make every guess slower. */
   readonly iterations: number;
+  /** Set when the code is a PIN of this many digits, so phones offer the number pad. */
+  readonly digits?: number;
 }
 
 /** Where the key of an opened panel is kept; both kinds of web storage fit. */

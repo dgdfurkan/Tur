@@ -1,156 +1,177 @@
-import type { BookingService, DraftErrors, PassengerDraft } from '@/application/BookingService';
-import type { Passenger } from '@/domain/booking/Passenger';
+import type { BookingService } from '@/application/BookingService';
+import type { SiteSettingsService } from '@/application/SiteSettings';
+import type { TourCatalogEditor } from '@/application/TourCatalogEditor';
 import { tr } from '@/i18n/tr';
-import type { ListExporter, ListTable } from '@/infrastructure/export/ListExporter';
-import { required } from './dom';
-import { PassengerForm } from './PassengerForm';
-import { PassengerList } from './PassengerList';
-import { SAMPLE_PEOPLE } from './sampleData';
-import { SummaryView } from './SummaryView';
-import { Toast } from './Toast';
+import type { RestoreResult } from '@/infrastructure/backup/PanelBackup';
+import type { ListExporter } from '@/infrastructure/export/ListExporter';
+import type { AppContext, Screen, Section } from './context';
+import { resolveRoute } from './routes';
+import { confirmInSheet, Sheet } from './ui/Sheet';
+import { Toast } from './ui/Toast';
+import { transition } from './ui/motion';
 
-type ViewName = 'ozet' | 'ekle' | 'liste';
+export interface AdminServices {
+  readonly bookings: BookingService;
+  readonly catalog: TourCatalogEditor;
+  readonly settings: SiteSettingsService;
+  readonly exporter: ListExporter;
+  readonly backup: {
+    create(): string;
+    restore(text: string): RestoreResult;
+  };
+  readonly today: string;
+}
 
-/** How many departures the sample passengers are spread over. */
-const SAMPLE_DEPARTURES = 2;
+const SECTIONS: readonly Section[] = ['ozet', 'turlar', 'yolcular', 'site'];
 
-const isViewName = (value: string | undefined): value is ViewName =>
-  value === 'ozet' || value === 'ekle' || value === 'liste';
+function currentPath(): string {
+  const path = decodeURI(location.hash.replace(/^#/, ''));
+  return path.startsWith('/') ? path : '/';
+}
+
+const depthOf = (path: string): number =>
+  path.split('?')[0]?.split('/').filter(Boolean).length ?? 0;
 
 /**
- * The operations panel. It owns navigation between the three tabs and
- * re-renders every view from the booking service after each change, so the
- * views hold no records of their own; the form only remembers which record
- * it is editing.
+ * The operations panel as an app: it reads the address after the #, builds
+ * the screen it names and moves between screens the way a phone app does.
+ * Screens hold no state of their own beyond what is typed into a form; they
+ * are rebuilt from the services whenever something changes.
  */
-export class AdminApp {
-  private readonly summary: SummaryView;
-  private readonly form: PassengerForm;
-  private readonly list: PassengerList;
-  private readonly toast: Toast;
-  private readonly tabs: HTMLButtonElement[];
+export class AdminApp implements AppContext {
+  readonly bookings: BookingService;
+  readonly catalog: TourCatalogEditor;
+  readonly settings: SiteSettingsService;
+  readonly exporter: ListExporter;
+  readonly backup: AdminServices['backup'];
+  readonly today: string;
+  readonly sheet: Sheet;
+  readonly toast: Toast;
+
+  private current: { path: string; screen: Screen; section: Section } | null = null;
+  /** The addresses visited in this tab, so going back knows where it leads. */
+  private readonly trail: string[] = [];
+  private readonly scrolls = new Map<string, number>();
+  private readonly navLinks: HTMLAnchorElement[];
 
   constructor(
     private readonly root: HTMLElement,
-    private readonly bookings: BookingService,
-    private readonly exporter: ListExporter,
-    private readonly today: string,
+    private readonly host: HTMLElement,
+    services: AdminServices,
   ) {
-    this.summary = new SummaryView(required(root, '[data-panel="ozet"]'));
-    this.form = new PassengerForm(required(root, '[data-panel="ekle"]'), {
-      save: (draft, editing) => this.save(draft, editing),
-      cancel: () => this.show('liste', true),
-    });
-    this.list = new PassengerList(required(root, '[data-panel="liste"]'), {
-      edit: (passenger) => this.edit(passenger),
-      remove: (passenger) => this.remove(passenger),
-      exportList: (table, fileName) => this.download(table, fileName),
-      exportEmpty: () => this.toast.show(tr.admin.list.exportEmpty),
-    });
-    this.toast = new Toast(required(root, '[data-toast]'));
-    this.tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-tab]')];
-
-    for (const tab of this.tabs) {
-      tab.addEventListener('click', () => {
-        const view = tab.dataset['tab'];
-        if (isViewName(view)) this.show(view, true);
-      });
-    }
-    required<HTMLButtonElement>(root, '[data-action="samples"]').addEventListener('click', () =>
-      this.loadSamples(),
-    );
-    required<HTMLButtonElement>(root, '[data-action="reset"]').addEventListener('click', () => {
-      this.bookings.clear();
-      this.refresh();
-      this.toast.show(tr.admin.dataCleared);
-    });
+    this.bookings = services.bookings;
+    this.catalog = services.catalog;
+    this.settings = services.settings;
+    this.exporter = services.exporter;
+    this.backup = services.backup;
+    this.today = services.today;
+    this.sheet = new Sheet(root);
+    this.toast = new Toast(root);
+    this.navLinks = [...root.querySelectorAll<HTMLAnchorElement>('[data-nav]')];
   }
 
-  /** @param section The section to open first, as named in the address by the tab bar of other pages. */
-  start(section?: string | null): void {
-    this.refresh();
-    this.show(isViewName(section ?? undefined) ? (section as ViewName) : 'ozet', false);
+  start(): void {
+    addEventListener('hashchange', () => this.route());
+    // The back arrow of a screen returns through the history, as a phone's back gesture does.
+    this.host.addEventListener('click', (event) => {
+      const link = event.target instanceof Element ? event.target.closest('.topbar__back') : null;
+      if (!(link instanceof HTMLAnchorElement)) return;
+      event.preventDefault();
+      this.back(link.hash.replace(/^#/, '') || '/');
+    });
+    // Another tab of the panel changed the records: show them.
+    addEventListener('storage', () => {
+      this.catalog.reload();
+      if (!this.sheet.isOpen) this.refresh();
+    });
+    this.route();
     this.root.dataset['ready'] = 'true';
   }
 
-  private show(view: ViewName, moveFocus: boolean): void {
-    this.root.dataset['view'] = view;
-    for (const tab of this.tabs) {
-      if (tab.dataset['tab'] === view) tab.setAttribute('aria-current', 'page');
-      else tab.removeAttribute('aria-current');
+  go(path: string, options: { readonly replace?: boolean } = {}): void {
+    if (options.replace) {
+      // The replaced screen leaves the trail too, so going back skips it.
+      this.trail.pop();
+      history.replaceState(null, '', `#${path}`);
+      this.route();
+    } else {
+      location.hash = path;
     }
-    // Screen reader users land on the heading of the section they opened.
-    if (moveFocus) required<HTMLElement>(this.root, `[data-panel="${view}"] h1`).focus();
   }
 
-  private refresh(): void {
-    const bookings = this.bookings.bookings(this.today);
-    this.summary.render(this.bookings.summary(this.today), bookings);
-    this.form.render(bookings);
-    this.list.render(bookings);
+  back(fallback: string): void {
+    if (this.trail.length > 1) history.back();
+    else this.go(fallback, { replace: true });
   }
 
-  private save(draft: PassengerDraft, editing: Passenger | null): DraftErrors | null {
-    const result = editing
-      ? this.bookings.updatePassenger(editing, draft)
-      : this.bookings.addPassenger(draft);
-    if (!result.ok) {
-      this.toast.show(tr.admin.form.fixErrors);
-      return result.errors;
-    }
-    this.refresh();
-    this.list.select(result.passenger.departureId);
-    // A changed record is shown where it now stands; after adding, the next passenger usually follows.
-    if (editing) this.show('liste', true);
-    this.toast.show(editing ? tr.admin.form.updated : tr.admin.form.saved);
-    return null;
+  refresh(): void {
+    if (!this.current) return;
+    const scroll = scrollY;
+    this.mount(this.current.screen, false);
+    scrollTo({ top: scroll, behavior: 'instant' });
   }
 
-  private edit(passenger: Passenger): void {
-    this.form.edit(passenger);
-    this.show('ekle', true);
+  confirm(options: Parameters<AppContext['confirm']>[0]): Promise<boolean> {
+    return confirmInSheet(this.sheet, options);
   }
 
-  private remove(passenger: Passenger): void {
-    this.bookings.removePassenger(passenger.id);
-    this.refresh();
-    this.toast.show(tr.admin.list.removed, {
-      label: tr.admin.list.undo,
-      run: () => {
-        const restored = this.bookings.restorePassenger(passenger);
-        this.refresh();
-        this.toast.show(restored ? tr.admin.list.restored : tr.admin.list.restoreFailed);
-      },
-    });
-  }
-
-  /** Spreads the sample passengers over the two nearest departures that have room for them. */
-  private loadSamples(): void {
-    const perDeparture = Math.ceil(SAMPLE_PEOPLE.length / SAMPLE_DEPARTURES);
-    const targets = this.bookings
-      .bookings(this.today)
-      .filter(({ departure }) => departure.occupancy.remaining >= perDeparture)
-      .slice(0, SAMPLE_DEPARTURES);
-    SAMPLE_PEOPLE.forEach((person, index) => {
-      const target = targets[index % Math.max(1, targets.length)];
-      if (!target) return;
-      // Re-read the departure so seats taken earlier in this loop are excluded.
-      const seat = this.bookings.booking(target.departure.id)?.departure.freeSeats[0];
-      if (seat === undefined) return;
-      this.bookings.addPassenger({ ...person, departureId: target.departure.id, seatNumber: seat });
-    });
-    this.refresh();
-    this.toast.show(tr.admin.samplesLoaded);
-  }
-
-  private download(table: ListTable, fileName: string): void {
-    const blob = new Blob([this.exporter.export(table)], { type: this.exporter.mimeType });
-    const url = URL.createObjectURL(blob);
+  download(content: string, fileName: string, type: string): void {
+    const url = URL.createObjectURL(new Blob([content], { type }));
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${fileName}.${this.exporter.extension}`;
+    link.download = fileName;
     link.click();
-    URL.revokeObjectURL(url);
-    this.toast.show(tr.admin.list.exported);
+    // The click starts the download synchronously; the URL is not needed after it.
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  }
+
+  private route(): void {
+    const path = currentPath();
+    const screen = resolveRoute(path, this);
+    if (!screen) {
+      this.go('/', { replace: true });
+      return;
+    }
+    void this.sheet.close({ instant: true });
+    const previous = this.current;
+    if (previous) this.scrolls.set(previous.path, scrollY);
+
+    const returning = this.trail.at(-2) === path;
+    if (returning) this.trail.pop();
+    else if (this.trail.at(-1) !== path) this.trail.push(path);
+
+    const section = screen.section ?? previous?.section ?? 'ozet';
+    const direction =
+      previous === null
+        ? 'none'
+        : previous.section !== section
+          ? 'tab'
+          : returning || depthOf(path) < depthOf(previous.path)
+            ? 'pop'
+            : 'push';
+    this.current = { path, screen, section };
+
+    transition(direction, () => {
+      this.mount(screen, true);
+      // Going back returns to where the list was left; anything else starts at the top.
+      const top = direction === 'pop' ? (this.scrolls.get(path) ?? 0) : 0;
+      scrollTo({ top, behavior: 'instant' });
+      // Keyboard and screen reader users land on the title of what they opened.
+      if (previous) this.host.querySelector<HTMLElement>('h1')?.focus({ preventScroll: true });
+    });
+    document.title = `${screen.title} | ${tr.admin.title}`;
+    this.markSection(section);
+  }
+
+  private mount(screen: Screen, entering: boolean): void {
+    this.host.replaceChildren(screen.render(this, entering));
+  }
+
+  private markSection(section: Section): void {
+    for (const link of this.navLinks) {
+      if (link.dataset['nav'] === section) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    }
+    this.root.style.setProperty('--nav-index', String(SECTIONS.indexOf(section)));
   }
 }

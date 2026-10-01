@@ -55,3 +55,15 @@ export async function waitForStillness(page: Page): Promise<void> {
     )
     .toBe(0);
 }
+
+/**
+ * Opens a screen of the panel by its address, the way the panel's own links
+ * do, and waits until the new screen has replaced the old one.
+ */
+export async function goToScreen(page: Page, path: string): Promise<void> {
+  await page.evaluate((hash) => {
+    document.querySelector('[data-screen]')?.setAttribute('data-leaving', '');
+    location.hash = hash;
+  }, path);
+  await expect(page.locator('[data-screen]:not([data-leaving]) h1')).toBeVisible();
+}

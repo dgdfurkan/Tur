@@ -9,6 +9,11 @@ export interface SiteConfig {
     readonly city: string;
     readonly description: string;
   };
+  /** The home page's headline and the paragraph under it. */
+  readonly home: {
+    readonly title: string;
+    readonly lead: string;
+  };
   readonly contact: {
     readonly phone: string | null;
     readonly whatsapp: string | null;
@@ -28,6 +33,10 @@ export const siteConfig: SiteConfig = {
     city: 'Ankara',
     description:
       'Ankara çıkışlı kültür turları: günlük program, konaklama, doluluk durumu ve üç boyutlu rota ön izlemesi.',
+  },
+  home: {
+    title: 'Ankara Çıkışlı Kültür Turları',
+    lead: "Kapadokya'dan Karadeniz yaylalarına uzanan programlarda ulaşım, konaklama ve rehberlik tek elden planlanır. Her turun rotası, yola çıkmadan önce harita üzerinde izlenebilir.",
   },
   contact: {
     phone: null,

@@ -12,7 +12,8 @@ import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const ITERATIONS = 310_000;
-const MIN_LENGTH = 8;
+// Six digits is the shortest code the office uses, a PIN like a phone's.
+const MIN_LENGTH = 6;
 const LOCK_FILE = fileURLToPath(new URL('../src/config/panel-lock.json', import.meta.url));
 const CODE_FILE = fileURLToPath(new URL('../erisim-kodu.txt', import.meta.url));
 /** Letters and digits that are not mistaken for one another when read aloud or typed on a phone. */
@@ -21,10 +22,13 @@ const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 function writeLock(code: string): void {
   const salt = randomBytes(16);
   const key = pbkdf2Sync(code.trim().normalize('NFC'), salt, ITERATIONS, 32, 'sha256');
+  const trimmed = code.trim();
   const lock = {
     salt: salt.toString('hex'),
     verifier: createHash('sha256').update(key).digest('hex'),
     iterations: ITERATIONS,
+    // A code of digits only is typed on the number pad, and sent once complete.
+    ...(/^\d+$/.test(trimmed) ? { digits: trimmed.length } : {}),
   };
   writeFileSync(LOCK_FILE, `${JSON.stringify(lock, null, 2)}\n`);
 }

@@ -1,5 +1,6 @@
 {
   "salt": "af675612ca32bd767f2eadddd3221505",
   "verifier": "dc5c640081d94994d5c2959e2c536e00fa872ad932aaea8f167abb71e6396ec3",
-  "iterations": 310000
+  "iterations": 310000,
+  "digits": 6
 }

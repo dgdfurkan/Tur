@@ -65,7 +65,9 @@ const tourUrl = pageUrl(`turlar/${tour.id}`);
   <div class="ticket__stub">
     <p class="ticket__price">
       <span class="ticket__price-label">{tr.tour.perPerson}</span>
-      <strong class="tabular">{formatMoney(tour.price)}</strong>
+      <strong class="tabular" data-price-for={tour.id}>
+        {formatMoney(tour.price)}
+      </strong>
     </p>
     {departure && <OccupancyMeter occupancy={departure.occupancy} departureId={departure.id} />}
   </div>

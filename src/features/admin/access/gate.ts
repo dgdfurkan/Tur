@@ -2,7 +2,7 @@ import { panelLock } from '@/config/panel';
 import { tr } from '@/i18n/tr';
 import { SafeStorage } from '@/infrastructure/storage/SafeStorage';
 import { isFramed } from '@/shared/framing';
-import { required } from '../dom';
+import { required } from '../ui/dom';
 import { PanelLock } from './PanelLock';
 
 const MAX_TRIES = 5;
@@ -46,6 +46,14 @@ export function whenPanelOpens(root: HTMLElement): Promise<void> {
       location.reload();
     });
 
+    // A PIN is sent as soon as its last digit is typed, as on a phone's own lock screen.
+    const codeInput = required<HTMLInputElement>(form, 'input[name="code"]');
+    const digits = Number(codeInput.dataset['digits']);
+    codeInput.addEventListener('input', () => {
+      error.textContent = '';
+      if (digits > 0 && codeInput.value.length === digits) form.requestSubmit();
+    });
+
     let tries = 0;
     form.addEventListener('submit', (event) => {
       event.preventDefault();
@@ -60,9 +68,12 @@ export function whenPanelOpens(root: HTMLElement): Promise<void> {
           return;
         }
         tries += 1;
+        codeInput.value = '';
+        form.dataset['shake'] = String(tries);
         if (tries < MAX_TRIES) {
           error.textContent = gate.wrong;
           submit.disabled = false;
+          codeInput.focus();
           return;
         }
         // Guessing at the form is slowed down; the pause is a courtesy, not a defence.

@@ -7,7 +7,7 @@ import type { SafeStorage } from './SafeStorage';
 const KEY = 'passengers';
 
 /** Plain shape written to storage; never trusted when read back. */
-interface StoredPassenger {
+export interface StoredPassenger {
   id: string;
   departureId: string;
   fullName: string;
@@ -53,7 +53,12 @@ export class LocalPassengerRepository implements PassengerRepository {
   }
 
   replaceAll(passengers: readonly Passenger[]): void {
-    const stored: StoredPassenger[] = passengers.map((passenger) => ({
+    this.storage.write(KEY, JSON.stringify(passengers.map(LocalPassengerRepository.toPlain)));
+  }
+
+  /** The plain shape a record is written in, here and in backups. */
+  static toPlain(passenger: Passenger): StoredPassenger {
+    return {
       id: passenger.id,
       departureId: passenger.departureId,
       fullName: passenger.fullName,
@@ -63,11 +68,11 @@ export class LocalPassengerRepository implements PassengerRepository {
       paymentMethod: passenger.paymentMethod,
       note: passenger.note,
       createdAt: passenger.createdAt,
-    }));
-    this.storage.write(KEY, JSON.stringify(stored));
+    };
   }
 
-  private static revive(item: unknown): Passenger | null {
+  /** Turns a plain record back into a passenger; anything incomplete or invalid gives null. */
+  static revive(item: unknown): Passenger | null {
     if (typeof item !== 'object' || item === null) return null;
     const record = item as Partial<Record<keyof StoredPassenger, unknown>>;
     const phone = typeof record.phone === 'string' ? Phone.parse(record.phone) : null;

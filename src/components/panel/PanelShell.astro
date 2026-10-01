@@ -2,104 +2,115 @@
 import BrandMark from '@/components/ui/BrandMark.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { assetUrl, pageUrl } from '@/config/paths';
+import { panelLock } from '@/config/panel';
 import { tr } from '@/i18n/tr';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import '@/styles/panel.css';
-import '@/styles/admin.css';
 
 /**
- * The frame every page of the operations panel shares: the header, the lock
- * that asks for the access code, and the tab bar. A page puts its own content
- * in the slot; it stays out of sight until the panel has been opened.
+ * The frame every page of the operations panel shares: the lock that asks
+ * for the access code, and the navigation, at the foot of the screen on a
+ * phone and down the side on a wide one. A page puts its own content in the
+ * slot; it stays out of sight until the panel has been opened.
  */
 interface Props {
   title: string;
   description: string;
-  /** Which page this is, so the tab bar can mark it. */
-  current: 'kayit' | 'video';
+  /** The app page, whose sections change in place, or the video studio. */
+  current: 'app' | 'video';
 }
 
 const { title, description, current } = Astro.props;
 const { admin } = tr;
+const app = pageUrl('yonetim');
 const sections = [
-  { id: 'ozet', label: admin.tabs.summary, icon: 'chart' },
-  { id: 'ekle', label: admin.tabs.add, icon: 'plus' },
-  { id: 'liste', label: admin.tabs.list, icon: 'list' },
+  { id: 'ozet', path: '/', label: admin.nav.home, icon: 'home' },
+  { id: 'turlar', path: '/turlar', label: admin.nav.tours, icon: 'ticket' },
+  { id: 'yolcular', path: '/yolcular', label: admin.nav.passengers, icon: 'users' },
+  { id: 'site', path: '/site', label: admin.nav.site, icon: 'globe' },
 ] as const;
+const codeDigits = panelLock.digits;
 ---
 
 <BaseLayout title={title} description={description} chrome={false}>
   <link slot="head" rel="manifest" href={assetUrl('manifest.webmanifest')} />
 
-  <div class="admin" data-admin data-access="checking" data-view="ozet">
-    <header class="admin__bar">
-      <a class="admin__brand" href={pageUrl()} aria-label={admin.backToSite}>
-        <BrandMark size={32} />
-      </a>
-      <span class="admin__title">{admin.title}</span>
-      <button class="admin__lock" type="button" data-action="lock" hidden>
-        <Icon name="lock" size={18} />
-        <span>{admin.gate.lock}</span>
-      </button>
-    </header>
-
-    <p class="admin__framed">{admin.framed}</p>
+  <div class="app" data-admin data-access="checking" data-page={current}>
+    <p class="app__framed">{admin.framed}</p>
 
     <form class="gate" data-gate novalidate>
-      <h1 tabindex="-1">{admin.gate.heading}</h1>
-      <p>{admin.gate.intro}</p>
-      <div class="field">
-        <label for="gate-code">{admin.gate.code}</label>
+      <div class="gate__mark" aria-hidden="true">
+        <BrandMark size={56} />
+      </div>
+      <h1 tabindex="-1">{admin.title}</h1>
+      <p class="gate__intro">{admin.gate.intro}</p>
+      <div class="gate__field">
+        <label class="visually-hidden" for="gate-code">
+          {admin.gate.code}
+        </label>
         <input
+          class="gate__code"
           id="gate-code"
           name="code"
           type="password"
           autocomplete="current-password"
+          inputmode={codeDigits ? 'numeric' : undefined}
+          maxlength={codeDigits}
+          data-digits={codeDigits}
+          placeholder={admin.gate.code}
           aria-describedby="gate-error"
           required
         />
-        <p class="field__error" id="gate-error" role="alert" data-gate-error></p>
+        <p class="gate__error" id="gate-error" role="alert" data-gate-error></p>
       </div>
-      <label class="check">
+      <label class="gate__remember">
         <input type="checkbox" name="remember" />
         <span>{admin.gate.remember}</span>
       </label>
-      <button class="button button--primary button--block" type="submit">
-        {admin.gate.submit}
+      <button class="btn btn--primary btn--lg btn--block" type="submit">
+        <Icon name="lock" />
+        <span>{admin.gate.submit}</span>
       </button>
+      <a class="gate__site" href={pageUrl()}>
+        {admin.backToSite}
+      </a>
     </form>
 
-    <div class="admin__content">
-      <slot />
-    </div>
-
-    <nav class="tabs" aria-label={admin.tabs.label}>
-      {sections.map((section, index) =>
-        current === 'kayit' ? (
-          <button
-            class="tab"
-            type="button"
-            data-tab={section.id}
-            aria-current={index === 0 ? 'page' : undefined}
+    <nav class="nav" aria-label={admin.nav.label}>
+      <a class="nav__brand" href={pageUrl()} aria-label={admin.backToSite}>
+        <BrandMark size={30} />
+        <span>{admin.title}</span>
+      </a>
+      <div class="nav__items">
+        <span class="nav__indicator" aria-hidden="true"></span>
+        {sections.map((section) => (
+          <a
+            class="nav__item"
+            href={current === 'app' ? `#${section.path}` : `${app}#${section.path}`}
+            data-nav={section.id}
           >
             <Icon name={section.icon} size={22} />
             <span>{section.label}</span>
-          </button>
-        ) : (
-          <a class="tab" href={`${pageUrl('yonetim')}?bolum=${section.id}`}>
-            <Icon name={section.icon} size={22} />
-            <span>{section.label}</span>
           </a>
-        ),
-      )}
-      <a
-        class="tab"
-        href={pageUrl('yonetim/video')}
-        aria-current={current === 'video' ? 'page' : undefined}
-      >
-        <Icon name="film" size={22} />
-        <span>{admin.tabs.video}</span>
-      </a>
+        ))}
+        <a
+          class="nav__item"
+          href={pageUrl('yonetim/video')}
+          data-nav="video"
+          aria-current={current === 'video' ? 'page' : undefined}
+        >
+          <Icon name="film" size={22} />
+          <span>{admin.nav.video}</span>
+        </a>
+      </div>
+      <button class="nav__lock" type="button" data-action="lock" hidden>
+        <Icon name="lock" size={20} />
+        <span>{admin.gate.lock}</span>
+      </button>
     </nav>
+
+    <div class="app__main">
+      <slot />
+    </div>
   </div>
 </BaseLayout>
