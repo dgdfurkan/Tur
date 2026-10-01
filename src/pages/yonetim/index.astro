@@ -13,12 +13,10 @@ const deposits = [500, 1000, 2000];
 
 <PanelShell
   title={admin.title}
-  description="Yolcu ve kapora kaydı, doluluk takibi ve sigorta listesi için demo panel."
+  description="Yolcu ve kapora kaydı, doluluk takibi ve sigorta listesi."
   current="kayit"
 >
   <script is:inline type="application/json" data-tours set:html={toursJson} />
-  <p class="admin__notice">{admin.notice}</p>
-
   <div class="admin__body">
     <section class="panel" data-panel="ozet" aria-labelledby="ozet-baslik">
       <h1 id="ozet-baslik" tabindex="-1">

@@ -55,25 +55,6 @@
   display: none;
 }
 
-.admin__lock:not([hidden]) + .admin__badge {
-  margin-left: 0;
-}
-
-.admin__badge {
-  margin-left: auto;
-  padding: 0.125rem var(--space-3);
-  border-radius: var(--radius-sm);
-  background: var(--c-yellow);
-  font-size: var(--text-small);
-  font-weight: 700;
-}
-
-.admin__notice {
-  padding: var(--space-3) var(--gutter);
-  background: var(--c-yellow-tint);
-  font-size: var(--text-small);
-}
-
 /* Shown instead of the panel when another page has put it in a frame. */
 .admin__framed {
   display: none;

@@ -145,12 +145,12 @@ test('the insurance list downloads as a CSV file', async ({ page }) => {
   );
 });
 
-test('sample data loads and the demo can be reset', async ({ page }) => {
+test('sample data loads and the records can be reset', async ({ page }) => {
   await openPanel(page);
   await page.getByRole('button', { name: 'Örnek Verileri Yükle' }).click();
   await expect(page.locator('[data-stat="passengers"]')).toHaveText('6');
 
-  await page.getByRole('button', { name: 'Demo Verilerini Sıfırla' }).click();
+  await page.getByRole('button', { name: 'Kayıtları Sıfırla' }).click();
   await expect(page.locator('[data-stat="passengers"]')).toHaveText('0');
 });
 
@@ -170,7 +170,7 @@ test('the panel refuses to run inside another page', async ({ page, baseURL }) =
   await expect(panel).toHaveAttribute('data-framed', 'true');
   await expect(panel).not.toHaveAttribute('data-ready', 'true');
   await expect(panel.getByText('başka bir sayfanın içinde')).toBeVisible();
-  await expect(panel.getByRole('button', { name: 'Demo Verilerini Sıfırla' })).toBeHidden();
+  await expect(panel.getByRole('button', { name: 'Kayıtları Sıfırla' })).toBeHidden();
 });
 
 test.describe('the lock', () => {

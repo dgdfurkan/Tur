@@ -85,9 +85,6 @@ export const tr = {
   },
   admin: {
     title: 'Operasyon Paneli',
-    demoBadge: 'Demo',
-    notice:
-      'Demo: Kayıtlar yalnızca bu cihazda saklanır ve hiçbir sunucuya gönderilmez. Gerçek kişi bilgisi girmeyiniz.',
     framed:
       'Panel, başka bir sayfanın içinde açıldığında çalışmaz. Lütfen paneli kendi adresinden açınız.',
     backToSite: 'Siteye Dön',
@@ -117,9 +114,9 @@ export const tr = {
     },
     upcoming: 'Yaklaşan Kalkışlar',
     loadSamples: 'Örnek Verileri Yükle',
-    reset: 'Demo Verilerini Sıfırla',
+    reset: 'Kayıtları Sıfırla',
     samplesLoaded: 'Örnek kayıtlar yüklendi.',
-    dataCleared: 'Demo verileri silindi.',
+    dataCleared: 'Kayıtlar silindi.',
     form: {
       departure: 'Kalkış',
       fullName: 'Ad Soyad',
@@ -171,8 +168,7 @@ export const tr = {
       restored: 'Kayıt geri alındı.',
       restoreFailed: 'Koltuk başka bir yolcuya verildiği için kayıt geri alınamadı.',
       export: 'Sigorta Listesini İndir',
-      exportNote:
-        'Bu demo kimlik numarası toplamaz. Gerçek sürümde sigorta için gereken alanlar listeye eklenir.',
+      exportNote: 'Liste, sigorta için gereken kimlik bilgilerini henüz içermez.',
       exportEmpty: 'Listede yolcu olmadığı için dosya oluşturulmadı.',
       exported: 'Sigorta listesi indirildi.',
       columns: {
