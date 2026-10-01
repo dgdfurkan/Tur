@@ -81,7 +81,7 @@ export function programScreen(tourId: string): Screen {
         {
           title: tr.tour.itinerary,
           subtitle: data.title,
-          back: { href: `#/turlar/${tourId}`, label: data.title },
+          back: { href: `#/turlar/${tourId}`, label: data.destination },
         },
         [...days, el('p', { class: 'block__foot', text: tr.admin.program.note })],
       );
@@ -375,7 +375,11 @@ export function listScreen(tourId: string, which: 'dahil' | 'haric'): Screen | n
         save([...items, text], tr.admin.list.added);
       });
       return screen(
-        { title, subtitle: data.title, back: { href: `#/turlar/${tourId}`, label: data.title } },
+        {
+          title,
+          subtitle: data.title,
+          back: { href: `#/turlar/${tourId}`, label: data.destination },
+        },
         [group(rows), add],
       );
     },
@@ -429,7 +433,7 @@ export function hotelsScreen(tourId: string): Screen {
         {
           title: tr.tour.lodging,
           subtitle: data.title,
-          back: { href: `#/turlar/${tourId}`, label: data.title },
+          back: { href: `#/turlar/${tourId}`, label: data.destination },
         },
         [
           data.hotels.length === 0

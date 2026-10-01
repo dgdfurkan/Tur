@@ -24,7 +24,7 @@ export function departureEditScreen(tourId: string, departureId: string): Screen
     render(context: AppContext) {
       const data = context.catalog.snapshot(tourId);
       const existing = data?.departures.find((item) => item.id === departureId);
-      const back = { href: `#/turlar/${tourId}`, label: tr.admin.ui.back };
+      const back = { href: `#/turlar/${tourId}`, label: data?.destination ?? tr.admin.ui.back };
       if (!data || (departureId !== NEW && !existing)) {
         return screen({ title: tr.admin.departure.edit, back }, [
           el('p', { class: 'block__empty', text: tr.admin.departure.missing }),

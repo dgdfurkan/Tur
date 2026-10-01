@@ -26,9 +26,11 @@ GitHub Pages özel HTTP başlığı göndermeye izin vermez. Site Cloudflare üz
 
 Kendi alan adı, tarayıcı deposunu da ayırır: bugün `dgdfurkan.github.io` adresindeki diğer projeler aynı tarayıcı deposunu paylaşır.
 
-## Aşama 2: Paylaşımlı Operasyon Paneli
+## Aşama 2: Panelden Yayın ve Paylaşımlı Kayıtlar
 
-Demo paneli kayıtları yalnızca girildiği cihazda tutar. Gerçek kullanım için kayıtların ofisteki ve sahadaki herkes tarafından aynı anda görülmesi gerekir.
+Panel turları, fiyatları, kalkışları ve site içeriğini yönetir; ancak değişiklikler bugün yalnızca girildiği cihazda durur. Gerçek kullanım için iki şey gerekir: değişikliklerin siteye yayınlanması ve kayıtların ofisteki ve sahadaki herkes tarafından aynı anda görülmesi.
+
+- Yayın: paneldeki taslaklar tek dokunuşla yayınlanır. GitHub ile yayında taslaklar depodaki içerik dosyalarına yazılır ve site bir iki dakikada yeniden derlenir; Cloudflare ile yayında değişiklik anında görünür.
 
 - Veri, Cloudflare Workers ve D1 üzerinde tutulur.
 - Giriş Cloudflare Access ile yapılır; ofis, satış ve rehber rolleri ayrılır. Bugünkü erişim kodu kilidi bu girişle değiştirilir.
