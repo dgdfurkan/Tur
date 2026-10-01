@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import type { JourneyData, JourneySnapshot } from '@/application/dto/JourneyData';
 import type { TourData, TourSnapshot } from '@/application/dto/TourData';
 import { SafeStorage, type KeyValueStore } from '@/infrastructure/storage/SafeStorage';
 
@@ -21,15 +22,24 @@ export function memoryStorage(): SafeStorage {
   return new SafeStorage(new MemoryStore());
 }
 
-const CONTENT_DIR = join(process.cwd(), 'src/content/tours');
-
-/** The site's tours as the panel receives them. */
-export function publishedTours(): TourSnapshot[] {
-  return readdirSync(CONTENT_DIR)
+/** The records of a content folder, each with its file name as its id. */
+function readContent<T>(folder: string): (T & { id: string })[] {
+  const dir = join(process.cwd(), 'src/content', folder);
+  return readdirSync(dir)
     .filter((file) => file.endsWith('.json'))
     .sort()
     .map((file) => ({
       id: file.replace(/\.json$/, ''),
-      ...(JSON.parse(readFileSync(join(CONTENT_DIR, file), 'utf8')) as TourData),
+      ...(JSON.parse(readFileSync(join(dir, file), 'utf8')) as T),
     }));
+}
+
+/** The site's tours as the panel receives them. */
+export function publishedTours(): TourSnapshot[] {
+  return readContent<TourData>('tours');
+}
+
+/** The site's past journeys as the panel receives them. */
+export function publishedJourneys(): JourneySnapshot[] {
+  return readContent<JourneyData>('journeys');
 }

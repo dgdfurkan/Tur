@@ -1,4 +1,9 @@
 ---
+import ContactActions from '@/components/contact/ContactActions.astro';
+import FaqList from '@/components/faq/FaqList.astro';
+import JourneyStub from '@/components/journey/JourneyStub.astro';
+import JourneySync from '@/components/journey/JourneySync.astro';
+import BookingBar from '@/components/tour/BookingBar.astro';
 import DepartureBoard from '@/components/tour/DepartureBoard.astro';
 import Itinerary from '@/components/tour/Itinerary.astro';
 import OccupancyMeter from '@/components/tour/OccupancyMeter.astro';
@@ -8,7 +13,8 @@ import RouteThumb from '@/components/tour/RouteThumb.astro';
 import Button from '@/components/ui/Button.astro';
 import Emblem from '@/components/ui/Emblem.astro';
 import Icon from '@/components/ui/Icon.astro';
-import { tourCatalog } from '@/composition/catalog';
+import Steps from '@/components/ui/Steps.astro';
+import { journeyArchive, loadFaq, tourCatalog } from '@/composition/catalog';
 import { pageUrl } from '@/config/paths';
 import type { Tour } from '@/domain/tour/Tour';
 import { categoryLabels, tr } from '@/i18n/tr';
@@ -31,6 +37,11 @@ const next = departures[0];
 const routeUrl = pageUrl(`turlar/${tour.id}/rota`);
 const meetingPoint = (next ?? tour.departures[0])?.meetingPoint;
 const postcards = tour.highlights(2);
+const journeys = (await journeyArchive.ofTour(tour.id)).slice(0, 3);
+const questions = (await loadFaq()).filter((question) => question.featured);
+const message = next
+  ? tr.booking.message(tour.title, formatDateRange(next.startDate, next.endDate))
+  : tr.booking.tourMessage(tour.title);
 
 const facts = [
   { label: tr.tour.duration, value: formatDuration(tour.nights, tour.dayCount) },
@@ -82,7 +93,7 @@ const facts = [
           </dl>
         </div>
 
-        <aside class="fare" aria-label="Fiyat ve En Yakın Kalkış">
+        <aside class="fare" aria-label="Fiyat ve En Yakın Kalkış" data-fare>
           <p class="fare__label">{tr.tour.perPerson}</p>
           <p class="fare__price tabular" data-price-for={tour.id}>
             {formatMoney(tour.price)}
@@ -100,9 +111,12 @@ const facts = [
               <OccupancyMeter occupancy={next.occupancy} departureId={next.id} />
             </div>
           )}
-          <Button href="#kalkis-tarihleri" class="fare__action">
-            {tr.tour.departures}
+          <Button href="#rezervasyon" class="fare__action">
+            {tr.actions.reserve}
           </Button>
+          <a class="fare__link" href="#kalkis-tarihleri">
+            {tr.tour.departures}
+          </a>
         </aside>
       </div>
     </header>
@@ -193,19 +207,62 @@ const facts = [
       </div>
     </section>
 
-    <section class="section container reserve" aria-labelledby="rezervasyon">
-      <div>
+    <section class="section container reserve" aria-labelledby="rezervasyon" data-booking>
+      <div class="reserve__copy">
         <h2 id="rezervasyon">Rezervasyon</h2>
         <p class="lead">
-          Yer ayırtmak ve ayrıntılı bilgi almak için ofisimizle iletişime geçebilirsiniz.
+          Yer ayırtmak ve ayrıntılı bilgi almak için ofisimize telefonla, WhatsApp üzerinden veya
+          e-postayla ulaşabilirsiniz.
         </p>
+        <ContactActions message={message} />
       </div>
-      <Button href={pageUrl('iletisim')} size="lg">
-        {tr.actions.contactUs}
-      </Button>
+      <div class="reserve__steps">
+        <h3 class="reserve__steps-title">{tr.booking.title}</h3>
+        <Steps steps={tr.booking.steps} headingLevel="h4" vertical />
+      </div>
+    </section>
+
+    {journeys.length > 0 && (
+      <section class="section section--mist" aria-labelledby="gecmis-tarihler">
+        <div class="container">
+          <h2 id="gecmis-tarihler" class="section-title section-title--lead">
+            {tr.journeys.ofTour}
+          </h2>
+          <p class="lead section-lead">{tr.journeys.ofTourLead}</p>
+          <ul class="stubs">
+            {journeys.map((journey) => (
+              <li data-reveal data-journey-card={journey.id}>
+                <JourneyStub journey={journey} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )}
+
+    <section class="section container" aria-labelledby="sorular">
+      <div class="questions">
+        <h2 id="sorular" class="section-title">
+          {tr.faq.title}
+        </h2>
+        <FaqList items={questions} name="tur-sss" show="featured" />
+        <div class="questions__more">
+          <Button href={pageUrl('sss')} variant="secondary">
+            {tr.actions.allQuestions}
+          </Button>
+        </div>
+      </div>
     </section>
   </article>
-  <SceneSprite scenes={[tour.scene, ...tour.stops.map((stop) => stop.scene)]} />
+  <BookingBar tour={tour} next={next} target="rezervasyon" />
+  <SceneSprite
+    scenes={[
+      tour.scene,
+      ...tour.stops.map((stop) => stop.scene),
+      ...journeys.map((journey) => journey.scene),
+    ]}
+  />
+  <JourneySync />
 </BaseLayout>
 
 <style>
@@ -448,14 +505,56 @@ const facts = [
     color: var(--c-muted);
   }
 
-  .reserve {
-    display: grid;
-    gap: var(--space-5);
-    align-items: center;
+  .fare__link {
+    justify-self: center;
+    color: var(--c-blue);
+    font-size: var(--text-small);
+    font-weight: 600;
   }
 
-  .reserve .lead {
-    margin-top: var(--space-3);
+  .reserve {
+    display: grid;
+    gap: var(--space-7);
+    align-items: start;
+  }
+
+  .reserve__copy {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+  }
+
+  .reserve__steps {
+    display: grid;
+    gap: var(--space-5);
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    background: var(--c-mist);
+  }
+
+  .reserve__steps-title {
+    font-size: 1.25rem;
+  }
+
+  .section-title--lead {
+    margin-bottom: var(--space-4);
+  }
+
+  .section-lead {
+    margin-bottom: var(--space-7);
+  }
+
+  .stubs {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .questions {
+    max-width: 56rem;
+  }
+
+  .questions__more {
+    margin-top: var(--space-6);
   }
 
   @media (min-width: 40rem) {
@@ -480,6 +579,16 @@ const facts = [
     .scope {
       grid-template-columns: repeat(2, 1fr);
     }
+
+    .stubs {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 68rem) {
+    .stubs {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 
   @media (min-width: 60rem) {
@@ -494,7 +603,8 @@ const facts = [
     }
 
     .reserve {
-      grid-template-columns: 1fr auto;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+      gap: var(--space-8);
     }
   }
 </style>

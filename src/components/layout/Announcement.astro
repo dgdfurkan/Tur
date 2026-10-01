@@ -1,0 +1,43 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import { siteConfig } from '@/config/site';
+import { tr } from '@/i18n/tr';
+
+/**
+ * A short notice above the header, such as the last seats of a departure. The
+ * office writes it in the panel; without a notice the band stays out of sight.
+ */
+const text = siteConfig.announcement;
+---
+
+<aside class="announcement" aria-label={tr.announcement} data-announcement hidden={!text}>
+  <div class="container announcement__inner">
+    <Icon name="megaphone" size={20} />
+    <p data-announcement-text>{text ?? ''}</p>
+  </div>
+</aside>
+
+<style>
+  /* A yellow warning sign stretched across the top of the page. */
+  .announcement {
+    background: var(--c-yellow);
+    color: var(--c-asphalt);
+  }
+
+  .announcement__inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    min-height: 2.75rem;
+    padding-block: var(--space-2);
+    font-stretch: var(--wdth-sign);
+    font-weight: 650;
+    line-height: 1.35;
+    text-align: center;
+  }
+
+  .announcement :global(svg) {
+    flex: none;
+  }
+</style>

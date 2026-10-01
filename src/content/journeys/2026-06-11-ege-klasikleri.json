@@ -1,0 +1,37 @@
+{
+  "tour": "ege-klasikleri",
+  "title": "Ege Klasikleri Turu",
+  "scene": "kutuphane",
+  "startDate": "2026-06-11",
+  "endDate": "2026-06-14",
+  "group": "genel",
+  "guests": 34,
+  "distanceKm": 1540,
+  "story": "Haziranın ikinci haftasında 34 misafirle dört günlük Ege programı tamamlandı. İlk gün Pamukkale ve Hierapolis, ikinci gün Efes ve Şirince gezildi; dönüş yolunda Sardes ve Gordion programa alındı.",
+  "moments": [
+    {
+      "day": 1,
+      "place": "Pamukkale Travertenleri",
+      "scene": "traverten",
+      "note": "Traverten teraslarında çıplak ayakla yürünerek Hierapolis'e çıkıldı."
+    },
+    {
+      "day": 2,
+      "place": "Efes Antik Kenti",
+      "scene": "kutuphane",
+      "note": "Kuretler Caddesi'nden Celsus Kütüphanesi'ne inildi; Büyük Tiyatro rehber anlatımıyla gezildi."
+    },
+    {
+      "day": 2,
+      "place": "Şirince",
+      "scene": "koy",
+      "note": "Taş döşeli sokaklarda öğle yemeği için serbest zaman verildi."
+    },
+    {
+      "day": 4,
+      "place": "Gordion Antik Kenti",
+      "scene": "tumulus",
+      "note": "Midas Tümülüsü'nün içindeki ahşap mezar odası görüldü."
+    }
+  ]
+}

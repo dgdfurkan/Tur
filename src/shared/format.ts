@@ -20,6 +20,17 @@ const fullDateFormat = new Intl.DateTimeFormat(LOCALE, {
   year: 'numeric',
   timeZone: 'UTC',
 });
+const monthYearFormat = new Intl.DateTimeFormat(LOCALE, {
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+const dayWeekdayFormat = new Intl.DateTimeFormat(LOCALE, {
+  day: 'numeric',
+  month: 'long',
+  weekday: 'long',
+  timeZone: 'UTC',
+});
 const weekdayDateFormat = new Intl.DateTimeFormat(LOCALE, {
   day: 'numeric',
   month: 'long',
@@ -61,6 +72,16 @@ export function formatKm(km: number): string {
 /** "16 Ekim 2026 Cuma" */
 export function formatDate(iso: string): string {
   return weekdayDateFormat.format(parseIsoDate(iso));
+}
+
+/** "Eylül 2026" */
+export function formatMonthYear(iso: string): string {
+  return monthYearFormat.format(parseIsoDate(iso));
+}
+
+/** "18 Eylül Cuma" */
+export function formatDayAndWeekday(iso: string): string {
+  return dayWeekdayFormat.format(parseIsoDate(iso));
 }
 
 /** "16-18 Ekim 2026", "30 Ekim-1 Kasım 2026" or, for a single day, "4 Ekim 2026 Pazar". */

@@ -19,6 +19,8 @@ export interface SiteSettings {
   readonly instagram: string;
   /** Tours kept off the lists of the site; their pages stay reachable by address. */
   readonly hiddenTourIds: readonly string[];
+  /** Past journeys kept off the site's lists in the same way. */
+  readonly hiddenJourneyIds: readonly string[];
 }
 
 const line = (max: number) => z.string().trim().max(max);
@@ -37,6 +39,8 @@ export const siteSettingsSchema = z.object({
   hours: line(120),
   instagram: z.union([z.literal(''), z.string().regex(/^@?[A-Za-z0-9._]{1,30}$/)]),
   hiddenTourIds: z.array(z.string().min(1)).max(200),
+  // Settings saved before journeys could be hidden have no such list.
+  hiddenJourneyIds: z.array(z.string().min(1)).max(500).default([]),
 }) satisfies z.ZodType<SiteSettings>;
 
 /** A field of the settings that failed its rules, by name. */
@@ -88,6 +92,15 @@ export class SiteSettingsService {
   setTourHidden(tourId: string, hidden: boolean): void {
     const others = this.get().hiddenTourIds.filter((id) => id !== tourId);
     this.update({ hiddenTourIds: hidden ? [...others, tourId] : others });
+  }
+
+  isJourneyHidden(journeyId: string): boolean {
+    return this.get().hiddenJourneyIds.includes(journeyId);
+  }
+
+  setJourneyHidden(journeyId: string, hidden: boolean): void {
+    const others = this.get().hiddenJourneyIds.filter((id) => id !== journeyId);
+    this.update({ hiddenJourneyIds: hidden ? [...others, journeyId] : others });
   }
 
   reset(): void {

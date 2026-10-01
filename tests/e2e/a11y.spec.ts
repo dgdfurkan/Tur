@@ -7,6 +7,10 @@ const PAGES: Record<string, string> = {
   'tour list': './turlar/',
   'tour page': './turlar/kapadokya/',
   'day-trip page': './turlar/beypazari-gunubirlik/',
+  'departure calendar': './takvim/',
+  'past tours': './gecmis-turlar/',
+  'past tour page': './gecmis-turlar/2026-09-18-kapadokya/',
+  'questions page': './sss/',
   'corporate page': './kurumsal/',
   'contact page': './iletisim/',
   'not-found page': './boyle-bir-sayfa-yok/',
@@ -63,6 +67,8 @@ test('the locked panel has no accessibility violations', async ({ page }) => {
 test('every screen of the operations panel is free of accessibility violations', async ({
   page,
 }) => {
+  // Every screen and sheet in one walk through the panel takes a while.
+  test.slow();
   await openPanelPage(page, './yonetim/');
   await expect(page.locator('[data-admin]')).toHaveAttribute('data-ready', 'true');
   const screens = [
@@ -77,11 +83,19 @@ test('every screen of the operations panel is free of accessibility violations',
     '/kalkis/kapadokya-2026-11-06',
     '/yolcular',
     '/yolcular/yeni',
+    '/gecmis',
+    '/gecmis/yeni',
+    '/gecmis/2026-09-18-kapadokya',
+    '/site/sorular',
   ];
   for (const screen of screens) {
     await goToScreen(page, screen);
     if (screen === '/site') {
       await page.getByRole('button', { name: /Örnek Yolcuları Yükle/ }).click();
+      // The toast fades out on its own timer, unless the pointer rests on it; a later check
+      // must not catch it halfway.
+      await page.mouse.move(0, 0);
+      await expect(page.locator('.toast__text')).toHaveText('', { timeout: 10_000 });
     }
     await waitForStillness(page);
     const results = await new AxeBuilder({ page }).analyze();
@@ -95,4 +109,19 @@ test('every screen of the operations panel is free of accessibility violations',
   await waitForStillness(page);
   const sheet = await new AxeBuilder({ page }).analyze();
   expect(sheet.violations, 'passenger sheet').toEqual([]);
+
+  // The sheet that changes a moment of a past journey, with its picture strip.
+  await goToScreen(page, '/gecmis/2026-09-18-kapadokya');
+  await page.getByRole('button', { name: /^Ihlara Vadisi/ }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await waitForStillness(page);
+  const moment = await new AxeBuilder({ page }).analyze();
+  expect(moment.violations, 'moment sheet').toEqual([]);
+
+  await goToScreen(page, '/site/sorular');
+  await page.getByRole('button', { name: /^Yerimi Nasıl Ayırtırım\?/ }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await waitForStillness(page);
+  const question = await new AxeBuilder({ page }).analyze();
+  expect(question.violations, 'question sheet').toEqual([]);
 });

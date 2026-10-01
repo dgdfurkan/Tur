@@ -1,0 +1,14 @@
+---
+/** Brings the panel's changes to past journeys onto this page, on the device where they were made. */
+---
+
+<script>
+  import { readLocalJourneys, syncJourneys } from '@/features/site-sync/journeys';
+  import { readLocalSettings } from '@/features/site-sync/settings';
+  import { SafeStorage } from '@/infrastructure/storage/SafeStorage';
+
+  const storage = new SafeStorage();
+  const hidden = readLocalSettings(storage)?.hiddenJourneyIds ?? new Set<string>();
+  const local = readLocalJourneys(storage, hidden);
+  if (local.records.size > 0 || hidden.size > 0) syncJourneys(document, local);
+</script>

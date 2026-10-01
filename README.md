@@ -10,8 +10,11 @@ Ankara çıkışlı kültür turları için hazırlanan tanıtım sitesi, 3D rot
 
 - **Tur Vitrini:** Her tur için ayrı sayfa, günlük program, konaklama, fiyata dâhil olan ve olmayan hizmetler. Her durak bir çizimle ve rakım, yapım yılı gibi kısa bilgilerle gösterilir.
 - **Doluluk Görünümü:** Kalkış tarihine göre doluluk oranı, kalan koltuk sayısı ve koltuk durumu.
+- **Kalkış Takvimi:** Bütün kalkışlar ay ay, fiyatı ve doluluğuyla tek sayfada; tur türüne göre süzülebilir.
+- **Geçmiş Turlar:** Tamamlanan her yolculuk için tarih, misafir sayısı, yol ve yerlerin çizimleriyle yolculuktan notlar. Toplam yol, bir otobüs kilometre sayacında gösterilir.
+- **Rezervasyon Yolu:** Rezervasyonun adımları, sıkça sorulan sorular, telefonla arama ve ilk mesajı hazır WhatsApp bağlantısı. Telefonda tur sayfasının altında fiyat ve Yer Ayırt düğmesi sabit kalır.
 - **Rota Ön İzlemesi:** Çizim tarzında 3D Türkiye haritası üzerinde biniş kartı, mühür ve otobüs animasyonuyla ilerleyen rota simülasyonu. Otobüs bir durağa vardığında o yerin çizimi ve bilgileri ekranda belirir; yolculuğun sonunda kalkış tarihlerine geçilir. Grafik işlemcisi bulunmayan cihazlarda aynı simülasyon düz harita üzerinde çalışır.
-- **Operasyon Paneli:** Telefonda kullanılmak üzere tasarlanmış yönetim uygulaması. Turların fiyatı, kalkışları, başka kanaldan satılan koltukları, sitede görünüp görünmeyeceği ve sayfa içeriği; yolcu ve kapora kaydı, kalan ödemeler, sigorta listesi; ana sayfa metni, duyuru ve iletişim bilgileri buradan yönetilir. Panel erişim koduyla açılır ve siteden bağlantı verilmez.
+- **Operasyon Paneli:** Telefonda kullanılmak üzere tasarlanmış yönetim uygulaması. Turların fiyatı, kalkışları, başka kanaldan satılan koltukları, sitede görünüp görünmeyeceği ve sayfa içeriği; geçmiş turlar ve notları; yolcu ve kapora kaydı, kalan ödemeler, sigorta listesi; ana sayfa metni, duyuru ve iletişim bilgileri buradan yönetilir. Paneldeki değişiklikler, aynı cihazdaki sitede hemen görünür. Panel erişim koduyla açılır ve siteden bağlantı verilmez.
 - **Video Stüdyosu:** Panelde, tur rotasından Instagram boyutlarında (9:16, 4:5, 1:1, 16:9) 4K çözünürlüğe kadar MP4 video üretilir. Videoya logo, ajans adı ve iletişim satırı eklenir; video cihazda hazırlanır ve hiçbir sunucuya yüklenmez.
 - **Erişilebilirlik:** Klavye ile kullanım, ekran okuyucu duyuruları ve azaltılmış hareket tercihi desteklenir.
 
@@ -64,7 +67,7 @@ docs/               Mimari, yol haritası ve üçüncü taraf lisansları
 scripts/            Harita verisini üreten ve panel kodunu değiştiren betikler
 src/
   config/           Marka, iletişim ve yol yardımcıları
-  content/tours/    Tur içerikleri
+  content/          Tur, geçmiş tur ve soru içerikleri
   domain/           Çatıdan bağımsız iş kuralları
   application/      Servisler
   infrastructure/   Depolama ve dışa aktarma

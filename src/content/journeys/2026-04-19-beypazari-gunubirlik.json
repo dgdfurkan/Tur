@@ -1,0 +1,25 @@
+{
+  "tour": "beypazari-gunubirlik",
+  "title": "Beypazarı Günübirlik Turu",
+  "scene": "vadi",
+  "startDate": "2026-04-19",
+  "endDate": "2026-04-19",
+  "group": "genel",
+  "guests": 45,
+  "distanceKm": 220,
+  "story": "Bahar programının ilk günübirlik turu nisan ayında Beypazarı'na yapıldı. 45 misafirle tarihî evler ve çarşı gezildi; öğleden sonra İnözü Vadisi'nde yürüyüş yapıldı.",
+  "moments": [
+    {
+      "day": 1,
+      "place": "Alaaddin Sokak Çarşısı",
+      "scene": "carsi",
+      "note": "Öğle yemeği için çarşıda serbest zaman verildi."
+    },
+    {
+      "day": 1,
+      "place": "İnözü Vadisi",
+      "scene": "vadi",
+      "note": "Kaya mezarlarının bulunduğu vadide bir saatlik yürüyüş yapıldı."
+    }
+  ]
+}

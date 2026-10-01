@@ -1,0 +1,177 @@
+---
+/**
+ * The distance travelled on all past journeys, on the drums of a coach's
+ * odometer. The drums roll to the figure when it comes into view; the figure
+ * itself is in the caption for every reader.
+ */
+interface Props {
+  km: number;
+}
+
+const CELLS = 6;
+const { km } = Astro.props;
+const digits = String(Math.min(Math.max(0, Math.round(km)), 10 ** CELLS - 1))
+  .padStart(CELLS, '0')
+  .split('');
+const lead = digits.findIndex((digit) => digit !== '0');
+// Three turns of the drum, so the right-hand drums can spin past their figure before stopping on it.
+const reel = '0123456789'.repeat(3).split('').join('\n');
+---
+
+<figure class="odometer" data-odometer data-reveal>
+  <div class="odometer__dial" aria-hidden="true">
+    <span class="odometer__cells">
+      {digits.map((digit, index) => (
+        <span class="odometer__cell" data-lead={lead === -1 || index < lead ? '' : undefined}>
+          <span class="odometer__reel" data-digit={digit}>
+            {reel}
+          </span>
+        </span>
+      ))}
+    </span>
+    <span class="odometer__unit">km</span>
+  </div>
+  <figcaption class="odometer__caption">
+    <slot />
+  </figcaption>
+</figure>
+
+<style>
+  .odometer {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-4);
+    margin: 0;
+  }
+
+  /* The instrument: a dark bezel holding the drums, the unit printed beside them. */
+  .odometer__dial {
+    --cell-h: 1.18em;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4) var(--space-3) var(--space-3);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(180deg, #2b3138, var(--c-asphalt));
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.08),
+      0 0 0 0.25rem var(--c-mist),
+      0 0 0 0.3125rem var(--c-line),
+      var(--shadow-2);
+    color: var(--c-white);
+    font-stretch: var(--wdth-display);
+    font-size: clamp(2.25rem, 1.6rem + 3vw, 3.75rem);
+    font-weight: 750;
+    line-height: 1;
+  }
+
+  .odometer__cells {
+    display: inline-flex;
+    gap: 0.125rem;
+  }
+
+  /* A drum seen through its window: shaded top and bottom, like a cylinder. */
+  .odometer__cell {
+    position: relative;
+    width: 0.78em;
+    height: var(--cell-h);
+    overflow: hidden;
+    border-radius: 0.125em;
+    background: #11151a;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+
+  .odometer__cell::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgb(0 0 0 / 0.55),
+      transparent 28%,
+      transparent 72%,
+      rgb(0 0 0 / 0.55)
+    );
+    pointer-events: none;
+  }
+
+  /* Leading zeros print fainter, as on a real counter. */
+  .odometer__cell[data-lead] {
+    color: rgb(255 255 255 / 0.45);
+  }
+
+  .odometer__reel {
+    --turns: 0;
+    display: block;
+    line-height: var(--cell-h);
+    white-space: pre;
+    transform: translateY(calc((var(--turns) * 10 + var(--digit)) * var(--cell-h) * -1));
+    transition: transform 2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .odometer__cell:nth-last-child(2) .odometer__reel {
+    --turns: 1;
+  }
+
+  .odometer__cell:last-child .odometer__reel {
+    --turns: 2;
+  }
+
+  .odometer__reel[data-digit='0'] {
+    --digit: 0;
+  }
+  .odometer__reel[data-digit='1'] {
+    --digit: 1;
+  }
+  .odometer__reel[data-digit='2'] {
+    --digit: 2;
+  }
+  .odometer__reel[data-digit='3'] {
+    --digit: 3;
+  }
+  .odometer__reel[data-digit='4'] {
+    --digit: 4;
+  }
+  .odometer__reel[data-digit='5'] {
+    --digit: 5;
+  }
+  .odometer__reel[data-digit='6'] {
+    --digit: 6;
+  }
+  .odometer__reel[data-digit='7'] {
+    --digit: 7;
+  }
+  .odometer__reel[data-digit='8'] {
+    --digit: 8;
+  }
+  .odometer__reel[data-digit='9'] {
+    --digit: 9;
+  }
+
+  .odometer__unit {
+    color: rgb(255 255 255 / 0.7);
+    font-size: 0.42em;
+    font-weight: 650;
+  }
+
+  .odometer__caption {
+    max-width: 44ch;
+    color: var(--c-muted);
+    font-size: var(--text-lead);
+    line-height: 1.5;
+  }
+
+  /* Until it is seen, every drum waits at zero; then they roll, the right-hand ones the furthest. */
+  @media screen and (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+    .odometer:not([data-revealed]) .odometer__reel {
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .odometer__reel {
+      transition: none;
+    }
+  }
+</style>

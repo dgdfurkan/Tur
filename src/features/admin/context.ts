@@ -1,4 +1,6 @@
 import type { BookingService } from '@/application/BookingService';
+import type { FaqEditor } from '@/application/FaqEditor';
+import type { JourneyArchiveEditor } from '@/application/JourneyArchiveEditor';
 import type { SiteSettingsService } from '@/application/SiteSettings';
 import type { TourCatalogEditor } from '@/application/TourCatalogEditor';
 import type { RestoreResult } from '@/infrastructure/backup/PanelBackup';
@@ -13,6 +15,8 @@ export type Section = 'ozet' | 'turlar' | 'yolcular' | 'site';
 export interface AppContext {
   readonly bookings: BookingService;
   readonly catalog: TourCatalogEditor;
+  readonly journeys: JourneyArchiveEditor;
+  readonly faq: FaqEditor;
   readonly settings: SiteSettingsService;
   readonly exporter: ListExporter;
   readonly backup: {

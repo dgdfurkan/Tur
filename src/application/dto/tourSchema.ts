@@ -1,8 +1,8 @@
 import { SCENE_KEYS } from '@/domain/tour/Tour';
 import { z } from '../zod';
+import { isoDate, slug } from './fields';
 import type { TourData, TourSnapshot } from './TourData';
 
-const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Expected YYYY-MM-DD');
 const clockTime = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Expected HH:MM');
 
 const scene = z.enum(SCENE_KEYS);
@@ -72,5 +72,5 @@ export const tourDataSchema = z.object({
 }) satisfies z.ZodType<TourData>;
 
 export const tourSnapshotSchema = tourDataSchema.extend({
-  id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  id: slug,
 }) satisfies z.ZodType<TourSnapshot>;

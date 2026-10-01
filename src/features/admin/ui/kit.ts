@@ -1,5 +1,6 @@
-import type { SceneKey } from '@/domain/tour/Tour';
+import { SCENE_KEYS, type SceneKey } from '@/domain/tour/Tour';
 import type { Occupancy } from '@/domain/tour/Occupancy';
+import { tr } from '@/i18n/tr';
 import { ICON_PATHS, type IconName } from '@/shared/icons';
 import { formatNumber } from '@/shared/format';
 import { el, svg, type Child } from './dom';
@@ -52,6 +53,63 @@ export function scene(
     },
     [svg('use', { href: `#scene-${key}` })],
   );
+}
+
+/**
+ * Every place illustration in a row that scrolls sideways, for choosing one
+ * inside a form. `select` moves the choice from outside, as when a stop of
+ * the programme is picked.
+ */
+export function sceneStrip(options: {
+  readonly label: string;
+  readonly value: SceneKey;
+  readonly onChange: (key: SceneKey) => void;
+}): { readonly element: HTMLElement; select(key: SceneKey): void } {
+  const items = SCENE_KEYS.map((key) =>
+    el(
+      'button',
+      {
+        class: 'scene-grid__item',
+        attrs: {
+          type: 'button',
+          role: 'radio',
+          'aria-checked': String(key === options.value),
+          'aria-label': tr.admin.scenes[key],
+        },
+        on: {
+          click: () => {
+            select(key);
+            options.onChange(key);
+          },
+        },
+      },
+      [scene(key)],
+    ),
+  );
+  const element = el(
+    'div',
+    { class: 'scene-strip', attrs: { role: 'radiogroup', 'aria-label': options.label } },
+    items,
+  );
+  // Only the strip scrolls sideways; the sheet around it stays where it is.
+  const reveal = (key: SceneKey, behavior: ScrollBehavior): void => {
+    const item = items[SCENE_KEYS.indexOf(key)];
+    if (!item) return;
+    const strip = element.getBoundingClientRect();
+    const box = item.getBoundingClientRect();
+    element.scrollTo({
+      left: element.scrollLeft + box.left - strip.left - (strip.width - box.width) / 2,
+      behavior,
+    });
+  };
+  const select = (key: SceneKey): void => {
+    items.forEach((item, index) => {
+      item.setAttribute('aria-checked', String(SCENE_KEYS[index] === key));
+    });
+    reveal(key, 'smooth');
+  };
+  requestAnimationFrame(() => reveal(options.value, 'instant'));
+  return { element, select };
 }
 
 interface ButtonOptions {

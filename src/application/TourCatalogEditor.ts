@@ -1,6 +1,7 @@
 import type { Tour } from '@/domain/tour/Tour';
 import type { TourSnapshot } from './dto/TourData';
 import { tourSnapshotSchema } from './dto/tourSchema';
+import { fingerprint } from './fingerprint';
 import { toTour } from './tourMapper';
 
 /** A tour as changed in the panel, and the published version it was made from. */
@@ -26,29 +27,6 @@ export interface TourSource {
 /** A change that would leave a tour that cannot exist, such as a seat the coach does not have. */
 export class InvalidTourError extends Error {
   override readonly name = 'InvalidTourError';
-}
-
-/** JSON with object keys in sorted order, so equal tours read the same whatever built them. */
-function canonical(value: unknown): string {
-  if (Array.isArray(value)) return `[${value.map(canonical).join(',')}]`;
-  if (typeof value === 'object' && value !== null) {
-    const entries = Object.entries(value)
-      .filter(([, item]) => item !== undefined)
-      .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
-    return `{${entries.map(([key, item]) => `${JSON.stringify(key)}:${canonical(item)}`).join(',')}}`;
-  }
-  return JSON.stringify(value);
-}
-
-/** A short, stable fingerprint of a tour; it changes whenever anything in the tour does. */
-export function fingerprint(tour: TourSnapshot): string {
-  const text = canonical(tour);
-  let hash = 0x811c9dc5;
-  for (let i = 0; i < text.length; i += 1) {
-    hash ^= text.charCodeAt(i);
-    hash = Math.imul(hash, 0x01000193);
-  }
-  return (hash >>> 0).toString(16).padStart(8, '0');
 }
 
 /** Checks a tour against the content rules and the domain's own; returns it as a domain object. */

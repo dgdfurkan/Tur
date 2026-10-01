@@ -1,0 +1,154 @@
+---
+import Scene from '@/components/scenes/Scene.astro';
+import type { Journey } from '@/domain/journey/Journey';
+import { tr } from '@/i18n/tr';
+import { formatDayAndWeekday } from '@/shared/format';
+
+/**
+ * What was noted on the road, as postcards pinned in order of the days. The
+ * template lets the panel's changes on this device be drawn the same way. The
+ * page must include the pictures themselves with <SceneSprite>.
+ */
+interface Props {
+  journey: Journey;
+}
+
+const { journey } = Astro.props;
+---
+
+<ol class="moments" data-journey-moments>
+  {journey.moments.map((moment) => (
+    <li class="moment" data-reveal>
+      <figure class="moment__card">
+        <div class="moment__art">
+          <Scene scene={moment.scene} />
+          <p class="moment__sign">{moment.place}</p>
+        </div>
+        <figcaption class="moment__text">
+          <p class="moment__day">
+            {tr.journeys.dayOf(moment.day, formatDayAndWeekday(journey.dateOfDay(moment.day)))}
+          </p>
+          {moment.note && <p class="moment__note">{moment.note}</p>}
+        </figcaption>
+      </figure>
+    </li>
+  ))}
+</ol>
+
+<template data-moment-template>
+  <li class="moment">
+    <figure class="moment__card">
+      <div class="moment__art">
+        <svg
+          class="scene"
+          viewBox="0 0 320 200"
+          preserveAspectRatio="xMidYMid slice"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <use data-moment-scene></use>
+        </svg>
+        <p class="moment__sign" data-moment-field="place"></p>
+      </div>
+      <figcaption class="moment__text">
+        <p class="moment__day" data-moment-field="day"></p>
+        <p class="moment__note" data-moment-field="note"></p>
+      </figcaption>
+    </figure>
+  </li>
+</template>
+
+<style>
+  .moments {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .moment__card {
+    margin: 0;
+  }
+
+  .moment__art {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    border: 0.4375rem solid var(--c-white);
+    border-radius: var(--radius-md);
+    background: var(--c-mist);
+    box-shadow: var(--shadow-2);
+    overflow: hidden;
+  }
+
+  .moment__art :global(.scene) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* The brown sign that names a place of interest beside the road. */
+  .moment__sign {
+    position: absolute;
+    left: var(--space-3);
+    bottom: var(--space-3);
+    max-width: calc(100% - 2 * var(--space-3));
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-sm);
+    background: var(--c-brown);
+    box-shadow:
+      inset 0 0 0 0.09375rem var(--c-white),
+      0 0 0 0.125rem var(--c-brown),
+      var(--shadow-sign);
+    color: var(--c-white);
+    font-stretch: var(--wdth-sign);
+    font-weight: 650;
+    line-height: 1.25;
+  }
+
+  .moment__text {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-2) 0;
+  }
+
+  .moment__day {
+    color: var(--c-brown);
+    font-stretch: var(--wdth-sign);
+    font-size: var(--text-small);
+    font-weight: 650;
+  }
+
+  .moment__note {
+    max-width: 48ch;
+  }
+
+  .moment__note:empty {
+    display: none;
+  }
+
+  /* Pinned like photos in an album: two columns, the second a little lower, each slightly askew. */
+  @media (min-width: 48rem) {
+    .moments {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-8) var(--space-7);
+      padding-bottom: var(--space-8);
+    }
+
+    .moment:nth-child(even) {
+      translate: 0 var(--space-8);
+    }
+
+    .moment__art {
+      rotate: -0.8deg;
+      transition: rotate var(--dur-panel) var(--ease-out);
+    }
+
+    .moment:nth-child(even) .moment__art {
+      rotate: 0.8deg;
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .moment:hover .moment__art {
+      rotate: 0deg;
+    }
+  }
+</style>

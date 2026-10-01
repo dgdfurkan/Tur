@@ -1,0 +1,31 @@
+{
+  "tour": "kapadokya",
+  "title": "Kapadokya Kültür Turu",
+  "scene": "peribacasi",
+  "startDate": "2026-05-22",
+  "endDate": "2026-05-24",
+  "group": "kurum",
+  "guests": 30,
+  "distanceKm": 850,
+  "story": "Bir kamu kurumunun personel gezisi için Kapadokya programı kuruma özel tarihle düzenlendi. Araç, otel ve rehber, grubun büyüklüğüne göre önceden ayrıldı; kalkış saati kurumun mesai düzenine göre belirlendi.",
+  "moments": [
+    {
+      "day": 1,
+      "place": "Derinkuyu Yeraltı Şehri",
+      "scene": "yeralti",
+      "note": "Ziyarete açık sekiz katın yaşam alanları rehber eşliğinde gezildi."
+    },
+    {
+      "day": 2,
+      "place": "Paşabağları",
+      "scene": "peribacasi",
+      "note": "Üç başlıklı peribacalarının arasındaki yürüyüş yolunda fotoğraf molası verildi."
+    },
+    {
+      "day": 3,
+      "place": "Üç Güzeller",
+      "scene": "uc-guzeller",
+      "note": "Dönüş sabahı grup fotoğrafı Ürgüp girişindeki peribacalarının önünde çekildi."
+    }
+  ]
+}

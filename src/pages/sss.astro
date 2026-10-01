@@ -1,0 +1,129 @@
+---
+import { FAQ_TOPICS } from '@/application/dto/faqSchema';
+import ContactActions from '@/components/contact/ContactActions.astro';
+import FaqList from '@/components/faq/FaqList.astro';
+import PageHead from '@/components/layout/PageHead.astro';
+import { loadFaq } from '@/composition/catalog';
+import { tr } from '@/i18n/tr';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+
+const questions = await loadFaq();
+// Every topic is drawn, even one without questions yet, so the panel can add one to it.
+const topics = FAQ_TOPICS.map((topic) => ({
+  topic,
+  items: questions.filter((question) => question.topic === topic),
+}));
+---
+
+<BaseLayout title={tr.faq.title} description={tr.faq.lead}>
+  <PageHead title={tr.faq.title} lead={tr.faq.lead} />
+
+  <div class="container faq-page">
+    <nav class="topics" aria-label={tr.faq.title}>
+      <ul>
+        {topics.map(({ topic }) => (
+          <li>
+            <a href={`#${topic}`}>{tr.faq.topics[topic]}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="groups">
+      {topics.map(({ topic, items }) => (
+        <section class="group" aria-labelledby={topic}>
+          <h2 id={topic}>{tr.faq.topics[topic]}</h2>
+          <FaqList items={items} name={`sss-${topic}`} show={{ topic }} />
+        </section>
+      ))}
+    </div>
+  </div>
+
+  <section class="section section--mist" aria-labelledby="soru-sorun">
+    <div class="container ask">
+      <h2 id="soru-sorun">{tr.faq.more}</h2>
+      <ContactActions message={tr.faq.title} />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .faq-page {
+    display: grid;
+    gap: var(--space-7);
+    padding-block: var(--space-6) var(--space-section);
+  }
+
+  .topics ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .topics a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding: 0 var(--space-4);
+    border: 0.09375rem solid var(--c-line);
+    border-radius: var(--radius-md);
+    font-stretch: var(--wdth-sign);
+    font-weight: 600;
+    text-decoration: none;
+    transition: border-color var(--dur-ui) ease;
+  }
+
+  .groups {
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  .group {
+    display: grid;
+    gap: var(--space-5);
+    scroll-margin-top: var(--space-6);
+  }
+
+  .group:not(:has(.faq__item)) {
+    display: none;
+  }
+
+  .group h2 {
+    font-size: var(--text-h3);
+  }
+
+  .ask {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+  }
+
+  .ask h2 {
+    max-width: 30ch;
+    font-size: var(--text-h3);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .topics a:hover {
+      border-color: var(--c-muted);
+    }
+  }
+
+  @media (min-width: 60rem) {
+    .faq-page {
+      grid-template-columns: 15rem minmax(0, 1fr);
+      align-items: start;
+      gap: var(--space-8);
+    }
+
+    /* The topics stay beside the questions while the page scrolls. */
+    .topics {
+      position: sticky;
+      top: var(--space-6);
+    }
+
+    .topics ul {
+      display: grid;
+    }
+  }
+</style>

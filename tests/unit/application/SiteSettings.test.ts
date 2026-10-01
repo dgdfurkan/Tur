@@ -22,6 +22,7 @@ const DEFAULTS: SiteSettings = {
   hours: '',
   instagram: '',
   hiddenTourIds: [],
+  hiddenJourneyIds: [],
 };
 
 function service(storage = memoryStorage()) {

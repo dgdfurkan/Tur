@@ -2,15 +2,27 @@ import { expect, type Page } from '@playwright/test';
 import { TEST_PANEL_CODE } from '../panelCode';
 
 /**
+ * Chromium reports a cross-document view transition it could not start in
+ * time, as happens while many tests run at once, as a console error. The
+ * navigation goes ahead unchanged, so it is not a fault of the page.
+ */
+const SKIPPED_TRANSITION =
+  /^Transition was aborted because of invalid state\. ViewTransition opt-in disabled$/;
+
+/**
  * Collects console errors and uncaught exceptions. A Content Security Policy
  * violation is reported as a console error, so this also guards the CSP.
  */
 export function trackErrors(page: Page): string[] {
   const errors: string[] = [];
   page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(message.text());
+    if (message.type() === 'error' && !SKIPPED_TRANSITION.test(message.text())) {
+      errors.push(message.text());
+    }
   });
-  page.on('pageerror', (error) => errors.push(error.message));
+  page.on('pageerror', (error) => {
+    if (!SKIPPED_TRANSITION.test(error.message)) errors.push(error.message);
+  });
   return errors;
 }
 
