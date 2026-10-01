@@ -1,0 +1,350 @@
+---
+import JourneyMoments from '@/components/journey/JourneyMoments.astro';
+import JourneyStub from '@/components/journey/JourneyStub.astro';
+import JourneySync from '@/components/journey/JourneySync.astro';
+import Scene from '@/components/scenes/Scene.astro';
+import SceneSprite from '@/components/scenes/SceneSprite.astro';
+import RouteThumb from '@/components/tour/RouteThumb.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { journeyArchive, tourCatalog } from '@/composition/catalog';
+import { pageUrl } from '@/config/paths';
+import type { Journey } from '@/domain/journey/Journey';
+import { tr } from '@/i18n/tr';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { formatDateRange, formatMonthYear, todayIso } from '@/shared/format';
+import { journeyText } from '@/shared/journeyText';
+
+export async function getStaticPaths() {
+  const journeys = await journeyArchive.list();
+  return journeys.map((journey) => ({ params: { slug: journey.id }, props: { journey } }));
+}
+
+interface Props {
+  journey: Journey;
+}
+
+const { journey } = Astro.props;
+const text = journeyText(journey);
+const tours = await tourCatalog.listTours();
+const tour = tours.find((item) => item.id === journey.tourId);
+const next = tour?.nextDeparture(todayIso());
+const others = (await journeyArchive.list()).filter((other) => other.id !== journey.id).slice(0, 3);
+
+const facts = [
+  { label: tr.journeys.dates, value: text.dates, field: 'dates' },
+  { label: tr.journeys.duration, value: text.duration, field: 'duration' },
+  { label: tr.journeys.guests, value: text.guests, field: 'guests' },
+  { label: tr.journeys.distance, value: text.distance, field: 'distance' },
+] as const;
+---
+
+<BaseLayout
+  title={`${journey.title}, ${formatMonthYear(journey.startDate)}`}
+  description={journey.story}
+>
+  <article class="journey" data-journey-page={journey.id}>
+    <header class="container journey-head" data-journey-head>
+      <nav class="crumbs" aria-label={tr.nav.breadcrumb}>
+        <a href={pageUrl('gecmis-turlar')}>{tr.journeys.title}</a>
+        <span aria-hidden="true">/</span>
+        <span class="tabular">{journey.year}</span>
+      </nav>
+
+      <div class="journey-head__grid">
+        <div class="journey-head__copy">
+          <p class="journey-head__group" data-journey-field="group">
+            {text.group}
+          </p>
+          <h1 data-journey-field="title">{text.title}</h1>
+          <p class="lead" data-journey-field="story">
+            {text.story}
+          </p>
+          <dl class="facts">
+            {facts.map((fact) => (
+              <div>
+                <dt>{fact.label}</dt>
+                <dd class="tabular" data-journey-field={fact.field}>
+                  {fact.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        <figure class="postcard" data-reveal>
+          <div class="postcard__picture">
+            <Scene scene={journey.scene} />
+          </div>
+          <p class="postcard__stamp" aria-hidden="true">
+            <span>{tr.journeys.stamp}</span>
+            <span class="postcard__stamp-date" data-journey-field="stamp">
+              {text.stamp}
+            </span>
+          </p>
+        </figure>
+      </div>
+    </header>
+
+    <section
+      class="section container"
+      aria-labelledby="notlar"
+      data-journey-moments-section
+      hidden={journey.moments.length === 0}
+    >
+      <h2 id="notlar" class="section-title">
+        {tr.journeys.moments}
+      </h2>
+      <JourneyMoments journey={journey} />
+    </section>
+
+    {tour && (
+      <section class="section section--mist" aria-labelledby="rota">
+        <div class="container route">
+          <div class="route__map">
+            <RouteThumb tour={tour} />
+          </div>
+          <div class="route__copy">
+            <h2 id="rota">{tr.journeys.route}</h2>
+            <p class="lead">{tr.journeys.routeLead}</p>
+            <p class="route__next">
+              {next
+                ? tr.journeys.nextOfTour(formatDateRange(next.startDate, next.endDate))
+                : tr.journeys.noNextOfTour}
+            </p>
+            <div class="route__actions">
+              <Button href={pageUrl(`turlar/${tour.id}/rota`)} size="lg">
+                <Icon slot="icon" name="route" />
+                {tr.actions.previewRoute}
+              </Button>
+              <Button href={pageUrl(`turlar/${tour.id}`)} variant="secondary" size="lg">
+                {tr.journeys.viewTour}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+    )}
+
+    {others.length > 0 && (
+      <section class="section container" aria-labelledby="diger">
+        <h2 id="diger" class="section-title">
+          {tr.journeys.others}
+        </h2>
+        <ul class="stub-list">
+          {others.map((other) => (
+            <li data-journey-card={other.id} data-reveal>
+              <JourneyStub journey={other} />
+            </li>
+          ))}
+        </ul>
+        <div class="more">
+          <Button href={pageUrl('gecmis-turlar')} variant="secondary">
+            {tr.actions.allPastTours}
+          </Button>
+        </div>
+      </section>
+    )}
+  </article>
+
+  <SceneSprite
+    scenes={[
+      journey.scene,
+      ...journey.moments.map((moment) => moment.scene),
+      ...others.map((other) => other.scene),
+    ]}
+  />
+  <JourneySync />
+</BaseLayout>
+
+<style>
+  .journey-head {
+    padding-block: var(--space-5) var(--space-section);
+  }
+
+  .crumbs {
+    display: flex;
+    gap: var(--space-2);
+    color: var(--c-muted);
+    font-size: var(--text-small);
+  }
+
+  .crumbs a {
+    color: var(--c-blue);
+    font-weight: 550;
+  }
+
+  .journey-head__grid {
+    display: grid;
+    gap: var(--space-7);
+    margin-top: var(--space-6);
+  }
+
+  .journey-head__group {
+    color: var(--c-brown);
+    font-stretch: var(--wdth-sign);
+    font-weight: 650;
+  }
+
+  .journey-head h1 {
+    margin-top: var(--space-2);
+    font-stretch: var(--wdth-display);
+    font-weight: 780;
+    line-height: 1;
+  }
+
+  .journey-head .lead {
+    margin-top: var(--space-5);
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5);
+    margin: var(--space-6) 0 0;
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--c-line);
+  }
+
+  .facts dt {
+    color: var(--c-muted);
+    font-size: var(--text-caption);
+  }
+
+  .facts dd {
+    margin: var(--space-1) 0 0;
+    font-weight: 650;
+  }
+
+  /* The journey's own picture, framed like a postcard and stamped as done. */
+  .postcard {
+    position: relative;
+    margin: 0;
+    align-self: start;
+  }
+
+  .postcard__picture {
+    aspect-ratio: 4 / 3;
+    border: 0.5rem solid var(--c-white);
+    border-radius: var(--radius-lg);
+    background: var(--c-mist);
+    box-shadow: var(--shadow-2);
+    overflow: hidden;
+    rotate: 1.2deg;
+  }
+
+  .postcard__stamp {
+    position: absolute;
+    right: var(--space-5);
+    bottom: var(--space-5);
+    display: grid;
+    justify-items: center;
+    padding: var(--space-2) var(--space-4);
+    border: 0.25rem solid var(--c-red);
+    border-radius: var(--radius-sm);
+    outline: 0.0625rem solid var(--c-red);
+    outline-offset: 0.25rem;
+    background: rgb(255 255 255 / 0.55);
+    color: var(--c-red);
+    font-stretch: var(--wdth-display);
+    font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: 0.05em;
+    mix-blend-mode: multiply;
+    rotate: -10deg;
+  }
+
+  .postcard__stamp-date {
+    font-size: 0.5em;
+    letter-spacing: 0.08em;
+  }
+
+  /* The stamp comes down once the postcard is in view. */
+  @media screen and (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+    .postcard__stamp {
+      transition:
+        scale 380ms cubic-bezier(0.3, 1.4, 0.5, 1) 420ms,
+        opacity 160ms ease 420ms;
+    }
+
+    .postcard:not([data-revealed]) .postcard__stamp {
+      opacity: 0;
+      scale: 1.6;
+    }
+  }
+
+  .section-title {
+    margin-bottom: var(--space-7);
+  }
+
+  .route {
+    display: grid;
+    gap: var(--space-6);
+    align-items: center;
+  }
+
+  .route__map {
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-lg);
+    background: var(--c-white);
+    overflow: hidden;
+  }
+
+  .route__copy {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+  }
+
+  .route__next {
+    font-weight: 600;
+  }
+
+  .route__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+  }
+
+  .stub-list {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .more {
+    margin-top: var(--space-6);
+  }
+
+  @media (min-width: 40rem) {
+    .facts {
+      grid-template-columns: repeat(4, auto);
+      justify-content: start;
+      gap: var(--space-5) var(--space-7);
+    }
+
+    .stub-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 60rem) {
+    .journey-head__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+      align-items: start;
+      gap: var(--space-8);
+    }
+
+    .route {
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+      gap: var(--space-8);
+    }
+  }
+
+  @media (min-width: 68rem) {
+    .stub-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

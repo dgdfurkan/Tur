@@ -16,6 +16,34 @@ import { daysBetween, departureRow, seatsText, whenText } from '../ui/parts';
 
 const SOON_DAYS = 3;
 const UPCOMING_SHOWN = 6;
+const COMPLETED_SHOWN = 3;
+
+/** Departures that have ended without a record among the past journeys yet, the latest first. */
+function completed(context: AppContext): HTMLElement[] {
+  const recorded = new Set(
+    context.journeys.journeys().map((journey) => `${journey.tourId}|${journey.startDate}`),
+  );
+  return context.catalog
+    .tours()
+    .flatMap((tour) =>
+      tour.departures
+        .filter(
+          (departure) =>
+            departure.endDate < context.today && !recorded.has(`${tour.id}|${departure.startDate}`),
+        )
+        .map((departure) => ({ tour, departure })),
+    )
+    .sort((a, b) => b.departure.startDate.localeCompare(a.departure.startDate))
+    .slice(0, COMPLETED_SHOWN)
+    .map(({ tour, departure }) =>
+      row({
+        title: tour.title,
+        subtitle: `${formatDateRange(departure.startDate, departure.endDate)}: ${tr.admin.journeys.addCompleted}`,
+        icon: { name: 'check', tone: 'green' },
+        href: href(`/gecmis/yeni?kalkis=${departure.id}`),
+      }),
+    );
+}
 
 /** Departures that need a look: full, nearly full, or leaving within days. */
 function attention(bookings: readonly DepartureBooking[], today: string): HTMLElement[] {
@@ -70,10 +98,16 @@ export function homeScreen(): Screen {
       });
 
       const alerts = attention(bookings, context.today);
+      const ended = completed(context);
       return screen({ title: tr.admin.nav.home, subtitle: formatDate(context.today) }, [
         next ? nextCard(next, context) : null,
         el('div', { class: 'stats' }, entering ? stagger(stats) : stats),
         alerts.length > 0 ? block(tr.admin.home.attention, [group(alerts)]) : null,
+        ended.length > 0
+          ? block(tr.admin.journeys.completed, [group(ended)], {
+              footnote: tr.admin.journeys.completedHint,
+            })
+          : null,
         block(
           tr.admin.home.upcoming,
           [

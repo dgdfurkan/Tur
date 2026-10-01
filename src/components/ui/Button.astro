@@ -1,10 +1,15 @@
 ---
 interface Props {
-  href?: string;
+  href?: string | undefined;
   variant?: 'primary' | 'secondary';
   size?: 'md' | 'lg';
   type?: 'button' | 'submit';
   class?: string;
+  /** For a link that only makes sense once a detail it needs is known. */
+  hidden?: boolean;
+  /** Always a link: makes `href` optional while the address is not known yet. */
+  link?: boolean;
+  target?: '_blank';
   [attribute: `data-${string}`]: string | undefined;
   [attribute: `aria-${string}`]: string | undefined;
 }
@@ -15,15 +20,21 @@ const {
   size = 'md',
   type = 'button',
   class: className,
+  hidden = false,
+  link = false,
+  target,
   ...rest
 } = Astro.props;
-const Tag = href ? 'a' : 'button';
+const Tag = href || link ? 'a' : 'button';
 ---
 
 <Tag
   class:list={['button', `button--${variant}`, `button--${size}`, className]}
   href={href}
-  type={href ? undefined : type}
+  type={Tag === 'a' ? undefined : type}
+  hidden={hidden}
+  target={target}
+  rel={target ? 'noopener noreferrer' : undefined}
   {...rest}
 >
   <slot name="icon" />
@@ -69,6 +80,10 @@ const Tag = href ? 'a' : 'button';
     background: var(--c-white);
     border-color: var(--c-asphalt);
     color: var(--c-asphalt);
+  }
+
+  .button[hidden] {
+    display: none;
   }
 
   .button:active {

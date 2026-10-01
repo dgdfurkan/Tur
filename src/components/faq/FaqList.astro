@@ -1,0 +1,138 @@
+---
+import type { FaqEntry } from '@/application/dto/faqSchema';
+
+/**
+ * Questions that open to their answers. Opening one closes the others in the
+ * same list, so the page stays short.
+ */
+interface Props {
+  items: readonly FaqEntry[];
+  name: string;
+}
+
+const { items, name } = Astro.props;
+---
+
+<div class="faq">
+  {items.map((item) => (
+    <details class="faq__item" name={name} id={`soru-${item.id}`}>
+      <summary class="faq__question">
+        <span>{item.question}</span>
+        <span class="faq__sign" aria-hidden="true"></span>
+      </summary>
+      <div class="faq__answer">
+        <p>{item.answer}</p>
+      </div>
+    </details>
+  ))}
+</div>
+
+<style>
+  .faq {
+    border-top: 1px solid var(--c-line);
+    interpolate-size: allow-keywords;
+  }
+
+  .faq__item {
+    border-bottom: 1px solid var(--c-line);
+  }
+
+  .faq__question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    min-height: 3.5rem;
+    padding-block: var(--space-4);
+    font-stretch: var(--wdth-heading);
+    font-size: 1.1875rem;
+    font-weight: 650;
+    line-height: 1.3;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .faq__question::-webkit-details-marker {
+    display: none;
+  }
+
+  /* A plus that turns into a minus. */
+  .faq__sign {
+    position: relative;
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--c-blue-tint);
+    transition: background-color var(--dur-ui) ease;
+  }
+
+  .faq__sign::before,
+  .faq__sign::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0.75rem;
+    height: 0.125rem;
+    margin: -0.0625rem 0 0 -0.375rem;
+    border-radius: 1px;
+    background: var(--c-blue-deep);
+    transition: transform var(--dur-ui) var(--ease-out);
+  }
+
+  .faq__sign::after {
+    transform: rotate(90deg);
+  }
+
+  .faq__item[open] .faq__sign {
+    background: var(--c-blue);
+  }
+
+  .faq__item[open] .faq__sign::before,
+  .faq__item[open] .faq__sign::after {
+    background: var(--c-white);
+  }
+
+  .faq__item[open] .faq__sign::after {
+    transform: rotate(0deg);
+  }
+
+  .faq__answer {
+    padding-bottom: var(--space-5);
+  }
+
+  .faq__answer p {
+    max-width: 66ch;
+    color: var(--c-muted);
+  }
+
+  .faq__question:focus-visible {
+    outline-offset: 2px;
+  }
+
+  /* Where the browser can animate to the answer's own height, the answer unfolds. */
+  @media (prefers-reduced-motion: no-preference) {
+    .faq__item::details-content {
+      block-size: 0;
+      overflow: hidden;
+      transition:
+        block-size 320ms var(--ease-out),
+        content-visibility 320ms allow-discrete;
+    }
+
+    .faq__item[open]::details-content {
+      block-size: auto;
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .faq__question:hover .faq__sign {
+      background: var(--c-line);
+    }
+
+    .faq__item[open] .faq__question:hover .faq__sign {
+      background: var(--c-blue-deep);
+    }
+  }
+</style>

@@ -136,6 +136,14 @@ summary {
   color: var(--c-white);
 }
 
+/*
+ * Nothing in the content may widen the page: a phone would otherwise zoom
+ * out to fit it. Clipping keeps sticky elements working, unlike hidden.
+ */
+main {
+  overflow-x: clip;
+}
+
 .container {
   width: 100%;
   max-width: calc(var(--container) + 2 * var(--gutter));
@@ -152,6 +160,8 @@ summary {
  * They are part of the paper the page is printed on, not of its content.
  */
 .section--mist {
+  /* Tickets cut their notches in the colour of the section they sit on. */
+  --section-bg: var(--c-mist);
   background-color: var(--c-mist);
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 420' fill='none' stroke='%23dbe3e9' stroke-width='1.4'%3E%3Cpath d='M388 40c70-30 170-6 196 66s-24 150-104 168-176-10-208-82 46-122 116-152z'/%3E%3Cpath d='M404 78c52-22 124-4 144 50s-18 110-78 124-130-8-154-60 36-92 88-114z'/%3E%3Cpath d='M420 116c34-14 80-2 94 34s-12 72-52 82-86-6-102-40 26-62 60-76z'/%3E%3Cpath d='M438 152c18-8 42 0 50 20s-8 38-28 42-46-2-54-20 14-34 32-42z'/%3E%3Cpath d='M40 300c60-40 170-30 220 20s40 120-20 150'/%3E%3Cpath d='M70 330c44-28 120-22 156 14s28 84-14 106'/%3E%3C/svg%3E"),

@@ -1,5 +1,6 @@
 import type { DepartureBooking } from '@/application/BookingService';
 import type { Passenger } from '@/domain/booking/Passenger';
+import type { Journey } from '@/domain/journey/Journey';
 import type { Tour } from '@/domain/tour/Tour';
 import type { SeatLayout } from '@/domain/vehicle/SeatLayout';
 import { tr } from '@/i18n/tr';
@@ -78,6 +79,35 @@ export function tourRow(
         el('strong', { class: 'tour-row__price tabular', text: formatMoney(tour.price) }),
         options.hidden ? chip(tr.admin.tours.hidden, 'grey') : chip(tr.admin.tours.live, 'green'),
         options.changed ? chip(tr.admin.tours.changed, 'blue') : null,
+      ]),
+    ]),
+    el('span', { class: 'row__chevron' }, [icon('chevron', 18)]),
+  ]);
+}
+
+/** A past journey in the archive: its picture, when it was, who travelled and its state. */
+export function journeyRow(
+  journey: Journey,
+  options: { readonly hidden: boolean; readonly isNew: boolean; readonly changed: boolean },
+): HTMLElement {
+  return el('a', { class: 'tour-row', attrs: { href: href(`/gecmis/${journey.id}`) } }, [
+    el('span', { class: 'tour-row__art' }, [scene(journey.scene)]),
+    el('span', { class: 'tour-row__text' }, [
+      el('span', { class: 'tour-row__title', text: journey.title }),
+      el('span', {
+        class: 'tour-row__meta',
+        text: `${formatDateRange(journey.startDate, journey.endDate)}, ${tr.journeys.groups[journey.group]}`,
+      }),
+      el('span', { class: 'tour-row__chips' }, [
+        el('strong', {
+          class: 'tour-row__price tabular',
+          text: tr.admin.journeys.guestsUnit(formatNumber(journey.guests)),
+        }),
+        options.hidden
+          ? chip(tr.admin.journeys.hidden, 'grey')
+          : chip(tr.admin.journeys.live, 'green'),
+        options.isNew ? chip(tr.admin.journeys.isNew, 'yellow') : null,
+        options.changed ? chip(tr.admin.journeys.changed, 'blue') : null,
       ]),
     ]),
     el('span', { class: 'row__chevron' }, [icon('chevron', 18)]),

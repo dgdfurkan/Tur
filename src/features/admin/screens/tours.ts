@@ -1,8 +1,8 @@
 import { tr } from '@/i18n/tr';
 import { formatNumber } from '@/shared/format';
-import type { AppContext, Screen } from '../context';
+import { href, type AppContext, type Screen } from '../context';
 import { el } from '../ui/dom';
-import { group, screen, segmented, stagger } from '../ui/kit';
+import { block, group, row, screen, segmented, stagger } from '../ui/kit';
 import { tourRow } from '../ui/parts';
 
 type Filter = 'all' | 'live' | 'hidden';
@@ -55,6 +55,16 @@ export function toursScreen(): Screen {
           }),
           group(entering ? stagger(rows) : rows, 'group--tours'),
           el('p', { class: 'block__foot', text: tr.admin.tours.newTourNote }),
+          block(tr.admin.journeys.title, [
+            group([
+              row({
+                title: tr.admin.journeys.title,
+                value: tr.admin.journeys.count(formatNumber(context.journeys.journeys().length)),
+                icon: { name: 'ticket', tone: 'brown' },
+                href: href('/gecmis'),
+              }),
+            ]),
+          ]),
         ],
       );
     },

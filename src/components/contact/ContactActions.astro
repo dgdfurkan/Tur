@@ -1,0 +1,78 @@
+---
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { pageUrl } from '@/config/paths';
+import { siteConfig } from '@/config/site';
+import { tr } from '@/i18n/tr';
+import { mailHref, telHref, whatsappHref } from '@/shared/contactLinks';
+
+/**
+ * The ways to reach the office about a booking: a call, a WhatsApp message
+ * already written, or an e-mail. A way the office has no detail for yet is
+ * left out; the contact page is always offered.
+ */
+interface Props {
+  /** The first message of a WhatsApp chat, and the subject of an e-mail. */
+  message: string;
+  showContactPage?: boolean;
+}
+
+const { message, showContactPage = true } = Astro.props;
+const { contact } = siteConfig;
+const phone = contact.phone ? telHref(contact.phone) : null;
+const whatsapp = contact.whatsapp ? whatsappHref(contact.whatsapp, message) : null;
+const email = contact.email ? mailHref(contact.email, message) : null;
+---
+
+<div class="contact-actions">
+  <Button
+    href={phone ?? undefined}
+    link
+    size="lg"
+    hidden={!phone}
+    data-contact-link="phone"
+    data-hide-empty=""
+  >
+    <Icon slot="icon" name="phone" />
+    {tr.actions.call}
+  </Button>
+  <Button
+    href={whatsapp ?? undefined}
+    link
+    size="lg"
+    target="_blank"
+    hidden={!whatsapp}
+    data-contact-link="whatsapp"
+    data-message={message}
+    data-hide-empty=""
+  >
+    <Icon slot="icon" name="message" />
+    {tr.actions.whatsapp}
+  </Button>
+  <Button
+    href={email ?? undefined}
+    link
+    variant="secondary"
+    size="lg"
+    hidden={!email}
+    data-contact-link="email"
+    data-message={message}
+    data-hide-empty=""
+  >
+    <Icon slot="icon" name="mail" />
+    {tr.actions.email}
+  </Button>
+  {showContactPage && (
+    <Button href={pageUrl('iletisim')} variant="secondary" size="lg">
+      {tr.actions.contactDetails}
+    </Button>
+  )}
+</div>
+
+<style>
+  .contact-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+</style>

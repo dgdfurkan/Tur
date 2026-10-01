@@ -146,8 +146,10 @@ test('a hidden tour leaves the lists of the site on this device', async ({ page 
   await expect(page.locator('.tour-row', { hasText: 'Kapadokya' })).toContainText('Gizli');
 
   await page.goto('./turlar/');
-  await expect(page.locator('[data-tour-card="kapadokya"]')).toBeHidden();
-  await expect(page.locator('[data-tour-card="ege-klasikleri"]')).toBeVisible();
+  await expect(page.locator('main [data-tour-card="kapadokya"]')).toBeHidden();
+  await expect(page.locator('main [data-tour-card="ege-klasikleri"]')).toBeVisible();
+  // The footer lists it no more either.
+  await expect(page.locator('footer [data-tour-card="kapadokya"]')).toBeHidden();
 });
 
 test('a departure can be added, sold in part and removed', async ({ page }) => {
@@ -292,7 +294,17 @@ test.describe('the lock', () => {
 });
 
 test('no public page links to the panel', async ({ page }) => {
-  for (const path of ['./', './turlar/', './turlar/kapadokya/', './kurumsal/', './iletisim/']) {
+  for (const path of [
+    './',
+    './turlar/',
+    './turlar/kapadokya/',
+    './takvim/',
+    './gecmis-turlar/',
+    './gecmis-turlar/2026-09-18-kapadokya/',
+    './sss/',
+    './kurumsal/',
+    './iletisim/',
+  ]) {
     await page.goto(path);
     await expect(page.locator('a[href*="yonetim"]')).toHaveCount(0);
   }

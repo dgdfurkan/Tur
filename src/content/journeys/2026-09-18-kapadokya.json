@@ -1,0 +1,37 @@
+{
+  "tour": "kapadokya",
+  "title": "Kapadokya Kültür Turu",
+  "scene": "uc-guzeller",
+  "startDate": "2026-09-18",
+  "endDate": "2026-09-20",
+  "group": "genel",
+  "guests": 41,
+  "distanceKm": 850,
+  "story": "Eylül ayının üçüncü hafta sonunda 41 misafirle Kapadokya'ya gidildi. İlk gün Sultanhanı ve Ihlara Vadisi gezildi; ikinci gün Göreme, Uçhisar ve Avanos programı tamamlandı. Üçüncü gün Mustafapaşa'dan sonra Ankara'ya dönüldü.",
+  "moments": [
+    {
+      "day": 1,
+      "place": "Ihlara Vadisi",
+      "scene": "vadi",
+      "note": "Melendiz Çayı boyunca Belisırma'ya kadar yüründü; öğle yemeği molası çay kenarında verildi."
+    },
+    {
+      "day": 2,
+      "place": "Göreme Açık Hava Müzesi",
+      "scene": "kaya-kilise",
+      "note": "Kaya kiliselerindeki freskler rehber anlatımıyla gezildi."
+    },
+    {
+      "day": 2,
+      "place": "Avanos",
+      "scene": "comlek",
+      "note": "Çömlek atölyesinde Kızılırmak kilinin çark başında biçimlendirilişi izlendi."
+    },
+    {
+      "day": 3,
+      "place": "Mustafapaşa",
+      "scene": "tas-konak",
+      "note": "Eski adı Sinasos olan köyün taş konakları arasında serbest zaman verildi."
+    }
+  ]
+}

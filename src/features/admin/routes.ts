@@ -3,6 +3,7 @@ import { hotelsScreen, listScreen, programScreen } from './screens/content';
 import { departureScreen } from './screens/departure';
 import { departureEditScreen } from './screens/departureEdit';
 import { homeScreen } from './screens/home';
+import { journeyFormScreen, journeyScreen, journeysScreen } from './screens/journeys';
 import { passengerFormScreen } from './screens/passengerForm';
 import { passengersScreen } from './screens/passengers';
 import { shownToursScreen, siteScreen } from './screens/site';
@@ -38,6 +39,15 @@ const ROUTES: readonly (readonly [string, Factory])[] = [
         : null,
   ],
   ['/turlar/:tour/konaklama', (params) => hotelsScreen(params['tour'] ?? '')],
+  ['/gecmis', () => journeysScreen()],
+  ['/gecmis/yeni', (_params, query) => journeyFormScreen({ departureId: query.get('kalkis') })],
+  [
+    '/gecmis/:journey',
+    (params, _query, context) =>
+      context.journeys.journey(params['journey'] ?? '')
+        ? journeyScreen(params['journey'] ?? '')
+        : null,
+  ],
   ['/yolcular', () => passengersScreen()],
   [
     '/yolcular/yeni',

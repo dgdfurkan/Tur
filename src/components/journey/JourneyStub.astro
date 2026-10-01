@@ -1,0 +1,255 @@
+---
+import Scene from '@/components/scenes/Scene.astro';
+import { pageUrl } from '@/config/paths';
+import type { Journey } from '@/domain/journey/Journey';
+import { tr } from '@/i18n/tr';
+import { journeyText } from '@/shared/journeyText';
+
+/**
+ * A completed journey as a used ticket: the picture stamped as done, where and
+ * when it went, and a stub with the guests, the days and the distance. The
+ * page must include the pictures themselves with <SceneSprite>.
+ */
+interface Props {
+  journey: Journey;
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { journey, headingLevel: Heading = 'h3' } = Astro.props;
+const text = journeyText(journey);
+---
+
+<article class="stub" data-tilt>
+  <div class="stub__art">
+    <div class="stub__picture">
+      <Scene scene={journey.scene} />
+    </div>
+    <p class="stub__stamp" aria-hidden="true">
+      <span>{tr.journeys.stamp}</span>
+      <span class="stub__stamp-date" data-journey-field="stamp">
+        {text.stamp}
+      </span>
+    </p>
+  </div>
+
+  <div class="stub__main">
+    <p class="stub__group" data-journey-field="group">
+      {text.group}
+    </p>
+    <Heading class="stub__title">
+      <a href={pageUrl(`gecmis-turlar/${journey.id}`)} data-journey-field="title">
+        {text.title}
+      </a>
+    </Heading>
+    <p class="stub__date" data-journey-field="dates">
+      {text.dates}
+    </p>
+  </div>
+
+  <dl class="stub__figures">
+    <span class="stub__punch" aria-hidden="true"></span>
+    <div>
+      <dt>{tr.journeys.guests}</dt>
+      <dd class="tabular" data-journey-field="guests">
+        {text.guests}
+      </dd>
+    </div>
+    <div>
+      <dt>{tr.journeys.duration}</dt>
+      <dd data-journey-field="duration">{text.duration}</dd>
+    </div>
+    <div>
+      <dt>{tr.journeys.distance}</dt>
+      <dd class="tabular" data-journey-field="distance">
+        {text.distance}
+      </dd>
+    </div>
+  </dl>
+</article>
+
+<style>
+  .stub {
+    --cut: var(--section-bg, var(--c-white));
+    --notch: 0.75rem;
+    --tilt-x: 0;
+    --tilt-y: 0;
+    position: relative;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    height: 100%;
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-lg);
+    background: var(--c-white);
+    box-shadow: var(--shadow-1);
+    transform: perspective(60rem) rotateX(calc(var(--tilt-y) * -5deg))
+      rotateY(calc(var(--tilt-x) * 7deg));
+    transition:
+      transform 500ms var(--ease-out),
+      box-shadow var(--dur-ui) ease;
+  }
+
+  .stub__art {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: calc(var(--radius-lg) - 1px) calc(var(--radius-lg) - 1px) 0 0;
+    overflow: hidden;
+  }
+
+  .stub__picture {
+    position: absolute;
+    inset: -4%;
+    transform: translate(calc(var(--tilt-x) * -3%), calc(var(--tilt-y) * -3%));
+    transition: transform 500ms var(--ease-out);
+  }
+
+  /* The rubber stamp of the boarding pass, now saying the journey is done. */
+  .stub__stamp {
+    position: absolute;
+    right: var(--space-4);
+    bottom: var(--space-3);
+    display: grid;
+    justify-items: center;
+    padding: 0.3125rem var(--space-3);
+    border: 0.1875rem solid var(--c-red);
+    border-radius: var(--radius-sm);
+    outline: 0.0625rem solid var(--c-red);
+    outline-offset: 0.1875rem;
+    background: rgb(255 255 255 / 0.55);
+    color: var(--c-red);
+    font-stretch: var(--wdth-display);
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: 0.05em;
+    mix-blend-mode: multiply;
+    transform: rotate(-9deg);
+  }
+
+  .stub__stamp-date {
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+  }
+
+  .stub__main {
+    display: grid;
+    align-content: start;
+    gap: var(--space-2);
+    padding: var(--space-5) var(--space-5) var(--space-4);
+  }
+
+  .stub__group {
+    color: var(--c-brown);
+    font-stretch: var(--wdth-sign);
+    font-size: var(--text-small);
+    font-weight: 650;
+  }
+
+  .stub__title {
+    font-size: var(--text-h3);
+  }
+
+  .stub__title a {
+    text-decoration: none;
+  }
+
+  /* The whole ticket is one target; the link stretches over it. */
+  .stub__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: var(--radius-lg);
+  }
+
+  .stub__date {
+    color: var(--c-muted);
+    font-weight: 550;
+  }
+
+  .stub__figures {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin: 0;
+    padding: var(--space-4) var(--space-5) var(--space-5);
+    border-top: 0.125rem dashed var(--c-line);
+  }
+
+  /* Punched notches where the stub tears off. */
+  .stub__figures::before,
+  .stub__figures::after {
+    content: '';
+    position: absolute;
+    top: calc(var(--notch) * -1 - 1px);
+    width: calc(var(--notch) * 2);
+    height: calc(var(--notch) * 2);
+    border: 1px solid var(--c-line);
+    border-radius: 50%;
+    background: var(--cut);
+  }
+
+  .stub__figures::before {
+    left: calc(var(--notch) * -1 - 1px);
+    clip-path: inset(0 0 0 50%);
+  }
+
+  .stub__figures::after {
+    right: calc(var(--notch) * -1 - 1px);
+    clip-path: inset(0 50% 0 0);
+  }
+
+  /* The conductor punched it: a used ticket. */
+  .stub__punch {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background: var(--cut);
+    box-shadow: inset 0 0.0625rem 0.125rem rgb(27 31 36 / 0.45);
+  }
+
+  .stub__figures dt {
+    color: var(--c-muted);
+    font-size: var(--text-caption);
+  }
+
+  .stub__figures dd {
+    margin: 0;
+    font-weight: 650;
+  }
+
+  .stub:has(a:active) {
+    transform: scale(0.99);
+  }
+
+  .stub:has(a:focus-visible) {
+    outline: 3px solid var(--c-blue);
+    outline-offset: 3px;
+  }
+
+  .stub__title a:focus-visible {
+    outline: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .stub:hover {
+      box-shadow: var(--shadow-2);
+    }
+
+    .stub:hover,
+    .stub:hover .stub__picture {
+      transition-duration: 140ms, var(--dur-ui);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stub,
+    .stub__picture {
+      transform: none;
+    }
+  }
+</style>

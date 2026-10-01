@@ -2,6 +2,7 @@
 import PageHead from '@/components/layout/PageHead.astro';
 import SceneSprite from '@/components/scenes/SceneSprite.astro';
 import TourTicket from '@/components/tour/TourTicket.astro';
+import FilterChips from '@/components/ui/FilterChips.astro';
 import { tourCatalog } from '@/composition/catalog';
 import { tr } from '@/i18n/tr';
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -28,21 +29,7 @@ const filters = [
   />
 
   <section class="container tours" aria-label="Tur Listesi">
-    <fieldset class="filter">
-      <legend class="visually-hidden">Tur Türü</legend>
-      {filters.map((filter, index) => (
-        <label class="chip">
-          <input
-            class="visually-hidden"
-            type="radio"
-            name="category"
-            value={filter.value}
-            checked={index === 0}
-          />
-          <span>{filter.label}</span>
-        </label>
-      ))}
-    </fieldset>
+    <FilterChips name="category" legend={tr.calendar.filter} options={filters} />
 
     <ul class="ticket-list">
       {tours.map((tour) => (
@@ -58,46 +45,6 @@ const filters = [
 <style>
   .tours {
     padding-block: var(--space-6) var(--space-section);
-  }
-
-  .filter {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    margin: 0 0 var(--space-6);
-    padding: 0;
-    border: 0;
-  }
-
-  .chip span {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.75rem;
-    padding: 0 var(--space-4);
-    border: 0.09375rem solid var(--c-line);
-    border-radius: var(--radius-md);
-    font-stretch: var(--wdth-sign);
-    font-weight: 600;
-    cursor: pointer;
-    transition:
-      background-color var(--dur-ui) ease,
-      border-color var(--dur-ui) ease,
-      transform var(--dur-press) var(--ease-out);
-  }
-
-  .chip span:active {
-    transform: scale(0.97);
-  }
-
-  .chip input:checked + span {
-    border-color: var(--c-blue);
-    background: var(--c-blue);
-    color: var(--c-white);
-  }
-
-  .chip input:focus-visible + span {
-    outline: 3px solid var(--c-blue);
-    outline-offset: 3px;
   }
 
   .ticket-list {
@@ -151,12 +98,6 @@ const filters = [
         opacity: 0;
         transform: translateY(0.75rem);
       }
-    }
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .chip input:not(:checked) + span:hover {
-      border-color: var(--c-muted);
     }
   }
 </style>

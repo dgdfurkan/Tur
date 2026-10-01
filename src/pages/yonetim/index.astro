@@ -1,12 +1,13 @@
 ---
 import PanelShell from '@/components/panel/PanelShell.astro';
 import SceneSprite from '@/components/scenes/SceneSprite.astro';
-import { loadTourSnapshots } from '@/composition/catalog';
+import { loadJourneySnapshots, loadTourSnapshots } from '@/composition/catalog';
 import { SCENE_KEYS } from '@/domain/tour/Tour';
 import { tr } from '@/i18n/tr';
 
 // "<" is escaped so the JSON can never close its own script element.
 const toursJson = JSON.stringify(await loadTourSnapshots()).replaceAll('<', '\\u003c');
+const journeysJson = JSON.stringify(await loadJourneySnapshots()).replaceAll('<', '\\u003c');
 ---
 
 <PanelShell
@@ -15,6 +16,7 @@ const toursJson = JSON.stringify(await loadTourSnapshots()).replaceAll('<', '\\u
   current="app"
 >
   <script is:inline type="application/json" data-tours set:html={toursJson} />
+  <script is:inline type="application/json" data-journeys set:html={journeysJson} />
   <div class="screens" data-screen-host></div>
   <SceneSprite scenes={SCENE_KEYS} />
 </PanelShell>

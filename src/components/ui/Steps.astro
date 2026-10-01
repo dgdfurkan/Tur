@@ -1,0 +1,119 @@
+---
+/**
+ * A sequence a visitor goes through, such as booking a seat. Each step is a
+ * numbered route marker, and a stretch of road leads from one to the next:
+ * down the page on a phone, across it on a wider screen.
+ */
+interface Props {
+  steps: readonly { title: string; text: string }[];
+  headingLevel?: 'h3' | 'h4';
+  /** Keeps the steps one under another on every screen, for a narrow column. */
+  vertical?: boolean;
+}
+
+const { steps, headingLevel: Heading = 'h3', vertical = false } = Astro.props;
+---
+
+<ol class:list={['steps', vertical && 'steps--vertical']}>
+  {steps.map((step, index) => (
+    <li class="step" data-reveal>
+      <span class="step__number tabular" aria-hidden="true">
+        {index + 1}
+      </span>
+      <div class="step__text">
+        <Heading class="step__title">{step.title}</Heading>
+        <p>{step.text}</p>
+      </div>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .steps {
+    --marker: 2.75rem;
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .step {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--marker) 1fr;
+    gap: var(--space-4);
+    align-items: start;
+  }
+
+  /* The road from this marker down to the next one. */
+  .step:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    top: calc(var(--marker) + var(--space-2));
+    bottom: calc(var(--space-2) - var(--space-5));
+    left: calc(var(--marker) / 2 - 0.125rem);
+    width: 0.25rem;
+    background: repeating-linear-gradient(180deg, var(--c-line) 0 1rem, transparent 1rem 1.6rem);
+  }
+
+  /* Route markers: blue, with the white rim of a road sign. */
+  .step__number {
+    display: grid;
+    place-items: center;
+    width: var(--marker);
+    height: var(--marker);
+    border-radius: var(--radius-md);
+    background: var(--c-blue);
+    box-shadow:
+      inset 0 0 0 0.1875rem var(--c-blue),
+      inset 0 0 0 0.3125rem var(--c-white);
+    color: var(--c-white);
+    font-stretch: var(--wdth-sign);
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .step__title {
+    font-size: 1.1875rem;
+    line-height: 1.25;
+  }
+
+  .step__text {
+    padding-top: 0.5rem;
+  }
+
+  .step p {
+    margin-top: var(--space-2);
+    max-width: 46ch;
+    color: var(--c-muted);
+  }
+
+  @media (min-width: 48rem) {
+    .steps:not(.steps--vertical) {
+      grid-auto-columns: minmax(0, 1fr);
+      grid-auto-flow: column;
+      gap: var(--space-6);
+    }
+
+    .steps:not(.steps--vertical) .step {
+      grid-template-columns: 1fr;
+    }
+
+    .steps:not(.steps--vertical) .step__text {
+      padding-top: 0;
+    }
+
+    /* Across the page now: from the right of this marker to the next one. */
+    .steps:not(.steps--vertical) .step:not(:last-child)::before {
+      top: calc(var(--marker) / 2 - 0.125rem);
+      bottom: auto;
+      left: calc(var(--marker) + var(--space-3));
+      right: calc(var(--space-3) - var(--space-6));
+      width: auto;
+      height: 0.25rem;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--c-line) 0 1.25rem,
+        transparent 1.25rem 2rem
+      );
+    }
+  }
+</style>

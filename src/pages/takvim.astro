@@ -1,0 +1,291 @@
+---
+import PageHead from '@/components/layout/PageHead.astro';
+import OccupancyMeter from '@/components/tour/OccupancyMeter.astro';
+import Button from '@/components/ui/Button.astro';
+import FilterChips from '@/components/ui/FilterChips.astro';
+import type { ScheduledTour } from '@/application/TourCatalogService';
+import { tourCatalog } from '@/composition/catalog';
+import { pageUrl } from '@/config/paths';
+import { tr } from '@/i18n/tr';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import {
+  formatDateRange,
+  formatDuration,
+  formatMoney,
+  formatMonthYear,
+  formatTime,
+  todayIso,
+} from '@/shared/format';
+
+const departures = await tourCatalog.upcomingDepartures(todayIso());
+const months = new Map<string, ScheduledTour[]>();
+for (const item of departures) {
+  const month = item.departure.startDate.slice(0, 7);
+  months.set(month, [...(months.get(month) ?? []), item]);
+}
+
+const weekday = new Intl.DateTimeFormat('tr-TR', { weekday: 'short', timeZone: 'UTC' });
+const dayOf = (iso: string) => {
+  const date = new Date(`${iso}T00:00:00Z`);
+  return { day: date.getUTCDate(), weekday: weekday.format(date) };
+};
+
+const filters = [
+  { value: 'all', label: tr.categories.all },
+  { value: 'kultur', label: tr.categories.kultur },
+  { value: 'doga', label: tr.categories.doga },
+  { value: 'gunubirlik', label: tr.categories.gunubirlik },
+];
+---
+
+<BaseLayout title={tr.calendar.title} description={tr.calendar.lead}>
+  <PageHead title={tr.calendar.title} lead={tr.calendar.lead} />
+
+  <div class="container calendar">
+    <FilterChips name="category" legend={tr.calendar.filter} options={filters} />
+
+    {months.size === 0 ? (
+      <p class="calendar__empty">{tr.calendar.empty}</p>
+    ) : (
+      [...months].map(([month, items]) => (
+        <section class="month" aria-labelledby={`ay-${month}`}>
+          <h2 class="month__title" id={`ay-${month}`}>
+            {formatMonthYear(`${month}-01`)}
+          </h2>
+          <ol class="month__list">
+            {items.map(({ tour, departure }) => {
+              const start = dayOf(departure.startDate);
+              return (
+                <li
+                  class="slot"
+                  data-tour-card={tour.id}
+                  data-category={tour.category}
+                  data-level={departure.occupancy.level}
+                >
+                  <span class="slot__date" aria-hidden="true">
+                    <span class="slot__weekday">{start.weekday}</span>
+                    <span class="slot__day tabular">{start.day}</span>
+                  </span>
+                  <div class="slot__main">
+                    <h3 class="slot__title">
+                      <a href={`${pageUrl(`turlar/${tour.id}`)}#kalkis-tarihleri`}>{tour.title}</a>
+                    </h3>
+                    <p class="slot__meta">
+                      {formatDateRange(departure.startDate, departure.endDate)},{' '}
+                      {formatDuration(tour.nights, tour.dayCount)}, {formatTime(departure.time)}
+                    </p>
+                  </div>
+                  <p class="slot__price">
+                    <span class="slot__label">{tr.tour.perPerson}</span>
+                    <strong class="tabular" data-price-for={tour.id}>
+                      {formatMoney(tour.price)}
+                    </strong>
+                  </p>
+                  <div class="slot__seats">
+                    <OccupancyMeter occupancy={departure.occupancy} departureId={departure.id} />
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+      ))
+    )}
+
+    <div class="calendar__more">
+      <Button href={pageUrl('turlar')} variant="secondary">
+        {tr.actions.allTours}
+      </Button>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .calendar {
+    display: grid;
+    gap: var(--space-7);
+    padding-block: var(--space-6) var(--space-section);
+  }
+
+  .calendar :global(.filter) {
+    margin-bottom: 0;
+  }
+
+  .month {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  /* The month stays in view above its departures while they scroll past. */
+  .month__title {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding-block: var(--space-3);
+    background: linear-gradient(var(--c-white) 80%, rgb(255 255 255 / 0));
+    font-size: var(--text-h3);
+  }
+
+  .month__list {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .slot {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'date main'
+      'date price'
+      'seats seats';
+    gap: var(--space-2) var(--space-4);
+    align-items: center;
+    padding: var(--space-4);
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-lg);
+    background: var(--c-white);
+    transition:
+      border-color var(--dur-ui) ease,
+      box-shadow var(--dur-ui) ease;
+  }
+
+  /* A tear-off calendar leaf with the weekday on its blue band. */
+  .slot__date {
+    grid-area: date;
+    display: grid;
+    align-self: start;
+    width: 3.75rem;
+    overflow: hidden;
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius-md);
+    text-align: center;
+  }
+
+  .slot__weekday {
+    padding-block: 0.125rem;
+    background: var(--c-blue);
+    color: var(--c-white);
+    font-stretch: var(--wdth-sign);
+    font-size: var(--text-caption);
+    font-weight: 650;
+  }
+
+  .slot__day {
+    padding-block: var(--space-1);
+    font-stretch: var(--wdth-display);
+    font-size: 1.75rem;
+    font-weight: 780;
+    line-height: 1.15;
+  }
+
+  .slot[data-level='full'] .slot__weekday {
+    background: var(--c-muted);
+  }
+
+  .slot__main {
+    grid-area: main;
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .slot__title {
+    font-size: 1.1875rem;
+  }
+
+  .slot__title a {
+    text-decoration: none;
+  }
+
+  /* The whole row is one target. */
+  .slot__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-lg);
+  }
+
+  .slot__meta {
+    color: var(--c-muted);
+    font-size: var(--text-small);
+  }
+
+  .slot__price {
+    grid-area: price;
+  }
+
+  .slot__label {
+    display: block;
+    color: var(--c-muted);
+    font-size: var(--text-caption);
+  }
+
+  .slot__price strong {
+    font-stretch: var(--wdth-heading);
+    font-size: 1.375rem;
+    font-weight: 750;
+  }
+
+  .slot__seats {
+    grid-area: seats;
+    padding-top: var(--space-2);
+  }
+
+  .slot:has(a:focus-visible) {
+    outline: 3px solid var(--c-blue);
+    outline-offset: 3px;
+  }
+
+  .slot__title a:focus-visible {
+    outline: none;
+  }
+
+  .slot:has(a:active) {
+    transform: scale(0.995);
+  }
+
+  .calendar__empty {
+    color: var(--c-muted);
+  }
+
+  /* Filtering needs no script: the checked radio decides which departures show. */
+  .calendar:has(input[value='kultur']:checked) .slot:not([data-category='kultur']),
+  .calendar:has(input[value='doga']:checked) .slot:not([data-category='doga']),
+  .calendar:has(input[value='gunubirlik']:checked) .slot:not([data-category='gunubirlik']) {
+    display: none;
+  }
+
+  .month:not(:has(.slot:not([hidden]))),
+  .calendar:has(input[value='kultur']:checked)
+    .month:not(:has(.slot[data-category='kultur']:not([hidden]))),
+  .calendar:has(input[value='doga']:checked)
+    .month:not(:has(.slot[data-category='doga']:not([hidden]))),
+  .calendar:has(input[value='gunubirlik']:checked)
+    .month:not(:has(.slot[data-category='gunubirlik']:not([hidden]))) {
+    display: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .slot:hover {
+      border-color: var(--c-muted);
+      box-shadow: var(--shadow-1);
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .slot {
+      grid-template-columns: auto minmax(0, 1fr) 9rem 13rem;
+      grid-template-areas: 'date main price seats';
+      gap: var(--space-5);
+      padding: var(--space-4) var(--space-5);
+    }
+
+    .slot__date {
+      align-self: center;
+    }
+
+    .slot__seats {
+      padding-top: 0;
+    }
+  }
+</style>

@@ -1,0 +1,86 @@
+[
+  {
+    "id": "yer-ayirtma",
+    "topic": "rezervasyon",
+    "featured": true,
+    "question": "Yerimi Nasıl Ayırtırım?",
+    "answer": "Tur sayfasındaki kalkış tarihlerinden size uygun olanı seçtikten sonra ofisimizi arayabilir veya WhatsApp üzerinden yazabilirsiniz. Boş koltuklardan biri adınıza ayrılır ve ön ödeme bilgisi size iletilir."
+  },
+  {
+    "id": "on-odeme",
+    "topic": "rezervasyon",
+    "featured": true,
+    "question": "Koltuğum Ne Zaman Kesinleşir?",
+    "answer": "Koltuğunuz, ön ödemenin alınmasıyla kesinleşir. Ön ödeme tutarı ve kalan ödemenin son günü, düzenlenen paket tur sözleşmesinde yazılır."
+  },
+  {
+    "id": "odeme-yontemi",
+    "topic": "rezervasyon",
+    "featured": false,
+    "question": "Ödemeyi Nasıl Yapabilirim?",
+    "answer": "Ödeme ofisimizde nakit veya kartla ya da banka havalesiyle yapılabilir. Havale bilgileri rezervasyon sırasında size iletilir."
+  },
+  {
+    "id": "fiyat-kapsami",
+    "topic": "rezervasyon",
+    "featured": true,
+    "question": "Fiyata Neler Dâhildir?",
+    "answer": "Her tur sayfasında fiyata dâhil olan ve olmayan hizmetler ayrı ayrı listelenir. Listede yer almayan bir hizmet fiyata dâhil değildir."
+  },
+  {
+    "id": "tek-kisilik-oda",
+    "topic": "rezervasyon",
+    "featured": false,
+    "question": "Tek Kişilik Oda Ayırtabilir miyim?",
+    "answer": "Konaklamalı turlarda tek kişilik oda ayırtılabilir. Oda farkı, tur sayfasında kişi başı fiyatın altında yazılır."
+  },
+  {
+    "id": "tur-iptali",
+    "topic": "rezervasyon",
+    "featured": false,
+    "question": "Tur İptal Edilirse Ne Olur?",
+    "answer": "Yeterli katılım sağlanamaması gibi bir nedenle tur ofisimiz tarafından iptal edilirse ödediğiniz tutarın tamamı size iade edilir. Sizin tarafınızdan yapılan iptallerde uygulanacak koşullar paket tur sözleşmesinde yazılır."
+  },
+  {
+    "id": "bulusma-noktasi",
+    "topic": "yolculuk",
+    "featured": true,
+    "question": "Buluşma Noktası Neresidir?",
+    "answer": "Her kalkışın buluşma noktası ve saati, tur sayfasındaki kalkış tarihleri bölümünde yazılır. Bu bilgiler kalkıştan önceki gün size yeniden bildirilir."
+  },
+  {
+    "id": "koltuk-secimi",
+    "topic": "yolculuk",
+    "featured": false,
+    "question": "Koltuğumu Seçebilir miyim?",
+    "answer": "Koltuk durumu planında boş görünen koltuklardan birini yer ayırtırken belirtebilirsiniz. Koltuklar, ayırtılma sırasına göre verilir."
+  },
+  {
+    "id": "molalar",
+    "topic": "yolculuk",
+    "featured": false,
+    "question": "Yolda Mola Veriliyor mu?",
+    "answer": "Mola yerleri, her turun günlük programında ayrıca gösterilir. Molalarda yemek ve dinlenme için yeterli zaman ayrılır."
+  },
+  {
+    "id": "sigorta",
+    "topic": "yolculuk",
+    "featured": false,
+    "question": "Misafirler Sigortalı mıdır?",
+    "answer": "Her misafir, tur başlamadan önce sigorta kapsamına alınır. Bunun için gereken kimlik bilgileri yer ayırtma sırasında alınır."
+  },
+  {
+    "id": "okul-teklifi",
+    "topic": "kurumsal",
+    "featured": false,
+    "question": "Okul Gezisi İçin Teklif Nasıl Alınır?",
+    "answer": "Katılımcı sayısı, tarih aralığı ve gidilmek istenen bölge ofisimize iletildikten sonra üç iş günü içinde günlük program ve kişi başı fiyat yazılı olarak sunulur."
+  },
+  {
+    "id": "arac-belgeleri",
+    "topic": "kurumsal",
+    "featured": false,
+    "question": "Araç ve Sürücü Belgeleri Paylaşılır mı?",
+    "answer": "Araç ve sürücü belgeleri, gezi öncesinde okul idaresine veya kuruma yazılı olarak sunulur."
+  }
+]

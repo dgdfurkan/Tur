@@ -1,5 +1,9 @@
 ---
+import FaqList from '@/components/faq/FaqList.astro';
 import DistanceSign from '@/components/home/DistanceSign.astro';
+import JourneyStub from '@/components/journey/JourneyStub.astro';
+import JourneySync from '@/components/journey/JourneySync.astro';
+import Odometer from '@/components/journey/Odometer.astro';
 import RoadScene from '@/components/home/RoadScene.astro';
 import SceneSprite from '@/components/scenes/SceneSprite.astro';
 import ServiceSign from '@/components/home/ServiceSign.astro';
@@ -8,17 +12,23 @@ import TourTicket from '@/components/tour/TourTicket.astro';
 import Button from '@/components/ui/Button.astro';
 import Icon from '@/components/ui/Icon.astro';
 import SectionHeading from '@/components/ui/SectionHeading.astro';
-import { tourCatalog } from '@/composition/catalog';
+import Steps from '@/components/ui/Steps.astro';
+import { journeyArchive, loadFaq, tourCatalog } from '@/composition/catalog';
 import { pageUrl } from '@/config/paths';
 import { siteConfig } from '@/config/site';
+import { totalsOf } from '@/domain/journey/Journey';
 import { tr } from '@/i18n/tr';
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { todayIso } from '@/shared/format';
+import { formatKm, formatNumber, todayIso } from '@/shared/format';
 
 const today = todayIso();
 const tours = await tourCatalog.listTours();
 
 const upcoming = await tourCatalog.nextDepartures(today, 4);
+const journeys = await journeyArchive.list();
+const journeyTotals = totalsOf(journeys);
+const latestJourneys = journeys.slice(0, 3);
+const questions = (await loadFaq()).filter((question) => question.featured);
 
 const services = [
   {
@@ -48,8 +58,10 @@ const services = [
   <section class="hero">
     <div class="container hero__inner">
       <div class="hero__copy">
-        <h1>{siteConfig.home.title}</h1>
-        <p class="lead">{siteConfig.home.lead}</p>
+        <h1 data-site-text="heroTitle">{siteConfig.home.title}</h1>
+        <p class="lead" data-site-text="heroLead">
+          {siteConfig.home.lead}
+        </p>
       </div>
       <div class="hero__actions">
         <Button href={pageUrl('turlar')} size="lg">
@@ -86,6 +98,9 @@ const services = [
         <Button href={pageUrl('turlar')} variant="secondary">
           {tr.actions.allTours}
         </Button>
+        <Button href={pageUrl('takvim')} variant="secondary">
+          {tr.actions.calendar}
+        </Button>
       </div>
     </div>
   </section>
@@ -101,6 +116,46 @@ const services = [
     </div>
   </section>
 
+  <section class="section section--mist" aria-labelledby="rezervasyon">
+    <div class="container">
+      <SectionHeading id="rezervasyon" title={tr.booking.title} lead={tr.booking.lead} />
+      <Steps steps={tr.booking.steps} />
+    </div>
+  </section>
+
+  {latestJourneys.length > 0 && (
+    <section class="section" aria-labelledby="gecmis-turlar">
+      <div class="container">
+        <div class="journeys__intro">
+          <SectionHeading
+            id="gecmis-turlar"
+            title={tr.journeys.teaser}
+            lead={tr.journeys.teaserLead}
+          />
+          <Odometer km={journeyTotals.distanceKm}>
+            {tr.journeys.totals(
+              formatNumber(journeyTotals.count),
+              formatNumber(journeyTotals.guests),
+              formatKm(journeyTotals.distanceKm),
+            )}
+          </Odometer>
+        </div>
+        <ul class="ticket-list ticket-list--three">
+          {latestJourneys.map((journey) => (
+            <li data-reveal data-journey-card={journey.id}>
+              <JourneyStub journey={journey} />
+            </li>
+          ))}
+        </ul>
+        <div class="section__more">
+          <Button href={pageUrl('gecmis-turlar')} variant="secondary">
+            {tr.actions.pastTours}
+          </Button>
+        </div>
+      </div>
+    </section>
+  )}
+
   <section class="section section--mist" aria-labelledby="hizmetler">
     <div class="container">
       <SectionHeading id="hizmetler" title="Her Turda Standart Olan Hizmetler" />
@@ -109,6 +164,20 @@ const services = [
           <ServiceSign {...service} />
         ))}
       </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="sorular">
+    <div class="container">
+      <div class="questions">
+        <div class="questions__head">
+          <SectionHeading id="sorular" title={tr.faq.title} lead={tr.faq.lead} />
+          <Button href={pageUrl('sss')} variant="secondary">
+            {tr.actions.allQuestions}
+          </Button>
+        </div>
+        <FaqList items={questions} name="ana-sayfa-sss" />
+      </div>
     </div>
   </section>
 
@@ -128,7 +197,10 @@ const services = [
       </div>
     </div>
   </section>
-  <SceneSprite scenes={tours.map((tour) => tour.scene)} />
+  <SceneSprite
+    scenes={[...tours.map((tour) => tour.scene), ...latestJourneys.map((journey) => journey.scene)]}
+  />
+  <JourneySync />
 </BaseLayout>
 
 <style>
@@ -225,8 +297,56 @@ const services = [
     }
   }
 
+  @media (min-width: 60rem) {
+    .ticket-list--three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .journeys__intro {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--space-8);
+    }
+  }
+
+  @media (min-width: 76rem) {
+    .ticket-list--three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
   .section__more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
     margin-top: var(--space-6);
+  }
+
+  .journeys__intro {
+    display: grid;
+    gap: var(--space-5);
+    align-items: end;
+    margin-bottom: var(--space-7);
+  }
+
+  .journeys__intro :global(.section-heading) {
+    margin-bottom: 0;
+  }
+
+  .questions {
+    display: grid;
+    gap: var(--space-2);
+    max-width: 56rem;
+  }
+
+  .questions__head {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+    margin-bottom: var(--space-5);
+  }
+
+  .questions__head :global(.section-heading) {
+    margin-bottom: 0;
   }
 
   .services {

@@ -7,6 +7,8 @@ import { tr } from '@/i18n/tr';
 
 const links = [
   { href: pageUrl('turlar'), label: tr.nav.tours },
+  { href: pageUrl('takvim'), label: tr.nav.calendar },
+  { href: pageUrl('gecmis-turlar'), label: tr.nav.pastTours },
   { href: pageUrl('kurumsal'), label: tr.nav.corporate },
   { href: pageUrl('iletisim'), label: tr.nav.contact },
 ];
@@ -17,9 +19,12 @@ const isCurrent = (href: string): boolean => currentPath.startsWith(href);
 
 <header class="site-header">
   <div class="container site-header__inner">
-    <a class="brand" href={pageUrl()} aria-label={`${siteConfig.brand.name}, ${tr.nav.home}`}>
+    <a class="brand" href={pageUrl()}>
       <BrandMark />
-      <span class="brand__name">{siteConfig.brand.name}</span>
+      <span class="brand__name" data-site-text="brandName">
+        {siteConfig.brand.name}
+      </span>
+      <span class="visually-hidden">, {tr.nav.home}</span>
     </a>
 
     <nav class="nav" aria-label={tr.nav.label}>
@@ -48,7 +53,9 @@ const isCurrent = (href: string): boolean => currentPath.startsWith(href);
     <div class="menu__top">
       <span class="brand">
         <BrandMark />
-        <span class="brand__name">{siteConfig.brand.name}</span>
+        <span class="brand__name" data-site-text="brandName">
+          {siteConfig.brand.name}
+        </span>
       </span>
       <button
         class="menu-button"
@@ -166,6 +173,8 @@ const isCurrent = (href: string): boolean => currentPath.startsWith(href);
     border: 0;
     background: var(--c-white);
     color: var(--c-asphalt);
+    overflow-y: auto;
+    overscroll-behavior: contain;
     opacity: 0;
     transition:
       opacity var(--dur-ui) ease,
@@ -192,8 +201,8 @@ const isCurrent = (href: string): boolean => currentPath.startsWith(href);
 
   .menu__list {
     display: grid;
-    gap: var(--space-4);
-    margin-top: var(--space-6);
+    gap: var(--space-3);
+    margin-top: var(--space-5);
   }
 
   .menu__link {
@@ -215,12 +224,12 @@ const isCurrent = (href: string): boolean => currentPath.startsWith(href);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--space-4) var(--space-5);
+    padding: var(--space-3) var(--space-5);
     border: 0.15625rem solid var(--c-white);
     border-radius: calc(var(--radius-sign) - 0.3125rem);
     font-stretch: var(--wdth-sign);
     font-weight: 650;
-    font-size: 1.625rem;
+    font-size: 1.5rem;
   }
 
   /* Direction signs slide in one after another, like passing a junction. */
@@ -245,6 +254,14 @@ const isCurrent = (href: string): boolean => currentPath.startsWith(href);
     transition-delay: 120ms;
   }
 
+  .menu:popover-open .menu__item:nth-child(4) {
+    transition-delay: 180ms;
+  }
+
+  .menu:popover-open .menu__item:nth-child(5) {
+    transition-delay: 240ms;
+  }
+
   @starting-style {
     .menu:popover-open .menu__item {
       opacity: 0;
@@ -262,7 +279,7 @@ const isCurrent = (href: string): boolean => currentPath.startsWith(href);
     }
   }
 
-  @media (min-width: 40rem) {
+  @media (min-width: 60rem) {
     .nav {
       display: block;
     }

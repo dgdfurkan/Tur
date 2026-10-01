@@ -20,10 +20,13 @@ export interface SiteConfig {
     readonly email: string | null;
     readonly address: string | null;
     readonly hours: string | null;
+    readonly instagram: string | null;
   };
   readonly license: {
     readonly tursabNumber: string | null;
   };
+  /** A notice shown above the header on every page; null shows none. */
+  readonly announcement: string | null;
   readonly isPrototype: boolean;
 }
 
@@ -44,9 +47,11 @@ export const siteConfig: SiteConfig = {
     email: null,
     address: null,
     hours: null,
+    instagram: null,
   },
   license: {
     tursabNumber: null,
   },
+  announcement: null,
   isPrototype: true,
 };

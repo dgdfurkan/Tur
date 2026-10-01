@@ -1,12 +1,23 @@
 import type { HotelData, StopData } from '@/application/dto/TourData';
 import { InvalidTourError } from '@/application/TourCatalogEditor';
 import { setDay, setHotels, setList, setStop } from '@/application/tourEdits';
-import { SCENE_KEYS, type SceneKey } from '@/domain/tour/Tour';
+import type { SceneKey } from '@/domain/tour/Tour';
 import { tr } from '@/i18n/tr';
 import { formatMinutes, formatNumber } from '@/shared/format';
 import type { AppContext, Screen } from '../context';
 import { el } from '../ui/dom';
-import { block, button, field, group, icon, iconButton, row, scene, screen } from '../ui/kit';
+import {
+  block,
+  button,
+  field,
+  group,
+  icon,
+  iconButton,
+  row,
+  scene,
+  sceneStrip,
+  screen,
+} from '../ui/kit';
 import { tap } from '../ui/motion';
 import { editText } from './editSheets';
 
@@ -155,33 +166,13 @@ function editStop(
   duration.value = stop.durationMinutes === undefined ? '' : String(stop.durationMinutes);
 
   let chosenScene: SceneKey = stop.scene;
-  const scenePicker = el(
-    'div',
-    { class: 'scene-strip', attrs: { role: 'radiogroup', 'aria-label': tr.admin.tour.picture } },
-    SCENE_KEYS.map((key) =>
-      el(
-        'button',
-        {
-          class: 'scene-grid__item',
-          attrs: {
-            type: 'button',
-            role: 'radio',
-            'aria-checked': String(key === chosenScene),
-            'aria-label': tr.admin.scenes[key],
-          },
-          on: {
-            click: (event) => {
-              chosenScene = key;
-              for (const item of scenePicker.querySelectorAll('[role="radio"]')) {
-                item.setAttribute('aria-checked', String(item === event.currentTarget));
-              }
-            },
-          },
-        },
-        [scene(key)],
-      ),
-    ),
-  );
+  const scenePicker = sceneStrip({
+    label: tr.admin.tour.picture,
+    value: chosenScene,
+    onChange: (key) => {
+      chosenScene = key;
+    },
+  });
 
   const facts = Array.from({ length: MAX_FACTS }, (_, index) => {
     const label = el('input', {
@@ -216,7 +207,7 @@ function editStop(
     }),
     el('fieldset', { class: 'field' }, [
       el('legend', { text: tr.admin.tour.picture }),
-      scenePicker,
+      scenePicker.element,
     ]),
     el('fieldset', { class: 'field' }, [
       el('legend', { text: tr.admin.program.facts }),

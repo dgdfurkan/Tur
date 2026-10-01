@@ -1,0 +1,131 @@
+---
+import type { Departure } from '@/domain/tour/Departure';
+import type { Tour } from '@/domain/tour/Tour';
+import { tr } from '@/i18n/tr';
+import { formatDateRange, formatMoney } from '@/shared/format';
+
+/**
+ * On a phone, the price and a way to book stay at the bottom of the screen
+ * once the fare box has scrolled away; they step aside while the booking
+ * section or the footer is in view.
+ */
+interface Props {
+  tour: Tour;
+  next?: Departure | undefined;
+  target: string;
+}
+
+const { tour, next, target } = Astro.props;
+---
+
+<div class="booking-bar" data-booking-bar>
+  <div class="booking-bar__inner">
+    <p class="booking-bar__fare">
+      <span class="booking-bar__label">
+        {next ? formatDateRange(next.startDate, next.endDate) : tr.tour.perPerson}
+      </span>
+      <strong class="tabular" data-price-for={tour.id}>
+        {formatMoney(tour.price)}
+      </strong>
+    </p>
+    <a class="booking-bar__action" href={`#${target}`}>
+      {tr.actions.reserve}
+    </a>
+  </div>
+</div>
+
+<script>
+  const bar = document.querySelector<HTMLElement>('[data-booking-bar]');
+  const watched = [
+    document.querySelector('[data-fare]'),
+    document.querySelector('[data-booking]'),
+    document.querySelector('.site-footer'),
+  ].filter((element): element is Element => element !== null);
+  if (bar && watched.length > 0) {
+    // The bar shows only while none of the places that already offer the booking is in view.
+    const inView = new Set<Element>();
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) inView.add(entry.target);
+        else inView.delete(entry.target);
+      }
+      bar.toggleAttribute('data-shown', inView.size === 0);
+    });
+    for (const element of watched) observer.observe(element);
+  }
+</script>
+
+<style>
+  .booking-bar {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: var(--z-sticky);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    border-top: 1px solid var(--c-line);
+    background: rgb(255 255 255 / 0.96);
+    box-shadow: 0 -8px 24px rgb(27 31 36 / 0.08);
+    visibility: hidden;
+    transform: translateY(110%);
+    transition:
+      transform 360ms var(--ease-drawer),
+      visibility 0s linear 360ms;
+  }
+
+  .booking-bar[data-shown] {
+    visibility: visible;
+    transform: none;
+    transition: transform 360ms var(--ease-drawer);
+  }
+
+  .booking-bar__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--gutter);
+  }
+
+  .booking-bar__label {
+    display: block;
+    color: var(--c-muted);
+    font-size: var(--text-caption);
+  }
+
+  .booking-bar__fare strong {
+    font-stretch: var(--wdth-heading);
+    font-size: 1.5rem;
+    font-weight: 780;
+    line-height: 1.1;
+  }
+
+  .booking-bar__action {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    padding: 0 var(--space-6);
+    border-radius: var(--radius-md);
+    background: var(--c-blue);
+    color: var(--c-white);
+    font-stretch: var(--wdth-sign);
+    font-weight: 650;
+    text-decoration: none;
+    transition: transform var(--dur-press) var(--ease-out);
+  }
+
+  .booking-bar__action:active {
+    transform: scale(0.97);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .booking-bar,
+    .booking-bar[data-shown] {
+      transition: none;
+    }
+  }
+
+  @media (min-width: 60rem) {
+    .booking-bar {
+      display: none;
+    }
+  }
+</style>

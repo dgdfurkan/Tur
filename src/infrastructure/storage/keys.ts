@@ -5,3 +5,4 @@
  */
 export const TOUR_DRAFTS_KEY = 'tour-drafts';
 export const SITE_SETTINGS_KEY = 'site-settings';
+export const JOURNEY_DRAFTS_KEY = 'journey-drafts';

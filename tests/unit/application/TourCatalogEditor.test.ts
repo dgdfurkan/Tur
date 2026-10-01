@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import {
-  checkTour,
-  fingerprint,
-  InvalidTourError,
-  TourCatalogEditor,
-} from '@/application/TourCatalogEditor';
+import { fingerprint } from '@/application/fingerprint';
+import { checkTour, InvalidTourError, TourCatalogEditor } from '@/application/TourCatalogEditor';
 import {
   addDays,
   newDepartureId,

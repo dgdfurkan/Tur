@@ -2701,3 +2701,10 @@ button.seat:focus-visible {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+button.block__link {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}

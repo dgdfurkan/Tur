@@ -1,0 +1,31 @@
+{
+  "tour": "beypazari-gunubirlik",
+  "title": "Beypazarı Günübirlik Turu",
+  "scene": "seyir",
+  "startDate": "2026-09-26",
+  "endDate": "2026-09-26",
+  "group": "okul",
+  "guests": 38,
+  "distanceKm": 220,
+  "story": "Bir ortaokulun yedinci sınıf öğrencileri ve öğretmenleri için Beypazarı'na günübirlik gezi düzenlendi. Program, sosyal bilgiler dersindeki kültürel miras ve el sanatları konularına göre öğretmenlerle birlikte hazırlandı.",
+  "moments": [
+    {
+      "day": 1,
+      "place": "Tarihî Beypazarı Evleri",
+      "scene": "konak",
+      "note": "Öğrenciler, üç katlı ahşap konakların yapım tekniğini Yaşayan Müze'de yerinde inceledi."
+    },
+    {
+      "day": 1,
+      "place": "Alaaddin Sokak Çarşısı",
+      "scene": "carsi",
+      "note": "Telkâri atölyesinde gümüş tellerin nasıl işlendiği izlendi."
+    },
+    {
+      "day": 1,
+      "place": "Hıdırlık Tepesi",
+      "scene": "seyir",
+      "note": "Gezi, ilçenin tamamını gören seyir tepesinde çekilen sınıf fotoğrafıyla tamamlandı."
+    }
+  ]
+}

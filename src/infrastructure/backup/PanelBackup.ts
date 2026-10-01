@@ -1,6 +1,8 @@
+import type { JourneyDraftRepository } from '@/application/JourneyArchiveEditor';
 import { siteSettingsSchema, type SiteSettingsRepository } from '@/application/SiteSettings';
 import type { TourDraftRepository } from '@/application/TourCatalogEditor';
 import type { PassengerRepository } from '@/domain/booking/PassengerRepository';
+import { LocalJourneyDrafts } from '../storage/LocalJourneyDrafts';
 import { LocalPassengerRepository } from '../storage/LocalPassengerRepository';
 import { LocalTourDrafts } from '../storage/LocalTourDrafts';
 
@@ -11,18 +13,24 @@ const BACKUP_VERSION = 1;
 export interface PanelStores {
   readonly passengers: PassengerRepository;
   readonly drafts: TourDraftRepository;
+  readonly journeys: JourneyDraftRepository;
   readonly settings: SiteSettingsRepository;
 }
 
 export type RestoreResult =
-  | { readonly ok: true; readonly passengers: number; readonly tours: number }
+  | {
+      readonly ok: true;
+      readonly passengers: number;
+      readonly tours: number;
+      readonly journeys: number;
+    }
   | { readonly ok: false };
 
 /**
  * Everything the panel keeps on this device in one JSON file: passengers,
- * changed tours and site settings. Until the panel shares its data through a
- * server, a backup is how records move to another device or survive a
- * cleared browser.
+ * changed tours, changed and recorded journeys, and site settings. Until the
+ * panel shares its data through a server, a backup is how records move to
+ * another device or survive a cleared browser.
  */
 export function createBackup(stores: PanelStores, now: Date): string {
   return JSON.stringify(
@@ -32,6 +40,7 @@ export function createBackup(stores: PanelStores, now: Date): string {
       createdAt: now.toISOString(),
       passengers: stores.passengers.findAll().map(LocalPassengerRepository.toPlain),
       tourDrafts: stores.drafts.load(),
+      journeyDrafts: stores.journeys.load(),
       siteSettings: stores.settings.load(),
     },
     null,
@@ -59,11 +68,19 @@ export function restoreBackup(text: string, stores: PanelStores): RestoreResult 
   const rawPassengers = Array.isArray(backup['passengers']) ? backup['passengers'] : [];
   const passengers = rawPassengers.flatMap((item) => LocalPassengerRepository.revive(item) ?? []);
   const drafts = LocalTourDrafts.revive(backup['tourDrafts']);
+  // Backups made before journeys could be recorded have none.
+  const journeys = LocalJourneyDrafts.revive(backup['journeyDrafts']);
 
   stores.passengers.replaceAll(passengers);
   stores.drafts.save(drafts);
+  stores.journeys.save(journeys);
   const settings = siteSettingsSchema.safeParse(backup['siteSettings']);
   if (settings.success) stores.settings.save(settings.data);
   else stores.settings.clear();
-  return { ok: true, passengers: passengers.length, tours: Object.keys(drafts).length };
+  return {
+    ok: true,
+    passengers: passengers.length,
+    tours: Object.keys(drafts).length,
+    journeys: Object.keys(journeys).length,
+  };
 }

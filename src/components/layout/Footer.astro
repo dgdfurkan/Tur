@@ -1,17 +1,44 @@
 ---
 import Coach from '@/components/scenes/parts/Coach.astro';
 import BrandMark from '@/components/ui/BrandMark.astro';
+import { tourCatalog } from '@/composition/catalog';
 import { pageUrl } from '@/config/paths';
 import { siteConfig } from '@/config/site';
 import { tr } from '@/i18n/tr';
+import { mailHref, telHref, whatsappHref } from '@/shared/contactLinks';
 
 const year = new Date().getFullYear();
-const links = [
-  { href: pageUrl('turlar'), label: tr.nav.tours },
+const tours = await tourCatalog.listTours();
+// The operations panel is for staff: no public page links to it.
+const pages = [
+  { href: pageUrl('takvim'), label: tr.calendar.title },
+  { href: pageUrl('gecmis-turlar'), label: tr.nav.pastTours },
   { href: pageUrl('kurumsal'), label: tr.nav.corporate },
+  { href: pageUrl('sss'), label: tr.nav.faq },
   { href: pageUrl('iletisim'), label: tr.nav.contact },
-  // The operations panel is for staff: no public page links to it.
 ];
+
+const { contact, license } = siteConfig;
+const channels = [
+  {
+    channel: 'phone',
+    label: tr.contact.phone,
+    value: contact.phone,
+    href: contact.phone ? telHref(contact.phone) : null,
+  },
+  {
+    channel: 'whatsapp',
+    label: tr.contact.whatsapp,
+    value: contact.whatsapp,
+    href: contact.whatsapp ? whatsappHref(contact.whatsapp) : null,
+  },
+  {
+    channel: 'email',
+    label: tr.contact.email,
+    value: contact.email,
+    href: contact.email ? mailHref(contact.email) : null,
+  },
+] as const;
 ---
 
 <footer class="site-footer">
@@ -25,14 +52,36 @@ const links = [
     <div class="site-footer__brand">
       <span class="brand">
         <BrandMark />
-        <span class="brand__name">{siteConfig.brand.name}</span>
+        <span class="brand__name" data-site-text="brandName">
+          {siteConfig.brand.name}
+        </span>
       </span>
-      <p>{siteConfig.license.tursabNumber ?? tr.footer.licensePending}</p>
+      <p class="site-footer__about">{siteConfig.brand.description}</p>
+      <p
+        class="site-footer__license"
+        data-tursab
+        data-label={tr.contact.tursab('').trim()}
+        data-pending={tr.footer.licensePending}
+      >
+        {license.tursabNumber ? tr.contact.tursab(license.tursabNumber) : tr.footer.licensePending}
+      </p>
     </div>
 
-    <nav aria-label={tr.nav.footerLabel}>
-      <ul class="site-footer__links">
-        {links.map((link) => (
+    <nav class="site-footer__column" aria-labelledby="alt-turlar">
+      <h2 id="alt-turlar">{tr.nav.tours}</h2>
+      <ul>
+        {tours.map((tour) => (
+          <li data-tour-card={tour.id}>
+            <a href={pageUrl(`turlar/${tour.id}`)}>{tour.title}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <nav class="site-footer__column" aria-labelledby="alt-bilgi">
+      <h2 id="alt-bilgi">{tr.nav.information}</h2>
+      <ul>
+        {pages.map((link) => (
           <li>
             <a href={link.href}>{link.label}</a>
           </li>
@@ -40,10 +89,34 @@ const links = [
       </ul>
     </nav>
 
+    <div class="site-footer__column">
+      <h2>{tr.nav.contact}</h2>
+      <dl class="site-footer__contact">
+        {channels.map((item) => (
+          <div>
+            <dt>{item.label}</dt>
+            <dd>
+              <a data-contact-link={item.channel} href={item.href ?? undefined}>
+                <span data-contact-value={item.channel} data-pending={tr.contact.pending}>
+                  {item.value ?? tr.contact.pending}
+                </span>
+              </a>
+            </dd>
+          </div>
+        ))}
+        <div>
+          <dt>{tr.contact.address}</dt>
+          <dd data-contact-value="address" data-pending={tr.contact.pending}>
+            {contact.address ?? tr.contact.pending}
+          </dd>
+        </div>
+      </dl>
+    </div>
+
     <div class="site-footer__legal">
       {siteConfig.isPrototype && <p>{tr.footer.prototypeNote}</p>}
       <p>
-        © {year} {siteConfig.brand.name}. {tr.footer.rights}
+        © {year} <span data-site-text="brandName">{siteConfig.brand.name}</span>. {tr.footer.rights}
       </p>
     </div>
   </div>
@@ -120,7 +193,7 @@ const links = [
 
   .site-footer__inner {
     display: grid;
-    gap: var(--space-6);
+    gap: var(--space-7);
     padding-block: var(--space-9) var(--space-7);
   }
 
@@ -136,32 +209,76 @@ const links = [
     font-size: 1.25rem;
   }
 
-  .site-footer__brand p {
-    margin-top: var(--space-3);
-    color: rgb(255 255 255 / 0.72);
+  .site-footer__about {
+    max-width: 38ch;
+    margin-top: var(--space-4);
+    color: rgb(255 255 255 / 0.78);
     font-size: var(--text-small);
   }
 
-  .site-footer__links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2) var(--space-5);
+  .site-footer__license {
+    margin-top: var(--space-3);
+    color: rgb(255 255 255 / 0.66);
+    font-size: var(--text-small);
   }
 
-  .site-footer__links a {
+  .site-footer__column h2 {
+    margin-bottom: var(--space-3);
+    color: rgb(255 255 255 / 0.66);
+    font-size: var(--text-small);
+    font-stretch: var(--wdth-sign);
+    font-weight: 650;
+    letter-spacing: 0;
+  }
+
+  .site-footer__column ul {
+    display: grid;
+  }
+
+  .site-footer__column a {
     display: inline-flex;
     align-items: center;
-    min-height: 2.75rem;
+    min-height: 2.5rem;
     font-weight: 550;
     text-decoration: none;
+  }
+
+  .site-footer__contact {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+  }
+
+  .site-footer__contact dt {
+    color: rgb(255 255 255 / 0.66);
+    font-size: var(--text-caption);
+  }
+
+  .site-footer__contact dd {
+    margin: 0;
+    font-weight: 550;
+  }
+
+  /* Without the detail yet the line is a note, not a link. */
+  .site-footer__contact a:not([href]),
+  .site-footer__contact [data-empty],
+  .site-footer__contact dd[data-contact-value] {
+    min-height: 0;
+    color: rgb(255 255 255 / 0.78);
+    font-weight: 400;
   }
 
   .site-footer__legal {
     display: grid;
     gap: var(--space-2);
-    max-width: 62ch;
-    color: rgb(255 255 255 / 0.72);
+    padding-top: var(--space-5);
+    border-top: 1px solid rgb(255 255 255 / 0.14);
+    color: rgb(255 255 255 / 0.66);
     font-size: var(--text-small);
+  }
+
+  .site-footer__legal p {
+    max-width: 62ch;
   }
 
   .site-footer :focus-visible {
@@ -169,19 +286,30 @@ const links = [
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .site-footer__links a:hover {
+    .site-footer__column a[href]:hover {
       text-decoration: underline;
     }
   }
 
-  @media (min-width: 56rem) {
+  @media (min-width: 40rem) {
     .site-footer__inner {
-      grid-template-columns: 1fr auto;
-      align-items: start;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .site-footer__brand,
     .site-footer__legal {
       grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .site-footer__inner {
+      grid-template-columns: minmax(0, 1.3fr) repeat(3, minmax(0, 1fr));
+      gap: var(--space-7) var(--space-6);
+    }
+
+    .site-footer__brand {
+      grid-column: auto;
     }
   }
 </style>

@@ -1,4 +1,5 @@
 import type { BookingService } from '@/application/BookingService';
+import type { JourneyArchiveEditor } from '@/application/JourneyArchiveEditor';
 import type { SiteSettingsService } from '@/application/SiteSettings';
 import type { TourCatalogEditor } from '@/application/TourCatalogEditor';
 import { tr } from '@/i18n/tr';
@@ -13,6 +14,7 @@ import { transition } from './ui/motion';
 export interface AdminServices {
   readonly bookings: BookingService;
   readonly catalog: TourCatalogEditor;
+  readonly journeys: JourneyArchiveEditor;
   readonly settings: SiteSettingsService;
   readonly exporter: ListExporter;
   readonly backup: {
@@ -41,6 +43,7 @@ const depthOf = (path: string): number =>
 export class AdminApp implements AppContext {
   readonly bookings: BookingService;
   readonly catalog: TourCatalogEditor;
+  readonly journeys: JourneyArchiveEditor;
   readonly settings: SiteSettingsService;
   readonly exporter: ListExporter;
   readonly backup: AdminServices['backup'];
@@ -61,6 +64,7 @@ export class AdminApp implements AppContext {
   ) {
     this.bookings = services.bookings;
     this.catalog = services.catalog;
+    this.journeys = services.journeys;
     this.settings = services.settings;
     this.exporter = services.exporter;
     this.backup = services.backup;
@@ -82,6 +86,7 @@ export class AdminApp implements AppContext {
     // Another tab of the panel changed the records: show them.
     addEventListener('storage', () => {
       this.catalog.reload();
+      this.journeys.reload();
       if (!this.sheet.isOpen) this.refresh();
     });
     this.route();

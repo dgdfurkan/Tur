@@ -1,0 +1,37 @@
+{
+  "tour": "karadeniz-yaylalari",
+  "title": "Karadeniz Yaylaları Turu",
+  "scene": "yayla",
+  "startDate": "2026-07-15",
+  "endDate": "2026-07-19",
+  "group": "genel",
+  "guests": 40,
+  "distanceKm": 2040,
+  "story": "Temmuz ortasında 40 misafirle beş günlük Karadeniz programı tamamlandı. Rota, Ordu'dan Ayder Yaylası'na kadar sahil yolunu izledi; Sümela Manastırı ve Uzungöl üçüncü günde gezildi.",
+  "moments": [
+    {
+      "day": 1,
+      "place": "Ordu Boztepe",
+      "scene": "teleferik",
+      "note": "Tepeye teleferikle çıkıldı; Ordu ve Karadeniz gün batımında izlendi."
+    },
+    {
+      "day": 3,
+      "place": "Sümela Manastırı",
+      "scene": "manastir",
+      "note": "Altındere Vadisi'ndeki manastıra orman içinden yürünerek çıkıldı."
+    },
+    {
+      "day": 3,
+      "place": "Uzungöl",
+      "scene": "gol",
+      "note": "Akşam, göl çevresindeki yürüyüş yolunda serbest zaman verildi."
+    },
+    {
+      "day": 4,
+      "place": "Ayder Yaylası",
+      "scene": "yayla",
+      "note": "Son gece yaylada, ahşap bir otelde konaklandı."
+    }
+  ]
+}

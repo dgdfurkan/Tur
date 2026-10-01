@@ -1,5 +1,6 @@
 ---
 import { Font } from 'astro:assets';
+import Announcement from '@/components/layout/Announcement.astro';
 import Footer from '@/components/layout/Footer.astro';
 import Header from '@/components/layout/Header.astro';
 import { assetUrl } from '@/config/paths';
@@ -19,7 +20,7 @@ const pageTitle = title ? `${title} | ${siteConfig.brand.name}` : siteConfig.bra
 ---
 
 <!doctype html>
-<html lang="tr">
+<html lang="tr" data-brand={siteConfig.brand.name}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -36,6 +37,7 @@ const pageTitle = title ? `${title} | ${siteConfig.brand.name}` : siteConfig.bra
     <a class="skip-link" href="#icerik">
       {tr.nav.skipToContent}
     </a>
+    {chrome && <Announcement />}
     {chrome && <Header />}
     <main id="icerik">
       <slot />
@@ -45,9 +47,14 @@ const pageTitle = title ? `${title} | ${siteConfig.brand.name}` : siteConfig.bra
 </html>
 
 <script>
+  import { applySiteSettings, readLocalSettings } from '@/features/site-sync/settings';
+  import { SafeStorage } from '@/infrastructure/storage/SafeStorage';
   import { watchReveals } from '@/shared/reveal';
   import { enableTilt } from '@/shared/tilt';
 
+  // On the office's device, the site shows what the panel has set there.
+  const settings = readLocalSettings(new SafeStorage());
+  if (settings) applySiteSettings(document, settings);
   watchReveals();
   enableTilt();
 </script>

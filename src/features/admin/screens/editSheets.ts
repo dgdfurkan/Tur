@@ -1,3 +1,4 @@
+import { InvalidJourneyError } from '@/application/JourneyArchiveEditor';
 import { InvalidTourError } from '@/application/TourCatalogEditor';
 import { SCENE_KEYS, type SceneKey } from '@/domain/tour/Tour';
 import { tr } from '@/i18n/tr';
@@ -15,11 +16,23 @@ import { parseLira } from './passengerForm';
 
 type Save<T> = (value: T) => void;
 
-function attempt(context: AppContext, error: HTMLElement, run: () => void, done: string): void {
+/** Runs a change made in a sheet; a refused change keeps the sheet open with the reason. */
+export function attempt(
+  context: AppContext,
+  error: HTMLElement,
+  run: () => void,
+  done: string,
+): void {
   try {
     run();
   } catch (problem) {
-    if (!(problem instanceof InvalidTourError || problem instanceof RangeError)) throw problem;
+    if (!(
+      problem instanceof InvalidTourError ||
+      problem instanceof InvalidJourneyError ||
+      problem instanceof RangeError
+    )) {
+      throw problem;
+    }
     error.textContent = tr.admin.ui.invalid;
     return;
   }

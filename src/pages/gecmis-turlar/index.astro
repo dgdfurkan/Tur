@@ -1,0 +1,191 @@
+---
+import JourneyStub from '@/components/journey/JourneyStub.astro';
+import JourneySync from '@/components/journey/JourneySync.astro';
+import Odometer from '@/components/journey/Odometer.astro';
+import PageHead from '@/components/layout/PageHead.astro';
+import SceneSprite from '@/components/scenes/SceneSprite.astro';
+import FilterChips from '@/components/ui/FilterChips.astro';
+import { journeyArchive } from '@/composition/catalog';
+import { siteConfig } from '@/config/site';
+import { JOURNEY_GROUPS, totalsOf, type Journey } from '@/domain/journey/Journey';
+import { tr } from '@/i18n/tr';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { formatKm, formatNumber } from '@/shared/format';
+
+const journeys = await journeyArchive.list();
+const totals = totalsOf(journeys);
+
+const years = new Map<number, Journey[]>();
+for (const journey of journeys) {
+  years.set(journey.year, [...(years.get(journey.year) ?? []), journey]);
+}
+
+const filters = [
+  { value: 'all', label: tr.categories.all },
+  ...JOURNEY_GROUPS.map((group) => ({ value: group, label: tr.journeys.groups[group] })),
+];
+const [sample] = journeys;
+---
+
+<BaseLayout
+  title={tr.journeys.title}
+  description="Tamamlanan turların tarihleri, misafir sayıları, rotaları ve yolculuktan notlar."
+>
+  <PageHead title={tr.journeys.title} lead={tr.journeys.lead} />
+
+  <section class="container archive-intro" aria-label={tr.journeys.odometer}>
+    <Odometer km={totals.distanceKm}>
+      <span data-journey-totals>
+        {tr.journeys.totals(
+          formatNumber(totals.count),
+          formatNumber(totals.guests),
+          formatKm(totals.distanceKm),
+        )}
+      </span>
+    </Odometer>
+  </section>
+
+  <section class="container archive" aria-label={tr.journeys.list} data-journey-archive>
+    <FilterChips name="group" legend={tr.journeys.groupFilter} options={filters} />
+
+    <div class="years" data-journey-years>
+      {[...years].map(([year, items]) => (
+        <section class="year" aria-labelledby={`yil-${year}`} data-journey-year={year}>
+          <h2 class="year__label tabular" id={`yil-${year}`}>
+            {year}
+          </h2>
+          <ul class="stub-list">
+            {items.map((journey) => (
+              <li
+                data-journey-card={journey.id}
+                data-group={journey.group}
+                data-km={journey.distanceKm}
+                data-guests={journey.guests}
+                data-start={journey.startDate}
+                data-reveal
+              >
+                <JourneyStub journey={journey} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+
+    {siteConfig.isPrototype && <p class="archive__note">{tr.journeys.sampleNote}</p>}
+
+    {
+      // Journeys recorded in the panel on this device are drawn from these, until they are published.
+      sample && (
+        <>
+          <template data-journey-card-template>
+            <li data-journey-card="" data-group="" data-km="" data-guests="" data-start="">
+              <JourneyStub journey={sample} />
+            </li>
+          </template>
+          <template data-journey-year-template>
+            <section class="year" data-journey-year="">
+              <h2 class="year__label tabular"></h2>
+              <ul class="stub-list"></ul>
+            </section>
+          </template>
+        </>
+      )
+    }
+  </section>
+
+  <SceneSprite scenes={journeys.map((journey) => journey.scene)} />
+  <JourneySync />
+</BaseLayout>
+
+<style>
+  .archive-intro {
+    padding-block: var(--space-6) var(--space-4);
+  }
+
+  .archive {
+    padding-block: var(--space-6) var(--space-section);
+  }
+
+  .years {
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  /* The year stands like a kilometre post at the side of the road through the archive. */
+  .year {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .year__label {
+    justify-self: start;
+    padding: var(--space-1) var(--space-4);
+    border-radius: var(--radius-sm);
+    background: var(--c-asphalt);
+    color: var(--c-white);
+    font-stretch: var(--wdth-display);
+    font-size: var(--text-h3);
+    font-weight: 780;
+  }
+
+  .stub-list {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 40rem) {
+    .stub-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 68rem) {
+    .stub-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .archive__note {
+    margin-top: var(--space-7);
+    max-width: 62ch;
+    color: var(--c-muted);
+    font-size: var(--text-small);
+  }
+
+  /* Filtering needs no script: the checked radio decides which journeys show. */
+  .archive:has(input[value='genel']:checked) li:not([data-group='genel']),
+  .archive:has(input[value='okul']:checked) li:not([data-group='okul']),
+  .archive:has(input[value='kurum']:checked) li:not([data-group='kurum']) {
+    display: none;
+  }
+
+  /* A year with nothing left to show leaves the list with its label. */
+  .year:not(:has(li:not([hidden]))),
+  .archive:has(input[value='genel']:checked) .year:not(:has(li[data-group='genel']:not([hidden]))),
+  .archive:has(input[value='okul']:checked) .year:not(:has(li[data-group='okul']:not([hidden]))),
+  .archive:has(input[value='kurum']:checked) .year:not(:has(li[data-group='kurum']:not([hidden]))) {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .stub-list li {
+      animation: stub-arrives 420ms var(--ease-out) backwards;
+    }
+
+    .stub-list li:nth-child(2) {
+      animation-delay: 60ms;
+    }
+
+    .stub-list li:nth-child(n + 3) {
+      animation-delay: 120ms;
+    }
+
+    @keyframes stub-arrives {
+      from {
+        opacity: 0;
+        transform: translateY(0.75rem);
+      }
+    }
+  }
+</style>

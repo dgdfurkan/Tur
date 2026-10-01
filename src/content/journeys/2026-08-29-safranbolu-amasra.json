@@ -1,0 +1,31 @@
+{
+  "tour": "safranbolu-amasra",
+  "title": "Safranbolu ve Amasra Turu",
+  "scene": "konak",
+  "startDate": "2026-08-29",
+  "endDate": "2026-08-30",
+  "group": "genel",
+  "guests": 36,
+  "distanceKm": 590,
+  "story": "Ağustosun son hafta sonunda 36 misafirle Safranbolu ve Amasra'ya gidildi. Gece Safranbolu'da tarihî bir konak otelde konaklandı; ikinci gün Amasra'da kale ve çarşı gezildi.",
+  "moments": [
+    {
+      "day": 1,
+      "place": "Safranbolu Çarşısı",
+      "scene": "carsi",
+      "note": "Cinci Hanı ve Yemeniciler Arastası rehber eşliğinde gezildi."
+    },
+    {
+      "day": 1,
+      "place": "İncekaya Su Kemeri",
+      "scene": "su-kemeri",
+      "note": "Su kemerinin üzerinden Tokatlı Kanyonu'na bakıldı."
+    },
+    {
+      "day": 2,
+      "place": "Amasra Kalesi",
+      "scene": "sahil-kalesi",
+      "note": "Ceneviz armalı surlardan Kemere Köprüsü'ne yüründü."
+    }
+  ]
+}
