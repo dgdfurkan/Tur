@@ -1,0 +1,1 @@
+var e=`/Tur/`.endsWith(`/`)?`/Tur/`:`/Tur//`;function t(t=``){let n=t.replace(/^\/+|\/+$/g,``);return n===``?e:`${e}${n}/`}export{t};
